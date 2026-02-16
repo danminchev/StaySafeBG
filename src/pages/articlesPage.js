@@ -3,13 +3,49 @@ import { renderFooter } from '../components/footer.js';
 import { getPublishedArticles } from '../services/articlesService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
-function escapeHtml(value) {
-	return String(value)
-		.replaceAll('&', '&amp;')
-		.replaceAll('<', '&lt;')
-		.replaceAll('>', '&gt;')
-		.replaceAll('"', '&quot;')
-		.replaceAll("'", '&#039;');
+// --- State ---
+const state = {
+	params: {
+		q: '',
+		category: '',
+		sort: 'newest',
+		limit: 9,
+		offset: 0
+	},
+	isLoading: false,
+	totalCount: 0,
+	loadedCount: 0
+};
+
+// --- DOM Elements ---
+const dom = {
+	container: document.getElementById('articles-container'),
+	loadMoreBtn: document.getElementById('btn-load-more'),
+	loadMoreContainer: document.getElementById('load-more-container'),
+	spinner: document.getElementById('loading-spinner'),
+	inputs: {
+		search: document.getElementById('params-search'),
+		category: document.getElementById('params-category'),
+		sort: document.getElementById('params-sort'),
+	},
+	clearBtn: document.getElementById('btn-clear'),
+	templates: {
+		article: document.getElementById('article-template'),
+		skeleton: document.getElementById('skeleton-template')
+	}
+};
+
+// --- Utilities ---
+function debounce(func, wait) {
+	let timeout;
+	return function executedFunction(...args) {
+		const later = () => {
+			clearTimeout(timeout);
+			func(...args);
+		};
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+	};
 }
 
 function formatDate(dateValue) {
@@ -18,77 +54,279 @@ function formatDate(dateValue) {
 	if (Number.isNaN(date.getTime())) return 'Без дата';
 
 	return new Intl.DateTimeFormat('bg-BG', {
-		day: '2-digit',
-		month: '2-digit',
-		year: 'numeric',
+		day: 'numeric',
+		month: 'short',
+		year: 'numeric'
 	}).format(date);
 }
 
-function renderArticles(articles) {
-	const pageContent = document.getElementById('page-content');
-	if (!pageContent) return;
-
-	const cardsHtml = articles
-		.map((article) => {
-			const excerpt = (article.content || '').slice(0, 140);
-			const safeTitle = escapeHtml(article.title || 'Без заглавие');
-			const safeExcerpt = escapeHtml(excerpt || 'Няма описание.');
-			const safeCategory = escapeHtml(article.category || 'Общи');
-			const dateLabel = formatDate(article.created_at);
-
-			return `
-				<div class="col">
-					<div class="card h-100 shadow-sm">
-						<div class="card-body d-flex flex-column">
-							<span class="badge bg-light text-dark mb-2 align-self-start">${safeCategory}</span>
-							<h5 class="card-title">${safeTitle}</h5>
-							<p class="card-text flex-grow-1">${safeExcerpt}${article.content && article.content.length > 140 ? '...' : ''}</p>
-							<a href="article-details.html?id=${article.id}" class="btn btn-outline-primary mt-2">Прочети повече</a>
-						</div>
-						<div class="card-footer text-muted">${dateLabel}</div>
-					</div>
-				</div>
-			`;
-		})
-		.join('');
-
-	pageContent.innerHTML = `
-		<h1 class="mb-4">Статии за онлайн безопасност</h1>
-		<div class="row row-cols-1 row-cols-md-3 g-4">${cardsHtml}</div>
-	`;
+function calculateReadingTime(text) {
+	const wpm = 200;
+	const words = (text || '').trim().split(/\s+/).length;
+	const time = Math.ceil(words / wpm);
+	return `~${time} мин`;
 }
 
-function renderEmptyState(message) {
-	const pageContent = document.getElementById('page-content');
-	if (!pageContent) return;
-
-	pageContent.innerHTML = `
-		<h1 class="mb-4">Статии за онлайн безопасност</h1>
-		<div class="alert alert-info">${message}</div>
-	`;
+function getCategoryColor(cat) {
+	const map = {
+		'phishing': 'bg-danger-subtle text-danger-emphasis',
+		'shopping': 'bg-success-subtle text-success-emphasis',
+		'investment': 'bg-warning-subtle text-warning-emphasis',
+		'security': 'bg-info-subtle text-info-emphasis'
+	};
+	return map[cat] || 'bg-secondary-subtle text-secondary-emphasis';
 }
 
-async function initArticlesPage() {
-	await renderHeader();
-	renderFooter();
+function getCategoryName(cat) {
+	const map = {
+		'phishing': 'Фишинг',
+		'shopping': 'Пазаруване',
+		'investment': 'Инвестиции',
+		'security': 'Сигурност',
+		'social': 'Социални мрежи'
+	};
+	return map[cat] || cat || 'Общи';
+}
 
-	if (!hasSupabaseConfig) {
-		return;
+function updateURL() {
+	const url = new URL(window.location);
+	if(state.params.q) url.searchParams.set('q', state.params.q); else url.searchParams.delete('q');
+	if(state.params.category) url.searchParams.set('category', state.params.category); else url.searchParams.delete('category');
+	if(state.params.sort !== 'newest') url.searchParams.set('sort', state.params.sort); else url.searchParams.delete('sort');
+	
+	window.history.replaceState({}, '', url);
+}
+
+function readURLParams() {
+	const params = new URLSearchParams(window.location.search);
+	state.params.q = params.get('q') || '';
+	state.params.category = params.get('category') || '';
+	state.params.sort = params.get('sort') || 'newest';
+	
+	// Sync inputs
+	if(dom.inputs.search) dom.inputs.search.value = state.params.q;
+	if(dom.inputs.category) dom.inputs.category.value = state.params.category;
+	if(dom.inputs.sort) dom.inputs.sort.value = state.params.sort;
+}
+
+// --- Rendering ---
+function showSkeletons(count = 6) {
+	if(!dom.container || !dom.templates.skeleton) return;
+	// Don't clear if appending
+	if (state.params.offset === 0) dom.container.innerHTML = '';
+	
+	const fragment = document.createDocumentFragment();
+	for (let i = 0; i < count; i++) {
+		const clone = dom.templates.skeleton.content.cloneNode(true);
+		fragment.appendChild(clone);
+	}
+	dom.container.appendChild(fragment);
+}
+
+function removeSkeletons() {
+	const skeletons = dom.container.querySelectorAll('.skeleton-wrapper');
+	skeletons.forEach(el => el.remove());
+}
+
+function renderError(message) {
+	dom.container.innerHTML = `
+		<div class="col-12 text-center py-5">
+			<div class="alert alert-danger d-inline-block" role="alert">
+				<h4 class="alert-heading">Възникна грешка!</h4>
+				<p>${message}</p>
+				<button class="btn btn-outline-danger btn-sm" onclick="location.reload()">Опитай пак</button>
+			</div>
+		</div>
+	`;
+	dom.loadMoreContainer.classList.add('d-none');
+}
+
+function renderNoResults() {
+	// Don't show empty state if we are just appending/loading more
+	if (state.params.offset > 0) return;
+
+	dom.container.innerHTML = `
+		<div class="col-12 text-center py-5 fade-in">
+			<div class="empty-state-icon">🔍</div>
+			<h3>Няма намерени статии</h3>
+			<p class="text-muted">Опитайте с други ключови думи или премахнете филтрите.</p>
+			<button class="btn btn-primary mt-2" onclick="document.getElementById('btn-clear').click()">
+				Покажи всички
+			</button>
+            <div class="mt-4">
+               <a href="report-scam.html" class="link-secondary small">Искате да докладвате измама?</a>
+            </div>
+		</div>
+	`;
+	dom.loadMoreContainer.classList.add('d-none');
+}
+
+function createCard(article) {
+	const clone = dom.templates.article.content.cloneNode(true);
+	
+	const link = clone.querySelector('.article-link-overlay');
+	link.href = `article-details.html?id=${article.id}`;
+	
+	const badge = clone.querySelector('.category-badge');
+	badge.className = `badge rounded-pill category-badge ${getCategoryColor(article.category)}`;
+	badge.textContent = getCategoryName(article.category);
+	
+	const title = clone.querySelector('.card-title');
+	title.textContent = article.title;
+	
+	const text = clone.querySelector('.card-text');
+	// Simple plaintext extraction if needed, but textContent handles simple stripping usually
+	text.textContent = (article.content || '').slice(0, 150) + '...';
+	
+	const dateSpan = clone.querySelector('.date-text');
+	dateSpan.textContent = formatDate(article.created_at);
+	
+	const timeSpan = clone.querySelector('.reading-time');
+	timeSpan.textContent = article.reading_time || calculateReadingTime(article.content);
+	
+	return clone;
+}
+
+// --- Data Fetching ---
+async function fetchArticles(isAppend = false) {
+	if (state.isLoading) return;
+	state.isLoading = true;
+	
+	if (!isAppend) {
+		state.params.offset = 0;
+		dom.loadMoreContainer.classList.add('d-none');
+		showSkeletons(6);
+	} else {
+		// Show spinner when loading more
+		dom.loadMoreBtn.classList.add('disabled');
+		dom.loadMoreBtn.textContent = 'Зареждане...';
 	}
 
 	try {
-		const articles = await getPublishedArticles();
-		if (!articles.length) {
-			// If no articles are found in the database, we keep the static HTML content
-			// instead of showing an empty state message.
-			// renderEmptyState('Все още няма публикувани статии.');
+		// Simulate network delay for UX demo if local, remove in prod
+		// await new Promise(r => setTimeout(r, 600)); 
+
+		const response = await getPublishedArticles(state.params);
+		
+		if (!isAppend) removeSkeletons();
+		
+		state.totalCount = response.count || 0;
+		const articles = response.data;
+		
+		if (articles.length === 0 && !isAppend) {
+			renderNoResults();
 			return;
 		}
 
-		renderArticles(articles);
-	} catch (error) {
-		renderEmptyState(error.message || 'Грешка при зареждане на статиите.');
+		if (articles.length > 0) {
+            // Check for demo data if database is empty but no error
+            if (response.count === null && articles.length === 0) {
+                 // Fallback to static html? No, service returns empty array.
+                 // If we are here, we have empty array from DB.
+                 renderNoResults();
+                 return;
+            }
+
+			const fragment = document.createDocumentFragment();
+			articles.forEach(article => {
+				fragment.appendChild(createCard(article));
+			});
+			dom.container.appendChild(fragment);
+		}
+		
+		state.loadedCount = isAppend ? state.loadedCount + articles.length : articles.length;
+		
+		// Handle Load More visibility
+		if (state.loadedCount < state.totalCount && state.totalCount > 0) {
+			dom.loadMoreContainer.classList.remove('d-none');
+			dom.loadMoreBtn.classList.remove('disabled');
+			dom.loadMoreBtn.textContent = 'Зареждане още статии';
+		} else {
+			dom.loadMoreContainer.classList.add('d-none');
+		}
+
+	} catch (err) {
+		console.error(err);
+		renderError('Неуспешно зареждане на статиите. Моля проверете връзката си.');
+	} finally {
+		state.isLoading = false;
 	}
 }
 
-initArticlesPage();
+// --- Initialization ---
+async function init() {
+	await renderHeader();
+	renderFooter();
+	
+	if (!hasSupabaseConfig) {
+        // If no config, maybe leave static content or show specific error?
+        // Current logic: assumes config exists or service handles it. 
+        // We will just let the service throw or return empty.
+	}
+
+	readURLParams();
+	
+	// Check if we should override the existing static HTML
+	// The requirement says "modernize articles.html". 
+	// The static HTML in articles.html IS the demo content.
+	// We should clear it initially IF we are going to fetch real data.
+	// But if DB is empty, maybe we want to keep it? 
+    // New Logic: Always fetch. If DB empty, show empty state (per requirement), 
+    // OR we can inject the "demo" data as a fallback JS array if needed.
+    // For this task, I will treat the HTML container as the target and clear it.
+    
+    // Clear static content (demo HTML) immediately so we can render skeletons/real data
+    if (dom.container) dom.container.innerHTML = '';
+	
+	// Event Listeners
+	dom.inputs.search.addEventListener('input', debounce((e) => {
+		state.params.q = e.target.value;
+		updateURL();
+		fetchArticles(false);
+	}, 400));
+	
+	dom.inputs.category.addEventListener('change', (e) => {
+		state.params.category = e.target.value;
+		updateURL();
+		fetchArticles(false);
+	});
+	
+	dom.inputs.sort.addEventListener('change', (e) => {
+		state.params.sort = e.target.value;
+		updateURL();
+		fetchArticles(false);
+	});
+	
+	dom.clearBtn.addEventListener('click', () => {
+		state.params.q = '';
+		state.params.category = '';
+		state.params.sort = 'newest';
+		
+		dom.inputs.search.value = '';
+		dom.inputs.category.value = '';
+		dom.inputs.sort.value = 'newest';
+		
+		updateURL();
+		fetchArticles(false);
+	});
+	
+	dom.loadMoreBtn.addEventListener('click', () => {
+		state.params.offset += state.params.limit;
+		fetchArticles(true);
+	});
+
+	// Sticky Toolbar Shadow Effect
+    const toolbar = document.getElementById('articles-toolbar');
+    window.addEventListener('scroll', () => {
+       if (window.scrollY > 10) {
+           toolbar.classList.add('is-stuck');
+       } else {
+           toolbar.classList.remove('is-stuck');
+       }
+    });
+
+	// Initial Fetch
+	fetchArticles(false);
+}
+
+init();

@@ -1,0 +1,151 @@
+/* Modern Articles UI Variables */
+:root {
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --transition-speed: 0.2s;
+  --backdrop-blur: blur(8px);
+}
+
+/* Sticky Toolbar */
+.articles-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.articles-toolbar.is-stuck {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Card Styling */
+.article-card {
+  border: none;
+  border-radius: 12px;
+  background: white;
+  box-shadow: var(--card-shadow);
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.article-card:hover, .article-card:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Accessibility: Focus Visible */
+.article-card:focus-within {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 4px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .article-card {
+    transition: none;
+  }
+  .article-card:hover {
+    transform: none;
+  }
+}
+
+/* Content Truncation */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Card Internals */
+.article-card .card-body {
+  padding: 1.5rem;
+}
+
+.article-meta {
+  font-size: 0.85rem;
+  color: #6c757d;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto; /* Push to bottom */
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.article-link-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Category Badge Positioning */
+.category-badge {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.7rem;
+  padding: 0.35em 0.65em;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-text { height: 1em; margin-bottom: 0.5rem; }
+.skeleton-title { height: 1.5em; margin-bottom: 1rem; width: 80%; }
+.skeleton-block { height: 150px; }
+
+/* Empty State */
+.empty-state-icon {
+  font-size: 4rem;
+  color: #dee2e6;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Toolbar */
+@media (max-width: 768px) {
+  .articles-toolbar .container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .filter-group {
+    width: 100%;
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .search-container {
+    width: 100%;
+  }
+}
