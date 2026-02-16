@@ -1,3 +1,7 @@
+import { getCurrentUser as getSupabaseCurrentUser, logoutUser } from '../services/authService.js';
+import { getUserRole } from '../services/rolesService.js';
+import { hasSupabaseConfig } from '../services/supabaseClient.js';
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll('&', '&amp;')
@@ -29,6 +33,10 @@ function getCurrentUser() {
   return null;
 }
 
+function getLocalCurrentUser() {
+  return getCurrentUser();
+}
+
 function isAdminUser(user) {
   if (!user) return false;
 
@@ -51,8 +59,37 @@ function getActivePage() {
   return path || 'index.html';
 }
 
-export function renderHeader() {
-  const currentUser = getCurrentUser();
+async function resolveCurrentUser() {
+  if (!hasSupabaseConfig) {
+    return getLocalCurrentUser();
+  }
+
+  try {
+    const user = await getSupabaseCurrentUser();
+    if (!user) return null;
+
+    let role = user.role || 'user';
+    try {
+      role = await getUserRole(user.id);
+    } catch {
+      role = user.role || 'user';
+    }
+
+    const normalizedUser = {
+      id: user.id,
+      email: user.email,
+      role,
+      username: user.firstName || user.email,
+    };
+
+    localStorage.setItem('staysafebgUser', JSON.stringify(normalizedUser));
+    return normalizedUser;
+  } catch {
+    return getLocalCurrentUser();
+  }
+}
+
+function renderHeaderHtml(currentUser) {
   const loggedIn = isLoggedIn(currentUser);
   const isAdmin = isAdminUser(currentUser);
   const userLabel = escapeHtml(currentUser?.email || currentUser?.username || 'Профил');
@@ -90,7 +127,7 @@ export function renderHeader() {
     `
     : '';
 
-  const headerHtml = `
+  return `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 ss-navbar">
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="index.html">
@@ -122,7 +159,11 @@ export function renderHeader() {
       </div>
     </nav>
   `;
+}
 
+export async function renderHeader() {
+  const currentUser = await resolveCurrentUser();
+  const headerHtml = renderHeaderHtml(currentUser);
   const container = document.getElementById('app-header');
   if (!container) return;
 
@@ -131,12 +172,25 @@ export function renderHeader() {
   const logoutButton = document.getElementById('logout-btn');
   if (!logoutButton) return;
 
-  logoutButton.addEventListener('click', () => {
-    localStorage.removeItem('staysafebgUser');
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('authToken');
+  logoutButton.addEventListener('click', async () => {
+    try {
+      if (hasSupabaseConfig) {
+        await logoutUser();
+      } else {
+        localStorage.removeItem('staysafebgUser');
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        localStorage.removeItem('authToken');
+      }
+    } catch {
+      localStorage.removeItem('staysafebgUser');
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      localStorage.removeItem('authToken');
+    }
+
     window.location.href = 'index.html';
   });
 }
