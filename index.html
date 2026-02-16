@@ -26,14 +26,24 @@
     </div>
     
     <div class="row align-items-md-stretch">
-      <div class="col-md-6">
+      <div class="col-md-7">
         <div class="h-100 p-5 text-bg-dark rounded-3">
           <h2>Последни статии</h2>
           <p>Прочетете за най-новите техники за измама и как да ги избегнете.</p>
-          <a class="btn btn-outline-light" href="articles.html">Виж статии</a>
+          
+          <div id="home-articles-list" class="mt-4 mb-4">
+              <!-- Loading spinner -->
+              <div class="d-flex justify-content-center">
+                  <div class="spinner-border text-light" role="status">
+                      <span class="visually-hidden">Зареждане...</span>
+                  </div>
+              </div>
+          </div>
+
+          <a class="btn btn-outline-light" href="articles.html">Виж всички статии</a>
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-5">
         <div class="h-100 p-5 bg-light border rounded-3">
           <h2>Доклади от общността</h2>
           <p>Вижте доклади в реално време от други потребители, за да бъдете една крачка пред измамниците.</p>
