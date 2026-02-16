@@ -53,3 +53,23 @@ export async function getArticleById(id) {
   if (error) throw error;
   return data;
 }
+
+export async function createArticle(articleData) {
+  const supabase = requireSupabase();
+  
+  // Get current user to set as author
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) throw new Error('User not authenticated');
+
+  const { data, error } = await supabase
+    .from('articles')
+    .insert([{
+        ...articleData,
+        author_id: user.id
+    }])
+    .select();
+
+  if (error) throw error;
+  return data?.[0];
+}

@@ -14,7 +14,15 @@
   <header id="app-header"></header>
   
   <main class="container py-4" id="page-content" style="display: none;">
-      <h1 class="mb-4">Админ Панел</h1>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Админ Панел</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createArticleModal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg me-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/>
+            </svg>
+            Добави Статия
+        </button>
+      </div>
        
       <div class="row mb-4">
           <div class="col-md-3">
@@ -97,6 +105,58 @@
         </table>
       </div>
   </main>
+
+  <!-- Create Article Modal -->
+  <div class="modal fade" id="createArticleModal" tabindex="-1" aria-labelledby="createArticleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createArticleModalLabel">Добавяне на нова статия</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="create-article-form">
+            <div class="mb-3">
+              <label for="article-title" class="form-label">Заглавие</label>
+              <input type="text" class="form-control" id="article-title" required>
+            </div>
+            
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="article-category" class="form-label">Категория</label>
+                    <select class="form-select" id="article-category" required>
+                        <option value="">Избери категория...</option>
+                        <option value="phishing">Фишинг</option>
+                        <option value="shopping">Пазаруване</option>
+                        <option value="investment">Инвестиции</option>
+                        <option value="security">Сигурност</option>
+                        <option value="social">Социални мрежи</option>
+                    </select>
+                </div>
+                <!-- Future improvement: Tag input -->
+            </div>
+
+            <div class="mb-3">
+              <label for="article-content" class="form-label">Съдържание</label>
+              <textarea class="form-control" id="article-content" rows="10" required placeholder="Пишете тук... Поддържа обикновен текст."></textarea>
+              <div class="form-text">Препоръчителна дължина: поне 3 параграфа.</div>
+            </div>
+
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="article-published" checked>
+              <label class="form-check-label" for="article-published">
+                Публикувай веднага
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
+          <button type="button" class="btn btn-primary" id="btn-save-article">Запази статията</button>
+        </div>
+      </div>
+    </div>
+  </div>
   
   <footer id="app-footer"></footer>
   
