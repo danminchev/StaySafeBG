@@ -5,7 +5,8 @@ export async function getPublishedArticles({ category, q, sort = 'newest', limit
   
   let query = supabase
     .from('articles')
-    .select('id, title, content, category, tags, created_at, reading_time', { count: 'exact' })
+    // removed reading_time as it doesn't exist in DB
+    .select('id, title, content, category, tags, created_at', { count: 'exact' })
     .eq('is_published', true);
 
   // Apply filters
