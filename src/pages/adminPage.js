@@ -4,6 +4,7 @@ import { getCurrentUser } from '../services/authService.js';
 import { getUserRole } from '../services/rolesService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 import { createArticle } from '../services/articlesService.js';
+import { showToast } from '../utils/notifications.js';
 
 function showForbidden(message) {
 	const container = document.getElementById('page-content');
@@ -74,7 +75,7 @@ function initArticleCreation() {
         const publishedInput = document.getElementById('article-published');
 
         if (!titleInput.value || !categoryInput.value || !contentInput.value) {
-            alert('Моля попълнете всички полета.');
+            showToast('Моля попълнете всички полета.', 'warning');
             return;
         }
 
@@ -92,7 +93,7 @@ function initArticleCreation() {
 
             await createArticle(newArticle);
 
-            alert('Статията е създадена успешно!');
+            showToast('Статията е създадена успешно!', 'success');
             
             // Close modal using Bootstrap API
             const modalEl = document.getElementById('createArticleModal');
@@ -110,7 +111,7 @@ function initArticleCreation() {
 
         } catch (error) {
             console.error('Error creating article:', error);
-            alert('Възникна грешка при създаването на статията: ' + error.message);
+            showToast('Възникна грешка при създаването на статията: ' + error.message, 'error');
         } finally {
             saveBtn.disabled = false;
             saveBtn.textContent = 'Запази статията';
