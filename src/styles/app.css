@@ -10,6 +10,64 @@ body {
     width: 100%;
 }
 
+.ss-navbar {
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+  box-shadow: 0 6px 18px rgba(44, 62, 80, 0.18);
+}
+
+.ss-navbar .btn {
+  border-radius: 0.7rem;
+  transition: all 0.2s ease;
+}
+
+.ss-navbar .ss-nav-btn,
+.ss-navbar .ss-account-btn,
+.ss-navbar .ss-profile-btn {
+  background-color: transparent;
+  border-color: var(--light-color);
+  color: var(--light-color);
+}
+
+.ss-navbar .ss-account-solid,
+.ss-navbar .ss-nav-btn-active {
+  background-color: var(--light-color);
+  border-color: var(--light-color);
+  color: var(--success-color);
+}
+
+.ss-navbar .ss-nav-btn:hover,
+.ss-navbar .ss-nav-btn:focus,
+.ss-navbar .ss-account-btn:hover,
+.ss-navbar .ss-account-btn:focus,
+.ss-navbar .ss-profile-btn:hover,
+.ss-navbar .ss-profile-btn:focus,
+.ss-navbar .ss-account-solid:hover,
+.ss-navbar .ss-account-solid:focus,
+.ss-navbar .ss-nav-btn-active:hover,
+.ss-navbar .ss-nav-btn-active:focus {
+  background-color: var(--light-color);
+  border-color: var(--light-color);
+  color: var(--success-color);
+  transform: translateY(-1px);
+}
+
+.ss-navbar .ss-nav-btn:active,
+.ss-navbar .ss-account-btn:active,
+.ss-navbar .ss-profile-btn:active,
+.ss-navbar .ss-account-solid:active,
+.ss-navbar .ss-nav-btn-active:active {
+  transform: translateY(0);
+}
+
+.ss-navbar .ss-account-solid {
+  min-width: 150px;
+}
+
+.ss-navbar .ss-nav-btn {
+  min-width: 150px;
+}
+
 .bg-primary {
   background-color: var(--primary-color) !important;
 }
