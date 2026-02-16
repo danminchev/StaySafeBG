@@ -32,11 +32,31 @@ async function initAdminPage() {
 
 		const role = await getUserRole(user.id);
 		if (role !== 'admin') {
-			showForbidden('Нямате права за достъп до админ панела.');
+			// Redirect immediately if not admin
+			window.location.replace('index.html');
+			return;
 		}
+
+		// Proceed to render admin content...
+		renderAdminContent();
+
 	} catch (error) {
-		showForbidden(error.message || 'Грешка при проверка на правата.');
+		console.error('Admin check failed:', error);
+		window.location.replace('index.html');
 	}
+}
+
+function renderAdminContent() {
+	const container = document.getElementById('page-content');
+	if (!container) return;
+
+	container.innerHTML = `
+		<div class="container mt-4">
+			<h1>Админ Панел</h1>
+			<p>Добре дошли, администратор!</p>
+			<!-- Add admin controls here -->
+		</div>
+	`;
 }
 
 initAdminPage();
