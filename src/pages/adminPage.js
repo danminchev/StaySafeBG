@@ -8,6 +8,7 @@ function showForbidden(message) {
 	const container = document.getElementById('page-content');
 	if (!container) return;
 
+    container.style.display = 'block';
 	container.innerHTML = `
 		<div class="alert alert-danger" role="alert">${message}</div>
 		<a href="index.html" class="btn btn-primary mt-2">Към началната страница</a>
@@ -49,14 +50,10 @@ async function initAdminPage() {
 function renderAdminContent() {
 	const container = document.getElementById('page-content');
 	if (!container) return;
-
-	container.innerHTML = `
-		<div class="container mt-4">
-			<h1>Админ Панел</h1>
-			<p>Добре дошли, администратор!</p>
-			<!-- Add admin controls here -->
-		</div>
-	`;
+    
+    container.style.display = 'block'; 
+    // Instead of overwriting, we can just log success or initialize specific JS components if needed.
+    console.log('Admin content rendered successfully');
 }
 
 initAdminPage();
