@@ -79,7 +79,9 @@ async function initArticlesPage() {
 	try {
 		const articles = await getPublishedArticles();
 		if (!articles.length) {
-			renderEmptyState('Все още няма публикувани статии.');
+			// If no articles are found in the database, we keep the static HTML content
+			// instead of showing an empty state message.
+			// renderEmptyState('Все още няма публикувани статии.');
 			return;
 		}
 
