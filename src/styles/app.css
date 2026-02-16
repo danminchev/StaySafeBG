@@ -1,0 +1,20 @@
+body {
+    background-color: var(--body-bg);
+    color: var(--body-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#app-header {
+    width: 100%;
+}
+
+main {
+    flex: 1;
+}
+
+#app-footer {
+    width: 100%;
+    margin-top: auto;
+}

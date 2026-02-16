@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StaySafeBG - Докладвай измама</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="./src/styles/theme.css">
+  <link rel="stylesheet" href="./src/styles/app.css">
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <header id="app-header"></header>
+  
+  <main class="container py-4" id="page-content">
+      <div class="row justify-content-center">
+          <div class="col-md-8">
+              <h2 class="mb-4">Докладвай измама</h2>
+              <p class="text-muted mb-4">Помогнете ни да защитим другите, като докладвате подозрителни дейности. Вашата информация ще бъде прегледана от нашия екип.</p>
+              
+              <form>
+                  <div class="mb-3">
+                      <label for="scamType" class="form-label">Тип измама</label>
+                      <select class="form-select" id="scamType">
+                          <option selected>Изберете тип измама...</option>
+                          <option value="phishing">Фишинг (Имейл/Сайт)</option>
+                          <option value="phone">Телефонна измама</option>
+                          <option value="investment">Инвестиционна измама</option>
+                          <option value="shopping">Онлайн пазаруване</option>
+                          <option value="romance">Романтична измама</option>
+                          <option value="other">Друго</option>
+                      </select>
+                  </div>
+                  
+                  <div class="mb-3">
+                      <label for="scamSource" class="form-label">Източник (Уебсайт, Телефон, Имейл)</label>
+                      <input type="text" class="form-control" id="scamSource" placeholder="напр. www.fake-bank.com или +359...">
+                  </div>
+                  
+                  <div class="mb-3">
+                      <label for="description" class="form-label">Описание на ситуацията</label>
+                      <textarea class="form-control" id="description" rows="5" placeholder="Моля, опишете какво се случи..."></textarea>
+                  </div>
+                  
+                  <div class="mb-3">
+                      <label for="evidence" class="form-label">Прикачи доказателство (Снимки на екрана)</label>
+                      <input class="form-control" type="file" id="evidence" multiple>
+                  </div>
+                  
+                  <div class="form-check mb-3">
+                      <input class="form-check-input" type="checkbox" value="" id="anonymous">
+                      <label class="form-check-label" for="anonymous">
+                          Искам да остана анонимен
+                      </label>
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary btn-lg">Изпрати доклад</button>
+              </form>
+          </div>
+      </div>
+  </main>
+  
+  <footer id="app-footer"></footer>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script type="module" src="./src/pages/reportScamPage.js"></script>
+</body>
+</html>
