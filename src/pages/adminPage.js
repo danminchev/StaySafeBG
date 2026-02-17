@@ -2,6 +2,7 @@ import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
 import { getCurrentUser } from '../services/authService.js';
 import { getUserRole } from '../services/rolesService.js';
+import { deleteUserByAdmin, getAdminUsers } from '../services/adminUsersService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 import { createArticle, getAdminArticles, getArticleById, updateArticle } from '../services/newsService.js';
 import { getAdminReports, getAdminReportById, getAdminReportStats, getEvidenceFileSignedUrl, updateReportStatus } from '../services/reportsService.js';
@@ -10,7 +11,9 @@ import { showToast } from '../utils/notifications.js';
 const state = {
     articles: [],
     reports: [],
-    selectedReportId: null
+    users: [],
+    selectedReportId: null,
+    currentUserId: null
 };
 
 const predefinedCategories = new Set([
@@ -35,10 +38,13 @@ const dom = {
     updateBtn: document.getElementById('btn-update-article'),
     refreshBtn: document.getElementById('btn-refresh-articles'),
     articlesBody: document.getElementById('admin-articles-body'),
+    usersRefreshBtn: document.getElementById('btn-refresh-users'),
+    usersBody: document.getElementById('admin-users-body'),
     reportsBody: document.getElementById('admin-reports-body'),
     stats: {
         pending: document.getElementById('admin-stat-pending'),
-        approved: document.getElementById('admin-stat-approved')
+        approved: document.getElementById('admin-stat-approved'),
+        users: document.getElementById('admin-stat-users')
     },
     reportReview: {
         id: document.getElementById('review-report-id'),
@@ -95,6 +101,20 @@ function formatDate(dateValue) {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
+    }).format(date);
+}
+
+function formatDateTime(dateValue) {
+    if (!dateValue) return 'Няма данни';
+    const date = new Date(dateValue);
+    if (Number.isNaN(date.getTime())) return 'Няма данни';
+
+    return new Intl.DateTimeFormat('bg-BG', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     }).format(date);
 }
 
@@ -156,6 +176,115 @@ function getReportStatusPriority(status) {
     };
 
     return priorityMap[status] ?? 99;
+}
+
+function renderUsersTable() {
+    if (!dom.usersBody) return;
+
+    dom.usersBody.textContent = '';
+
+    if (state.users.length === 0) {
+        dom.usersBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Няма потребители за показване.</td></tr>';
+        return;
+    }
+
+    state.users.forEach((user) => {
+        const row = document.createElement('tr');
+
+        const nameCell = document.createElement('td');
+        nameCell.textContent = user.full_name || 'Без име';
+
+        const emailCell = document.createElement('td');
+        emailCell.textContent = user.email || 'Без имейл';
+
+        const roleCell = document.createElement('td');
+        const roleBadge = document.createElement('span');
+        const isAdmin = user.role === 'admin';
+        roleBadge.className = `badge ${isAdmin ? 'bg-primary' : 'bg-secondary'}`;
+        roleBadge.textContent = isAdmin ? 'Админ' : 'Потребител';
+        roleCell.appendChild(roleBadge);
+
+        const createdCell = document.createElement('td');
+        createdCell.textContent = formatDate(user.created_at);
+
+        const lastLoginCell = document.createElement('td');
+        lastLoginCell.textContent = formatDateTime(user.last_sign_in_at);
+
+        const actionsCell = document.createElement('td');
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-sm btn-outline-danger';
+        deleteBtn.dataset.action = 'delete-user';
+        deleteBtn.dataset.userId = user.user_id;
+        deleteBtn.textContent = 'Изтрий';
+
+        if (user.user_id === state.currentUserId) {
+            deleteBtn.disabled = true;
+            deleteBtn.title = 'Не може да изтриете собствения си акаунт';
+        }
+
+        actionsCell.appendChild(deleteBtn);
+
+        row.appendChild(nameCell);
+        row.appendChild(emailCell);
+        row.appendChild(roleCell);
+        row.appendChild(createdCell);
+        row.appendChild(lastLoginCell);
+        row.appendChild(actionsCell);
+
+        dom.usersBody.appendChild(row);
+    });
+}
+
+async function loadAdminUsers() {
+    if (!dom.usersBody) return;
+
+    dom.usersBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Зареждане...</td></tr>';
+
+    try {
+        const users = await getAdminUsers();
+        state.users = users || [];
+        if (dom.stats.users) {
+            dom.stats.users.textContent = state.users.length.toLocaleString('bg-BG');
+        }
+        renderUsersTable();
+    } catch (error) {
+        console.error('Error loading users:', error);
+        dom.usersBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Грешка при зареждане на потребители.</td></tr>';
+        if (dom.stats.users) {
+            dom.stats.users.textContent = '-';
+        }
+        showToast('Неуспешно зареждане на потребители.', 'error');
+    }
+}
+
+async function deleteAdminUser(userId, button) {
+    if (!userId) return;
+
+    const user = state.users.find((currentUser) => currentUser.user_id === userId);
+    const displayName = user?.full_name || user?.email || 'този потребител';
+    const isConfirmed = window.confirm(`Сигурни ли сте, че искате да изтриете ${displayName}?`);
+    if (!isConfirmed) return;
+
+    const originalText = button?.textContent || 'Изтрий';
+
+    try {
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Изтриване...';
+        }
+
+        await deleteUserByAdmin(userId);
+        showToast('Потребителят е изтрит успешно.', 'success');
+        await loadAdminUsers();
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        showToast('Неуспешно изтриване на потребителя.', 'error');
+    } finally {
+        if (button) {
+            button.textContent = originalText;
+        }
+    }
 }
 
 function renderReportsTable() {
@@ -502,6 +631,8 @@ async function initAdminPage() {
 			return;
 		}
 
+        state.currentUserId = user.id;
+
 		// Proceed to render admin content...
 		renderAdminContent();
 
@@ -523,9 +654,34 @@ function renderAdminContent() {
     initArticleCreation();
 	initArticleEditing();
 	initReportReviewing();
+	initUserManagement();
 	loadAdminReports();
 	loadAdminReportStats();
 	loadAdminArticles();
+	loadAdminUsers();
+}
+
+function initUserManagement() {
+    if (dom.usersRefreshBtn) {
+        dom.usersRefreshBtn.addEventListener('click', () => {
+            loadAdminUsers();
+        });
+    }
+
+    if (dom.usersBody) {
+        dom.usersBody.addEventListener('click', async (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+
+            const deleteButton = target.closest('button[data-action="delete-user"]');
+            if (!deleteButton) return;
+
+            const userId = deleteButton.dataset.userId;
+            if (!userId) return;
+
+            await deleteAdminUser(userId, deleteButton);
+        });
+    }
 }
 
 function initReportReviewing() {
