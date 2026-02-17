@@ -32,6 +32,15 @@ function getCategoryName(categoryKey) {
     return categories[categoryKey] || categoryKey || 'Новини';
 }
 
+function getCategoryIcon(categoryKey) {
+    const icons = {
+        'phone': 'bi-telephone-fill',
+        'security': 'bi-shield-lock-fill'
+    };
+
+    return icons[categoryKey] || 'bi-tag-fill';
+}
+
 function renderLatestArticles(articles) {
     const listContainer = document.getElementById('home-articles-list');
     if (!listContainer) return;
@@ -53,11 +62,13 @@ function renderLatestArticles(articles) {
         const dateStr = formatDate(article.created_at);
         const categoryKey = article.category || 'other';
         const categoryLabel = getCategoryName(categoryKey);
+        const categoryIcon = getCategoryIcon(categoryKey);
+        const isIconOnlyCategory = categoryKey === 'phone' || categoryKey === 'security';
         
         wrapper.innerHTML = `
             <div class="news-card-header">
                 <span class="news-badge" data-category="${categoryKey}">
-                    <i class="bi bi-tag-fill me-1"></i><span class="cat-text"></span>
+                    <i class="bi ${categoryIcon}"></i><span class="cat-text"></span>
                 </span>
                 <time class="news-date">
                     <i class="bi bi-calendar3 me-1"></i>${dateStr}
@@ -70,7 +81,18 @@ function renderLatestArticles(articles) {
         `;
         
         // Securely set text content
-        wrapper.querySelector('.cat-text').textContent = categoryLabel;
+        const badgeElement = wrapper.querySelector('.news-badge');
+        const categoryTextElement = wrapper.querySelector('.cat-text');
+
+        if (isIconOnlyCategory) {
+            badgeElement.classList.add('icon-only');
+            badgeElement.setAttribute('title', categoryLabel);
+            badgeElement.setAttribute('aria-label', categoryLabel);
+            categoryTextElement.textContent = '';
+        } else {
+            categoryTextElement.textContent = categoryLabel;
+        }
+
         wrapper.querySelector('.article-link').textContent = article.title;
         
         listContainer.appendChild(wrapper);
