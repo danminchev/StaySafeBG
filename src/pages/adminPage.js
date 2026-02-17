@@ -130,6 +130,20 @@ function getReportStatusMeta(status) {
     return statusMap[status] || { label: status || 'Неизвестен', className: 'bg-secondary' };
 }
 
+function getReportTypeName(report) {
+    const scamType = report?.scam_type?.trim();
+    if (scamType) {
+        const normalizedType = scamType.toLowerCase();
+        if (predefinedCategories.has(normalizedType) || normalizedType === 'other') {
+            return getCategoryName(normalizedType);
+        }
+
+        return scamType;
+    }
+
+    return getCategoryName(report?.category);
+}
+
 function getReportSource(report) {
     return report.url || report.phone || report.iban || 'Не е посочен';
 }
@@ -166,7 +180,7 @@ function renderReportsTable() {
         dateCell.textContent = formatDate(report.created_at);
 
         const typeCell = document.createElement('td');
-        typeCell.textContent = report.scam_type || getCategoryName(report.category);
+        typeCell.textContent = getReportTypeName(report);
 
         const sourceCell = document.createElement('td');
         sourceCell.textContent = getReportSource(report);
@@ -308,7 +322,7 @@ async function openReportReview(reportId) {
         const report = await getAdminReportById(reportId);
         const statusMeta = getReportStatusMeta(report.status);
         dom.reportReview.title.textContent = report.title || 'Без заглавие';
-        dom.reportReview.type.textContent = report.scam_type || 'Не е посочен';
+        dom.reportReview.type.textContent = getReportTypeName(report) || 'Не е посочен';
         dom.reportReview.category.textContent = getCategoryName(report.category);
         dom.reportReview.source.textContent = getReportSource(report);
         dom.reportReview.description.textContent = report.description || 'Без описание';
