@@ -22,6 +22,35 @@
       .hero-section .text-muted {
         color: #dbe7f5 !important;
       }
+        .hero-title-interactive {
+          position: relative;
+          display: inline-block;
+          padding-bottom: 0.55rem;
+        }
+        .hero-title-interactive::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          height: 3px;
+          border-radius: 999px;
+          background-color: #c9a45a;
+            transform: scaleX(1);
+          transform-origin: left center;
+            transition: box-shadow 0.28s ease;
+        }
+        .hero-title-interactive:hover::after,
+        .hero-title-interactive:focus-visible::after {
+          box-shadow: 0 0 10px rgba(201, 164, 90, 0.55);
+        }
+        .hero-subtitle {
+          transition: color 0.28s ease;
+        }
+        .hero-title-interactive:hover + .hero-subtitle,
+        .hero-title-interactive:focus-visible + .hero-subtitle {
+          color: #c9a45a !important;
+        }
         .hero-brand {
           color: #c4e6f8;
         }
@@ -71,8 +100,8 @@
   <main class="container py-5" id="page-content">
     <div class="p-5 mb-5 hero-section rounded-4 shadow-sm text-center position-relative overflow-hidden fade-in">
       <div class="container-fluid py-4 position-relative z-1">
-        <h1 class="display-4 fw-bold text-heading mb-3">Добре дошли в <span class="hero-brand">StaySafe</span><span class="hero-brand-bg">BG</span></h1>
-        <p class="col-md-8 mx-auto fs-5 text-muted mb-4">Вашият надежден помощник за онлайн безопасност и превенция на измами в България. Бъдете информирани и защитени.</p>
+        <h1 class="display-4 fw-bold text-heading mb-3 hero-title-interactive">Добре дошли в <span class="hero-brand">StaySafe</span><span class="hero-brand-bg">BG</span></h1>
+        <p class="col-md-8 mx-auto fs-5 text-muted mb-4 hero-subtitle">Вашият надежден помощник за онлайн безопасност и превенция на измами в България. Бъдете информирани и защитени.</p>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
           <a class="btn hero-btn-primary btn-lg px-4 rounded-pill shadow-sm" href="scam-check.html">
                 <i class="bi bi-shield-check me-2"></i>Провери за измама
