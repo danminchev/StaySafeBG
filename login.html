@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="google" content="notranslate" />
+  <meta http-equiv="Content-Language" content="bg">
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StaySafeBG - Login</title>
@@ -17,14 +18,14 @@
       <div class="row justify-content-center">
           <div class="col-md-6 col-lg-4">
             <h2 class="text-center mb-4 text-primary">Вход</h2>
-            <form>
+            <form lang="bg" autocomplete="on">
             <div class="mb-3">
                 <label for="email" class="form-label">Имейл адрес</label>
-                <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
+              <input type="email" class="form-control" id="email" name="email" autocomplete="username" aria-describedby="emailHelp">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Парола</label>
-                <input type="password" class="form-control" id="password">
+              <input type="password" class="form-control" id="password" name="password" autocomplete="current-password">
             </div>
             <button type="submit" class="btn btn-primary w-100">Влез</button>
             </form>
