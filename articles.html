@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StaySafeBG - Articles</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="./src/styles/theme.css">
   <link rel="stylesheet" href="./src/styles/app.css">
   <link rel="stylesheet" href="./src/styles/articles.css">
@@ -16,39 +17,38 @@
   
   <div class="articles-toolbar" id="articles-toolbar">
     <div class="container">
-      <div class="row g-3 align-items-center">
+      <div class="row g-3 align-items-center justify-content-between">
         <!-- Search -->
-        <div class="col-md-5 col-lg-6">
-          <div class="input-group">
-            <span class="input-group-text bg-white border-end-0">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search text-muted" viewBox="0 0 16 16">
-                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-              </svg>
-            </span>
-            <input type="text" id="params-search" class="form-control border-start-0" placeholder="Търсене на статии..." aria-label="Търсене">
+        <div class="col-md-5 col-lg-5 search-container">
+          <div class="input-group search-input-group">
+            <input type="text" id="params-search" class="form-control" placeholder="Търсене на статии..." aria-label="Търсене">
+            <button class="btn btn-outline-secondary border-start-0 border" type="button">
+                <i class="bi bi-search"></i>
+            </button>
           </div>
         </div>
         
         <!-- Filters -->
-         <div class="col-md-7 col-lg-6">
+         <div class="col-md-7 col-lg-7 filter-group">
            <div class="d-flex gap-2">
-            <select class="form-select" id="params-category" aria-label="Категория">
-              <option value="">Всички категории</option>
-              <option value="phishing">Фишинг</option>
-              <option value="shopping">Пазаруване</option>
-              <option value="investment">Инвестиции</option>
-              <option value="security">Сигурност</option>
-              <option value="social">Социални мрежи</option>
+            <select class="form-select custom-select" id="params-category" aria-label="Категория">
+              <option value="" selected>Всички категории</option>
+              <option value="phishing">🎣 Фишинг</option>
+              <option value="identity_theft">🆔 Кражба на самоличност</option>
+              <option value="online_shopping">🛒 Онлайн пазаруване</option>
+              <option value="investment">📈 Инвестиции</option>
+              <option value="tech_support">💻 Техническа поддръжка</option>
+              <option value="job_scams">💼 Работа</option>
             </select>
             
-            <select class="form-select" id="params-sort" aria-label="Сортиране">
-              <option value="newest">Най-нови</option>
-              <option value="oldest">Най-стари</option>
-              <option value="az">А-Я</option>
+            <select class="form-select custom-select" id="params-sort" aria-label="Сортиране" style="max-width: 140px;">
+              <option value="newest">📅 Нови</option>
+              <option value="oldest">📅 Стари</option>
+              <option value="az">🔤 А-Я</option>
             </select>
 
-            <button class="btn btn-outline-secondary" id="btn-clear" title="Изчисти филтрите">
-               &times;
+            <button class="btn btn-outline-danger rounded-circle shadow-sm" id="btn-clear" title="Изчисти филтрите" style="width: 2.8rem; height: 2.8rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+               <i class="bi bi-x-lg"></i>
             </button>
            </div>
          </div>
@@ -75,19 +75,30 @@
   </main>
   
   <template id="article-template">
-      <div class="col">
+      <div class="col fade-in">
           <article class="article-card h-100">
             <a href="#" class="article-link-overlay" aria-label="Read more"></a>
-            <div class="card-body d-flex flex-column">
-              <div class="mb-3">
-                 <span class="badge rounded-pill category-badge">Category</span>
+            <div class="card-body">
+              <div class="article-header">
+                 <span class="category-badge">Category</span>
+                 <!-- Date moved here if desired, but I'll stick to bottom meta -->
               </div>
-              <h5 class="card-title fw-bold text-dark mb-2 line-clamp-2">Title</h5>
-              <p class="card-text text-muted line-clamp-3 mb-4 flex-grow-1">Excerpt</p>
+              <h5 class="article-title text-dark line-clamp-2">Title</h5>
+              <p class="article-excerpt line-clamp-3">Excerpt</p>
               
               <div class="article-meta">
-                  <span class="text-nowrap date-text">Date</span>
-                  <span class="text-nowrap reading-time">~3 мин</span>
+                  <span class="meta-item">
+                     <i class="bi bi-calendar3"></i>
+                     <span class="date-text">Date</span>
+                  </span>
+                  <span class="meta-item">
+                     <i class="bi bi-clock"></i>
+                     <span class="reading-time">~3 мин</span>
+                  </span>
+                  <span class="read-more-btn ms-auto">
+                    Прочети
+                    <i class="bi bi-arrow-right"></i>
+                  </span>
               </div>
             </div>
           </article>

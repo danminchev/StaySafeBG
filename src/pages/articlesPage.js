@@ -79,13 +79,17 @@ function getCategoryColor(cat) {
 
 function getCategoryName(cat) {
 	const map = {
-		'phishing': 'Фишинг',
-		'shopping': 'Пазаруване',
-		'investment': 'Инвестиции',
-		'security': 'Сигурност',
-		'social': 'Социални мрежи'
+		'phishing': '🎣 Фишинг',
+		'shopping': '🛒 Пазаруване',
+		'online_shopping': '🛒 Онлайн пазаруване',
+		'investment': '📈 Инвестиции',
+		'security': '🛡️ Сигурност',
+		'identity_theft': '🆔 Самоличност',
+		'tech_support': '💻 Тех. поддръжка',
+		'job_scams': '💼 Работа',
+		'social': '💬 Социални мрежи'
 	};
-	return map[cat] || cat || 'Общи';
+	return map[cat] || cat || '📰 Общи';
 }
 
 function updateURL() {
@@ -131,8 +135,8 @@ function removeSkeletons() {
 function renderError(message) {
 	dom.container.innerHTML = `
 		<div class="col-12 text-center py-5">
-			<div class="alert alert-danger d-inline-block" role="alert">
-				<h4 class="alert-heading">Възникна грешка!</h4>
+			<div class="alert alert-danger d-inline-block shadow-sm rounded-3" role="alert">
+				<h4 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Възникна грешка!</h4>
 				<p>${message}</p>
 				<button class="btn btn-outline-danger btn-sm" onclick="location.reload()">Опитай пак</button>
 			</div>
@@ -146,15 +150,17 @@ function renderNoResults() {
 	if (state.params.offset > 0) return;
 
 	dom.container.innerHTML = `
-		<div class="col-12 text-center py-5 fade-in">
-			<div class="empty-state-icon">🔍</div>
+		<div class="col-12 text-center py-5 fade-in empty-state">
+			<div class="empty-state-icon"><i class="bi bi-search"></i></div>
 			<h3>Няма намерени статии</h3>
 			<p class="text-muted">Опитайте с други ключови думи или премахнете филтрите.</p>
-			<button class="btn btn-primary mt-2" onclick="document.getElementById('btn-clear').click()">
+			<button class="btn btn-primary mt-2 rounded-pill px-4" onclick="document.getElementById('btn-clear').click()">
 				Покажи всички
 			</button>
             <div class="mt-4">
-               <a href="report-scam.html" class="link-secondary small">Искате да докладвате измама?</a>
+               <a href="report-scam.html" class="link-secondary small text-decoration-none">
+                 <i class="bi bi-shield-exclamation"></i> Искате да докладвате измама?
+               </a>
             </div>
 		</div>
 	`;
@@ -164,25 +170,37 @@ function renderNoResults() {
 function createCard(article) {
 	const clone = dom.templates.article.content.cloneNode(true);
 	
+	// Apply category class and data attribute to the card root
+	const card = clone.querySelector('.article-card');
+	if(card) {
+		card.dataset.category = article.category || 'default';
+	}
+	
 	const link = clone.querySelector('.article-link-overlay');
-	link.href = `article-details.html?id=${article.id}`;
+	if(link) link.href = `article-details.html?id=${article.id}`;
 	
 	const badge = clone.querySelector('.category-badge');
-	badge.className = `badge rounded-pill category-badge ${getCategoryColor(article.category)}`;
-	badge.textContent = getCategoryName(article.category);
+	if(badge) {
+		badge.textContent = getCategoryName(article.category);
+		// Note: The color is handled by CSS based on data-category
+	}
 	
-	const title = clone.querySelector('.card-title');
-	title.textContent = article.title;
+	const title = clone.querySelector('.article-title');
+	if(title) title.textContent = article.title;
 	
-	const text = clone.querySelector('.card-text');
-	// Simple plaintext extraction if needed, but textContent handles simple stripping usually
-	text.textContent = (article.content || '').slice(0, 150) + '...';
+	const text = clone.querySelector('.article-excerpt');
+	// Simple text stripping/truncation
+	if(text) {
+		const rawText = article.content || '';
+        // Basic strip html logic if needed, or rely on textContent
+		text.textContent = rawText.slice(0, 150) + (rawText.length > 150 ? '...' : '');
+	}
 	
 	const dateSpan = clone.querySelector('.date-text');
-	dateSpan.textContent = formatDate(article.created_at);
+	if(dateSpan) dateSpan.textContent = formatDate(article.created_at);
 	
 	const timeSpan = clone.querySelector('.reading-time');
-	timeSpan.textContent = article.reading_time || calculateReadingTime(article.content);
+	if(timeSpan) timeSpan.textContent = article.reading_time || calculateReadingTime(article.content);
 	
 	return clone;
 }
