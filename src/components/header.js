@@ -97,6 +97,7 @@ function renderHeaderHtml(currentUser) {
   const ctaClass = 'btn ss-nav-btn fw-semibold px-4 py-2 fs-5 border-2';
   const accountClass = 'btn ss-account-btn fw-semibold px-4 py-2 fs-5 border-2';
 
+  const homeIsActive = activePage === 'index.html';
   const checkIsActive = activePage === 'scam-check.html';
   const reportIsActive = activePage === 'report-scam.html';
   const articlesIsActive = activePage === 'news.html' || activePage === 'news-details.html';
@@ -141,6 +142,9 @@ function renderHeaderHtml(currentUser) {
 
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav mx-lg-auto mb-2 mb-lg-0 align-items-lg-center">
+            <li class="nav-item mt-2 mt-lg-0 me-lg-2">
+              <a class="${ctaClass} ${homeIsActive ? 'ss-nav-btn-active' : ''}" href="index.html">Начало</a>
+            </li>
             <li class="nav-item mt-2 mt-lg-0 me-lg-2">
               <a class="${ctaClass} ${checkIsActive ? 'ss-nav-btn-active' : ''}" href="scam-check.html">Провери</a>
             </li>
