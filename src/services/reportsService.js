@@ -93,6 +93,24 @@ export async function getApprovedReportsFeed({ limit = 20, offset = 0 } = {}) {
   };
 }
 
+export async function getApprovedReportById(reportId) {
+  const supabase = requireSupabase();
+
+  const { data, error } = await supabase
+    .from('scam_reports')
+    .select('id, created_at, category, scam_type, title, description, url, phone, iban, report_files(id, file_path, mime_type, created_at)')
+    .eq('id', reportId)
+    .eq('status', 'approved')
+    .single();
+
+  if (error) throw error;
+
+  return {
+    ...data,
+    files: data?.report_files || [],
+  };
+}
+
 export async function getAdminReportStats() {
   const supabase = requireSupabase();
 

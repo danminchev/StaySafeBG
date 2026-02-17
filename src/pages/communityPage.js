@@ -69,11 +69,21 @@ function renderReports(reports) {
   reports.forEach((report) => {
     const fragment = template.content.cloneNode(true);
 
+    const cardEl = fragment.querySelector('.article-card');
+    const linkEl = fragment.querySelector('.article-link-overlay');
     const categoryBadge = fragment.querySelector('.category-badge');
     const dateEl = fragment.querySelector('.community-date');
     const titleEl = fragment.querySelector('.article-title');
     const excerptEl = fragment.querySelector('.article-excerpt');
     const sourceEl = fragment.querySelector('.community-source');
+
+    if (cardEl) {
+      cardEl.dataset.category = report.category || 'other';
+    }
+
+    if (linkEl) {
+      linkEl.href = `article-details.html?id=${report.id}`;
+    }
 
     categoryBadge.textContent = getCategoryName(report.category);
     dateEl.textContent = formatDate(report.created_at);
