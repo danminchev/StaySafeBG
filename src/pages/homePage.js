@@ -1,6 +1,6 @@
 import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
-import { getPublishedArticles } from '../services/articlesService.js';
+import { getPublishedArticles } from '../services/newsService.js';
 import { getApprovedReports } from '../services/reportsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 import '../styles/home.css';
@@ -56,7 +56,7 @@ function renderLatestArticles(articles) {
     if (!listContainer) return;
 
     if (articles.length === 0) {
-        listContainer.innerHTML = '<p class="text-white-50">Все още няма публикувани статии.</p>';
+        listContainer.innerHTML = '<p class="text-white-50">Все още няма публикувани новини.</p>';
         return;
     }
 

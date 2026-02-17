@@ -1,6 +1,6 @@
 import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
-import { getArticleById } from '../services/articlesService.js';
+import { getArticleById } from '../services/newsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
 function escapeHtml(value) {
@@ -18,7 +18,7 @@ function renderMessage(message) {
 
 	pageContent.innerHTML = `
 		<div class="alert alert-info">${message}</div>
-		<a href="articles.html" class="btn btn-secondary mt-3">Обратно към статиите</a>
+		<a href="news.html" class="btn btn-secondary mt-3">Обратно към новините</a>
 	`;
 }
 
@@ -33,7 +33,7 @@ function renderArticle(article) {
 	pageContent.innerHTML = `
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><a href="articles.html">Статии</a></li>
+				<li class="breadcrumb-item"><a href="news.html">Новини</a></li>
 				<li class="breadcrumb-item active" aria-current="page">${title}</li>
 			</ol>
 		</nav>
@@ -43,7 +43,7 @@ function renderArticle(article) {
 			<p style="white-space: pre-line;">${content}</p>
 		</article>
 		<div class="mt-4">
-			<a href="articles.html" class="btn btn-secondary">Обратно към статиите</a>
+			<a href="news.html" class="btn btn-secondary">Обратно към новините</a>
 		</div>
 	`;
 }
@@ -58,20 +58,20 @@ async function initArticleDetailsPage() {
 
 	const id = new URLSearchParams(window.location.search).get('id');
 	if (!id) {
-		renderMessage('Липсва идентификатор на статията.');
+		renderMessage('Липсва идентификатор на новината.');
 		return;
 	}
 
 	try {
 		const article = await getArticleById(id);
 		if (!article) {
-			renderMessage('Статията не е намерена или не е достъпна.');
+			renderMessage('Новината не е намерена или не е достъпна.');
 			return;
 		}
 
 		renderArticle(article);
 	} catch (error) {
-		renderMessage(error.message || 'Грешка при зареждане на статията.');
+		renderMessage(error.message || 'Грешка при зареждане на новината.');
 	}
 }
 

@@ -1,6 +1,6 @@
 import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
-import { getPublishedArticles } from '../services/articlesService.js';
+import { getPublishedArticles } from '../services/newsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
 // --- State ---
@@ -158,7 +158,7 @@ function renderNoResults() {
 	dom.container.innerHTML = `
 		<div class="col-12 text-center py-5 fade-in empty-state">
 			<div class="empty-state-icon"><i class="bi bi-search"></i></div>
-			<h3>Няма намерени статии</h3>
+			<h3>Няма намерени новини</h3>
 			<p class="text-muted">Опитайте с други ключови думи или премахнете филтрите.</p>
 			<button class="btn btn-primary mt-2 rounded-pill px-4" onclick="document.getElementById('btn-clear').click()">
 				Покажи всички
@@ -264,14 +264,14 @@ async function fetchArticles(isAppend = false) {
 		if (state.loadedCount < state.totalCount && state.totalCount > 0) {
 			dom.loadMoreContainer.classList.remove('d-none');
 			dom.loadMoreBtn.classList.remove('disabled');
-			dom.loadMoreBtn.textContent = 'Зареждане още статии';
+			dom.loadMoreBtn.textContent = 'Зареждане още новини';
 		} else {
 			dom.loadMoreContainer.classList.add('d-none');
 		}
 
 	} catch (err) {
 		console.error(err);
-		renderError('Неуспешно зареждане на статиите. Моля проверете връзката си.');
+		renderError('Неуспешно зареждане на новините. Моля проверете връзката си.');
 	} finally {
 		state.isLoading = false;
 	}
@@ -291,8 +291,8 @@ async function init() {
 	readURLParams();
 	
 	// Check if we should override the existing static HTML
-	// The requirement says "modernize articles.html". 
-	// The static HTML in articles.html IS the demo content.
+	// The requirement says "modernize news.html". 
+	// The static HTML in news.html IS the demo content.
 	// We should clear it initially IF we are going to fetch real data.
 	// But if DB is empty, maybe we want to keep it? 
     // New Logic: Always fetch. If DB empty, show empty state (per requirement), 

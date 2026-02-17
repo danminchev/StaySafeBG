@@ -3,7 +3,7 @@ import { renderFooter } from '../components/footer.js';
 import { getCurrentUser } from '../services/authService.js';
 import { getUserRole } from '../services/rolesService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
-import { createArticle, getAdminArticles, getArticleById, updateArticle } from '../services/articlesService.js';
+import { createArticle, getAdminArticles, getArticleById, updateArticle } from '../services/newsService.js';
 import { getAdminReports, getAdminReportById, getAdminReportStats, getEvidenceFileSignedUrl, updateReportStatus } from '../services/reportsService.js';
 import { showToast } from '../utils/notifications.js';
 
@@ -405,7 +405,7 @@ function renderArticlesTable() {
         const cell = document.createElement('td');
         cell.colSpan = 5;
         cell.className = 'text-center text-muted py-4';
-        cell.textContent = 'Няма налични статии.';
+        cell.textContent = 'Няма налични новини.';
         row.appendChild(cell);
         dom.articlesBody.appendChild(row);
         return;
@@ -460,8 +460,8 @@ async function loadAdminArticles() {
         renderArticlesTable();
     } catch (error) {
         console.error('Error loading admin articles:', error);
-        dom.articlesBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Грешка при зареждане на статии.</td></tr>';
-        showToast('Неуспешно зареждане на статии.', 'error');
+        dom.articlesBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Грешка при зареждане на новини.</td></tr>';
+        showToast('Неуспешно зареждане на новини.', 'error');
     }
 }
 
@@ -581,7 +581,7 @@ function initArticleCreation() {
 
             await createArticle(newArticle);
 
-            showToast('Статията е създадена успешно!', 'success');
+            showToast('Новината е създадена успешно!', 'success');
 
             closeModal('createArticleModal');
 
@@ -592,10 +592,10 @@ function initArticleCreation() {
 
         } catch (error) {
             console.error('Error creating article:', error);
-            showToast('Възникна грешка при създаването на статията: ' + error.message, 'error');
+            showToast('Възникна грешка при създаването на новината: ' + error.message, 'error');
         } finally {
             saveBtn.disabled = false;
-            saveBtn.textContent = 'Запази статията';
+            saveBtn.textContent = 'Запази новината';
         }
     });
 }
@@ -622,7 +622,7 @@ function initArticleEditing() {
                 editButton.disabled = true;
                 const article = await getArticleById(articleId);
                 if (!article) {
-                    showToast('Статията не беше намерена.', 'warning');
+                    showToast('Новината не беше намерена.', 'warning');
                     return;
                 }
 
@@ -642,7 +642,7 @@ function initArticleEditing() {
                 openModal('editArticleModal');
             } catch (error) {
                 console.error('Error opening article editor:', error);
-                showToast('Неуспешно отваряне на статия за редакция.', 'error');
+                showToast('Неуспешно отваряне на новина за редакция.', 'error');
             } finally {
                 editButton.disabled = false;
             }
@@ -680,7 +680,7 @@ function initArticleEditing() {
                     tags: []
                 });
 
-                showToast('Статията е обновена успешно.', 'success');
+                showToast('Новината е обновена успешно.', 'success');
                 closeModal('editArticleModal');
                 await loadAdminArticles();
             } catch (error) {

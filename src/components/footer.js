@@ -39,7 +39,7 @@ export function renderFooter() {
                 <li><a href="index.html">Начало</a></li>
                 <li><a href="scam-check.html">Провери измама</a></li>
                 <li><a href="report-scam.html">Докладвай измама</a></li>
-                <li><a href="articles.html">Статии</a></li>
+                <li><a href="news.html">Новини</a></li>
               </ul>
             </div>
           </div>
