@@ -99,6 +99,12 @@
         .home-popup-theme .feature-icon {
           background-color: rgba(127, 220, 114, 0.18) !important;
           color: #7fdc72 !important;
+          border: 1px solid rgba(127, 220, 114, 0.45);
+        }
+        .home-popup-theme .feature-icon.feature-icon-news {
+          background-color: rgba(255, 193, 7, 0.18) !important;
+          color: #ffc107 !important;
+          border: 1px solid rgba(255, 193, 7, 0.45);
         }
         .home-popup-theme .btn-outline-secondary {
           border-color: rgba(255, 255, 255, 0.38);
@@ -147,11 +153,14 @@
       <div class="col-md-6">
         <div class="h-100 p-5 text-white latest-news-container home-popup-theme rounded-4 shadow-lg position-relative overflow-hidden">
           <div class="position-relative z-1">
-            <h2 class="fw-bold mb-3">
-              <a href="articles.html" class="text-reset text-decoration-none">
-                <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Последни новини
-              </a>
-            </h2>
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="feature-icon feature-icon-news mb-0">
+                <i class="bi bi-lightning-charge-fill"></i>
+              </div>
+              <h2 class="fw-bold mb-0">
+                <a href="articles.html" class="text-reset text-decoration-none">Последни новини</a>
+              </h2>
+            </div>
             <p class="text-white-50 mb-4">Научете за най-новите схеми и защитете себе си и близките си.</p>
             
             <div id="home-articles-list" class="mt-4 mb-4 d-flex flex-column gap-3">

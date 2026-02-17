@@ -43,6 +43,7 @@ function getCategoryName(categoryKey) {
 
 function getCategoryIcon(categoryKey) {
     const icons = {
+        'phishing': 'bi-envelope-exclamation-fill',
         'phone': 'bi-telephone-fill',
         'security': 'bi-shield-lock-fill'
     };
@@ -139,7 +140,7 @@ function renderApprovedReports(reports) {
         const categoryKey = report.category || 'other';
         const categoryLabel = getCategoryName(categoryKey);
         const categoryIcon = getCategoryIcon(categoryKey);
-        const isIconOnlyCategory = categoryKey === 'phone' || categoryKey === 'security';
+        const isIconOnlyCategory = categoryKey === 'phone' || categoryKey === 'security' || categoryKey === 'phishing';
 
         wrapper.innerHTML = `
             <div class="news-card-header">
