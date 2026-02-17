@@ -15,6 +15,7 @@ export default defineConfig({
         articleDetails: resolve(__dirname, 'article-details.html'),
         scamCheck: resolve(__dirname, 'scam-check.html'),
         reportScam: resolve(__dirname, 'report-scam.html'),
+        community: resolve(__dirname, 'community.html'),
         admin: resolve(__dirname, 'admin.html')
       }
     }

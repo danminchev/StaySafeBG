@@ -100,6 +100,7 @@ function renderHeaderHtml(currentUser) {
   const checkIsActive = activePage === 'scam-check.html';
   const reportIsActive = activePage === 'report-scam.html';
   const articlesIsActive = activePage === 'articles.html' || activePage === 'article-details.html';
+  const communityIsActive = activePage === 'community.html';
 
   const accountActionsHtml = loggedIn
     ? `
@@ -148,6 +149,9 @@ function renderHeaderHtml(currentUser) {
             </li>
             <li class="nav-item mt-2 mt-lg-0">
               <a class="${ctaClass} ${articlesIsActive ? 'ss-nav-btn-active' : ''}" href="articles.html">Статии</a>
+            </li>
+            <li class="nav-item mt-2 mt-lg-0 ms-lg-2">
+              <a class="${ctaClass} ${communityIsActive ? 'ss-nav-btn-active' : ''}" href="community.html">Общност</a>
             </li>
           </ul>
 
