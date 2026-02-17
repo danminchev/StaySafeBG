@@ -47,7 +47,7 @@ export async function getArticleById(id) {
   const supabase = requireSupabase();
   const { data, error } = await supabase
     .from('articles')
-    .select('id, title, content, category, tags, created_at')
+    .select('id, title, content, category, tags, is_published, created_at')
     .eq('id', id)
     .maybeSingle();
 
