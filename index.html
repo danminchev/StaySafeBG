@@ -168,16 +168,26 @@
       
       <div class="col-md-5">
         <div class="h-100 p-5 home-popup-theme rounded-4 shadow-sm d-flex flex-column">
-          <div class="feature-icon bg-success-subtle text-success">
-              <i class="bi bi-people-fill"></i>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="feature-icon bg-success-subtle text-success mb-0">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <h2 class="fw-bold mb-0">Общност</h2>
           </div>
-          <h2 class="fw-bold">Общност</h2>
-          <p class="text-muted flex-grow-1">Споделете своя опит и помогнете на другите да се предпазят. Заедно сме по-силни срещу онлайн заплахите.</p>
+          <p class="text-muted mb-3">Споделете своя опит и помогнете на другите да се предпазят. Заедно сме по-силни срещу онлайн заплахите.</p>
+
+          <div id="home-community-list" class="mb-4 d-flex flex-column gap-3">
+             <div class="d-flex justify-content-center">
+                <div class="spinner-border text-light" role="status">
+                    <span class="visually-hidden">Зареждане...</span>
+                </div>
+            </div>
+          </div>
           
           <div class="mt-auto pt-4 border-top">
              <div class="d-flex align-items-center justify-content-between text-muted small">
                  <span><i class="bi bi-circle-fill text-success small me-1"></i> Активна общност</span>
-                 <span>100+ Докладвани</span>
+                 <span id="home-approved-reports-count">Одобрени доклади</span>
              </div>
              <button class="btn btn-outline-secondary w-100 mt-3 rounded-pill" disabled>
                  <i class="bi bi-chat-dots me-2"></i>Форум (Скоро)

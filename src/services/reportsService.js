@@ -59,6 +59,23 @@ export async function getAdminReports({ limit = 20, offset = 0 } = {}) {
   };
 }
 
+export async function getApprovedReports({ limit = 3 } = {}) {
+  const supabase = requireSupabase();
+  const { data, error, count } = await supabase
+    .from('scam_reports')
+    .select('id, created_at, category, scam_type, title', { count: 'exact' })
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+
+  return {
+    data: data || [],
+    count: count || 0,
+  };
+}
+
 export async function getAdminReportStats() {
   const supabase = requireSupabase();
 

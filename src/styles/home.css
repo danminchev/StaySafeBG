@@ -16,6 +16,14 @@
     z-index: 2;
 }
 
+#home-community-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
 /* Individual News Card "Popup" Effect */
 .news-card {
     background: rgba(51, 65, 85, 0.8); /* Lighter slate, more opaque */
@@ -123,6 +131,11 @@
     background-position: left bottom;
     transition: background-size 0.3s ease;
     padding-bottom: 2px;
+}
+
+.news-title .community-report-title {
+    color: white;
+    display: inline-block;
 }
 
 .news-card:hover .news-title a {
