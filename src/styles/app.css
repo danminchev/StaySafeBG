@@ -126,6 +126,14 @@ main {
     margin-top: auto;
 }
 
+.modal-backdrop {
+  z-index: 1190;
+}
+
+.modal {
+  z-index: 1200;
+}
+
 .ss-footer {
   background:
     radial-gradient(circle at 50% 50%, rgba(42, 157, 143, 0.16) 0%, rgba(42, 157, 143, 0) 44%),
