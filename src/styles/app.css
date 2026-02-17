@@ -28,7 +28,9 @@ body {
 .ss-navbar {
   padding-top: 0.65rem;
   padding-bottom: 0.65rem;
-  box-shadow: 0 6px 18px rgba(44, 62, 80, 0.18);
+  background: linear-gradient(90deg, #102842 0%, #173655 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 22px rgba(8, 22, 38, 0.35);
 }
 
 .ss-navbar .btn {
@@ -40,15 +42,20 @@ body {
 .ss-navbar .ss-account-btn,
 .ss-navbar .ss-profile-btn {
   background-color: transparent;
-  border-color: var(--light-color);
-  color: var(--light-color);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #f8fbff;
 }
 
-.ss-navbar .ss-account-solid,
 .ss-navbar .ss-nav-btn-active {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--success-color);
+  background-color: #f4b63f;
+  border-color: #f4b63f;
+  color: #0d253d;
+}
+
+.ss-navbar .ss-account-solid {
+  background-color: #3f87ef;
+  border-color: #3f87ef;
+  color: #f8fbff;
 }
 
 .ss-navbar .ss-nav-btn:hover,
@@ -57,13 +64,19 @@ body {
 .ss-navbar .ss-account-btn:focus,
 .ss-navbar .ss-profile-btn:hover,
 .ss-navbar .ss-profile-btn:focus,
-.ss-navbar .ss-account-solid:hover,
-.ss-navbar .ss-account-solid:focus,
 .ss-navbar .ss-nav-btn-active:hover,
 .ss-navbar .ss-nav-btn-active:focus {
-  background-color: var(--light-color);
-  border-color: var(--light-color);
-  color: var(--success-color);
+  background-color: #f4b63f;
+  border-color: #f4b63f;
+  color: #0d253d;
+  transform: translateY(-1px);
+}
+
+.ss-navbar .ss-account-solid:hover,
+.ss-navbar .ss-account-solid:focus {
+  background-color: #2f77df;
+  border-color: #2f77df;
+  color: #f8fbff;
   transform: translateY(-1px);
 }
 
