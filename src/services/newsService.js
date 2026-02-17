@@ -4,7 +4,7 @@ export async function getPublishedArticles({ category, q, sort = 'newest', limit
   const supabase = requireSupabase();
   
   let query = supabase
-    .from('articles')
+    .from('news')
     // removed reading_time as it doesn't exist in DB
     .select('id, title, content, category, tags, created_at', { count: 'exact' })
     .eq('is_published', true);
@@ -46,7 +46,7 @@ export async function getPublishedArticles({ category, q, sort = 'newest', limit
 export async function getArticleById(id) {
   const supabase = requireSupabase();
   const { data, error } = await supabase
-    .from('articles')
+    .from('news')
     .select('id, title, content, category, tags, is_published, created_at')
     .eq('id', id)
     .maybeSingle();
@@ -64,7 +64,7 @@ export async function createArticle(articleData) {
   if (!user) throw new Error('User not authenticated');
 
   const { data, error } = await supabase
-    .from('articles')
+    .from('news')
     .insert([{
         ...articleData,
         author_id: user.id
@@ -79,7 +79,7 @@ export async function getAdminArticles({ limit = 100, offset = 0 } = {}) {
   const supabase = requireSupabase();
 
   const { data, error, count } = await supabase
-    .from('articles')
+    .from('news')
     .select('id, title, category, is_published, created_at', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
@@ -100,7 +100,7 @@ export async function updateArticle(articleId, articleData) {
   };
 
   const { data, error } = await supabase
-    .from('articles')
+    .from('news')
     .update(payload)
     .eq('id', articleId)
     .select('id, title, category, is_published, created_at')
