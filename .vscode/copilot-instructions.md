@@ -167,6 +167,7 @@ Recommended pages:
 
 - Never edit or overwrite an already created/applied migration.
 - Every schema change must be done in a **new** migration file (append-only migration history).
+- Always apply each new local migration to Supabase immediately after creation, and re-check migration history.
 - Keep local migrations and database migration history in sync at all times (no migration drift).
 - Before and after DB-related changes, verify local migration files match the migrations applied in Supabase.
 - If drift is detected, resolve it with a **new corrective migration** (or safe rebase/reset flow), not by changing old migrations.
