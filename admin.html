@@ -29,7 +29,7 @@
               <div class="card text-white bg-danger mb-3">
                   <div class="card-header">Чакащи доклади</div>
                   <div class="card-body">
-                      <h5 class="card-title">12</h5>
+                  <h5 class="card-title" id="admin-stat-pending">0</h5>
                       <p class="card-text">Нови доклади за преглед.</p>
                   </div>
               </div>
@@ -38,7 +38,7 @@
               <div class="card text-white bg-success mb-3">
                   <div class="card-header">Потвърдени измами</div>
                   <div class="card-body">
-                      <h5 class="card-title">1,245</h5>
+                  <h5 class="card-title" id="admin-stat-approved">0</h5>
                       <p class="card-text">Общо потвърдени записи.</p>
                   </div>
               </div>
@@ -76,31 +76,10 @@
                     <th scope="col">Действия</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">1024</th>
-                    <td>15-02-2026</td>
-                    <td>Фишинг</td>
-                    <td>apple-id-verify.site</td>
-                    <td><span class="badge bg-danger">Чакащ</span></td>
-                    <td><button class="btn btn-sm btn-outline-primary">Преглед</button></td>
-                </tr>
-                <tr>
-                    <th scope="row">1023</th>
-                    <td>15-02-2026</td>
-                    <td>Телефон</td>
-                    <td>+359 899 999 999</td>
-                    <td><span class="badge bg-warning text-dark">Разследва се</span></td>
-                    <td><button class="btn btn-sm btn-outline-primary">Преглед</button></td>
-                </tr>
-                 <tr>
-                    <th scope="row">1022</th>
-                    <td>14-02-2026</td>
-                    <td>Инвестиция</td>
-                    <td>easy-money-crypto.net</td>
-                    <td><span class="badge bg-success">Потвърден</span></td>
-                    <td><button class="btn btn-sm btn-outline-secondary">Детайли</button></td>
-                </tr>
+                <tbody id="admin-reports-body">
+                  <tr>
+                    <td colspan="6" class="text-center text-muted py-4">Зареждане на доклади...</td>
+                  </tr>
             </tbody>
         </table>
       </div>
@@ -252,6 +231,47 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
           <button type="button" class="btn btn-primary" id="btn-update-article">Запази промените</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="reportReviewModal" tabindex="-1" aria-labelledby="reportReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="reportReviewModalLabel">Преглед на доклад</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="review-report-id">
+          <dl class="row mb-0">
+            <dt class="col-sm-4">Заглавие</dt>
+            <dd class="col-sm-8" id="review-report-title">-</dd>
+
+            <dt class="col-sm-4">Тип измама</dt>
+            <dd class="col-sm-8" id="review-report-type">-</dd>
+
+            <dt class="col-sm-4">Категория</dt>
+            <dd class="col-sm-8" id="review-report-category">-</dd>
+
+            <dt class="col-sm-4">Източник</dt>
+            <dd class="col-sm-8" id="review-report-source">-</dd>
+
+            <dt class="col-sm-4">Описание</dt>
+            <dd class="col-sm-8" id="review-report-description">-</dd>
+
+            <dt class="col-sm-4">Статус</dt>
+            <dd class="col-sm-8"><span class="badge" id="review-report-status">-</span></dd>
+
+            <dt class="col-sm-4">Доказателства</dt>
+            <dd class="col-sm-8" id="review-report-files">Няма прикачени файлове.</dd>
+          </dl>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+          <button type="button" class="btn btn-outline-danger" id="btn-reject-report">Отхвърли</button>
+          <button type="button" class="btn btn-success" id="btn-approve-report">Добави като потвърдена</button>
         </div>
       </div>
     </div>
