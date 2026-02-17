@@ -74,3 +74,38 @@ export async function createArticle(articleData) {
   if (error) throw error;
   return data?.[0];
 }
+
+export async function getAdminArticles({ limit = 100, offset = 0 } = {}) {
+  const supabase = requireSupabase();
+
+  const { data, error, count } = await supabase
+    .from('articles')
+    .select('id, title, category, is_published, created_at', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) throw error;
+  return { data: data || [], count: count || 0 };
+}
+
+export async function updateArticle(articleId, articleData) {
+  const supabase = requireSupabase();
+
+  const payload = {
+    title: articleData.title,
+    category: articleData.category,
+    content: articleData.content,
+    is_published: articleData.is_published,
+    tags: articleData.tags || []
+  };
+
+  const { data, error } = await supabase
+    .from('articles')
+    .update(payload)
+    .eq('id', articleId)
+    .select('id, title, category, is_published, created_at')
+    .single();
+
+  if (error) throw error;
+  return data;
+}

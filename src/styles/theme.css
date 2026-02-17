@@ -1,66 +1,68 @@
 :root {
-    /* Brand Colors - Keeping Close to Logo but Modernized */
-    --primary-color: #0b7fe6;       /* Logo Shield Blue */
-    --primary-hover: #0866ba;
-    --secondary-color: #637d92;     /* Tagline Gray-Blue */
-    --success-color: #198754;       /* Modern Green */
-    --danger-color: #dc3545;        /* Alert Red */
-    --warning-color: #ffc107;       /* Warning Yellow */
-    --info-color: #0dcaf0;          /* Info Cyan */
+    /* Brand Colors - Psychology & Trust */
+    --primary-color: #E76F51;       /* Warm Orange (CTA, Buttons) - Accessibility & Innovation */
+    --primary-hover: #d65a3b;
+    
+    --secondary-color: #2A9D8F;     /* Turquoise Green (Links, Highlights) - Balance & Calm */
+    --text-main: #1E3A8A;           /* Dark Blue (Trust, Professionalism) - Main Text */
+    --text-heading: #1E3A8A;        /* Dark Blue - Headings */
+    
+    --danger-color: #E63946;        /* Red (Alerts) - Urgency */
+    --success-color: #2A9D8F;       /* Turquoise (Safe actions) */
+    --warning-color: #E9C46A;       /* Sandy Yellow (Warning - complementary) */
+    --info-color: #264653;          /* Dark Cyan/Blue */
     
     /* Backgrounds & Surfaces */
-    --bg-body: #f8f9fa;             /* Light Gray Background for better contrast */
-    --bg-surface: #ffffff;          /* White cards */
-    --bg-surface-secondary: #e9ecef;
+    --bg-body: #F7FAFC;             /* Very Light Blue-Grey - Clean, Empty */
+    --bg-surface: #FFFFFF;          /* Pure White */
+    --bg-surface-secondary: #EDF2F7; /* Light Neutral - Section Separation */
     
     /* Text */
-    --text-main: #212529;
-    --text-muted: #6c757d;
-    --text-heading: #1a202c;
+    --text-muted: #64748B;          /* Slate - Secondary Text */
 
     /* Borders & Rounding */
-    --border-color: #dee2e6;
+    --border-color: #E2E8F0;        /* Light Slate */
     --border-radius-sm: 0.375rem;   /* 6px */
     --border-radius-md: 0.75rem;    /* 12px */
     --border-radius-lg: 1rem;       /* 16px */
     --border-radius-pill: 50rem;
     
     /* Shadows - Soft & Modern */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 2px 0 rgba(30, 58, 138, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(30, 58, 138, 0.1), 0 2px 4px -1px rgba(30, 58, 138, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(30, 58, 138, 0.1), 0 4px 6px -2px rgba(30, 58, 138, 0.05);
+    --shadow-hover: 0 20px 25px -5px rgba(30, 58, 138, 0.1), 0 10px 10px -5px rgba(30, 58, 138, 0.04);
     
     /* Category Specific Colors (Backgrounds, Text, Border) */
     /* Phishing: Deceptive - Purple/Indigo */
-    --cat-phishing-bg: #e0cffc;
-    --cat-phishing-text: #59359a;
-    --cat-phishing-border: #6f42c1;
+    --cat-phishing-bg: #E0E7FF;
+    --cat-phishing-text: #3730A3;
+    --cat-phishing-border: #4F46E5;
 
     /* Identity Theft: Security/Personal - Red/Pink */
-    --cat-identity-bg: #f8d7da;
-    --cat-identity-text: #842029;
-    --cat-identity-border: #dc3545;
+    --cat-identity-bg: #FFE4E6;
+    --cat-identity-text: #BE123C;
+    --cat-identity-border: #E11D48;
 
     /* Online Shopping: Transactional - Blue */
-    --cat-shopping-bg: #cfe2ff;
-    --cat-shopping-text: #052c65;
-    --cat-shopping-border: #0d6efd;
+    --cat-shopping-bg: #DBEAFE;
+    --cat-shopping-text: #1E40AF;
+    --cat-shopping-border: #2563EB;
 
     /* Investment: Money - Green */
-    --cat-investment-bg: #d1e7dd;
-    --cat-investment-text: #0f5132;
-    --cat-investment-border: #198754;
+    --cat-investment-bg: #D1FAE5;
+    --cat-investment-text: #065F46;
+    --cat-investment-border: #10B981;
 
     /* Tech Support: Warning - Orange/Yellow */
-    --cat-tech-bg: #fff3cd;
-    --cat-tech-text: #664d03;
-    --cat-tech-border: #ffc107;
+    --cat-tech-bg: #FEF3C7;
+    --cat-tech-text: #92400E;
+    --cat-tech-border: #F59E0B;
 
     /* Job Scams: Dark Blue/Teal */
-    --cat-job-bg: #cff4fc;
-    --cat-job-text: #055160;
-    --cat-job-border: #0dcaf0;
+    --cat-job-bg: #CCFBF1;
+    --cat-job-text: #115E59;
+    --cat-job-border: #14B8A6;
     
     /* Transitions */
     --transition-fast: 0.15s ease;
@@ -78,6 +80,33 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--text-heading);
     font-weight: 700;
     letter-spacing: -0.025em;
+}
+
+/* Bootstrap Overrides for Color Palette */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+.text-primary {
+    color: var(--primary-color) !important;
+}
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+.link-primary {
+    color: var(--secondary-color) !important; /* Users requested links be Teal/Turquoise */
+}
+a {
+    color: var(--secondary-color);
+    text-decoration: none;
+}
+a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
 }
 
 /* Scrollbar Customization */
