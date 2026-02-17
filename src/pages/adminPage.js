@@ -81,6 +81,7 @@ function formatDate(dateValue) {
 function getCategoryName(category) {
     const map = {
         phishing: 'Фишинг',
+        phone: 'Телефонна измама',
         shopping: 'Пазаруване',
         online_shopping: 'Онлайн пазаруване',
         investment: 'Инвестиции',
@@ -88,14 +89,15 @@ function getCategoryName(category) {
         identity_theft: 'Кражба на самоличност',
         tech_support: 'Техническа поддръжка',
         job_scams: 'Работа',
-        phone: 'Телефонна измама',
         romance: 'Романтична измама',
         social: 'Социални мрежи',
+        social_media: 'Социални мрежи',
         crypto: 'Крипто измама',
-        marketplace: 'Marketplace измама'
+        marketplace: 'Marketplace измама',
+        other: 'Друго'
     };
 
-    return map[category] || category || 'Общи';
+    return map[category] || 'Общи';
 }
 
 function toggleOtherCategoryInput(selectEl, inputWrap, inputEl) {
