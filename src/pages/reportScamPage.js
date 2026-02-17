@@ -66,6 +66,7 @@ async function handleReportSubmit(event) {
 	}
 
 	const scamType = document.getElementById('scamType')?.value || '';
+	const scamTypeOther = document.getElementById('scamTypeOther')?.value.trim() || '';
 	const source = document.getElementById('scamSource')?.value || '';
 	const description = document.getElementById('description')?.value.trim() || '';
 	const files = document.getElementById('evidence')?.files || [];
@@ -75,13 +76,21 @@ async function handleReportSubmit(event) {
 		return;
 	}
 
+	if (scamType === 'other' && !scamTypeOther) {
+		showMessage('Моля, въведете какъв тип е измамата.');
+		return;
+	}
+
 	if (!description || description.length < 15) {
 		showMessage('Моля, добавете описание поне 15 символа.');
 		return;
 	}
 
+	const finalScamType = scamType === 'other' ? scamTypeOther : scamType;
+	const finalCategory = scamType === 'other' ? 'other' : scamType;
+
 	const sourceFields = parseSource(source);
-	const reportTitle = `${scamType.toUpperCase()} - ${source || 'Без източник'}`;
+	const reportTitle = `${finalScamType.toUpperCase()} - ${source || 'Без източник'}`;
 
 	const submitButton = event.target.querySelector('button[type="submit"]');
 	if (submitButton) {
@@ -93,8 +102,8 @@ async function handleReportSubmit(event) {
 		const report = await createScamReport({
 			title: reportTitle,
 			description,
-			category: scamType,
-			scamType,
+			category: finalCategory,
+			scamType: finalScamType,
 			...sourceFields,
 			createdBy: user.id,
 		});
@@ -130,6 +139,22 @@ async function initReportScamPage() {
 	renderFooter();
 
 	const form = document.querySelector('form');
+	const scamTypeSelect = document.getElementById('scamType');
+	const scamTypeOtherWrap = document.getElementById('scamTypeOtherWrap');
+	const scamTypeOtherInput = document.getElementById('scamTypeOther');
+
+	if (scamTypeSelect && scamTypeOtherWrap && scamTypeOtherInput) {
+		scamTypeSelect.addEventListener('change', () => {
+			const isOther = scamTypeSelect.value === 'other';
+			scamTypeOtherWrap.classList.toggle('d-none', !isOther);
+			if (isOther) {
+				scamTypeOtherInput.focus();
+			} else {
+				scamTypeOtherInput.value = '';
+			}
+		});
+	}
+
 	if (form) {
 		form.addEventListener('submit', handleReportSubmit);
 	}

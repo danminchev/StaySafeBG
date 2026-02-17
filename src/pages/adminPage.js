@@ -10,6 +10,22 @@ const state = {
     articles: []
 };
 
+const predefinedCategories = new Set([
+    'phishing',
+    'shopping',
+    'online_shopping',
+    'investment',
+    'security',
+    'identity_theft',
+    'tech_support',
+    'job_scams',
+    'phone',
+    'romance',
+    'social',
+    'crypto',
+    'marketplace'
+]);
+
 const dom = {
     container: document.getElementById('page-content'),
     createSaveBtn: document.getElementById('btn-save-article'),
@@ -19,6 +35,8 @@ const dom = {
     create: {
         title: document.getElementById('article-title'),
         category: document.getElementById('article-category'),
+        categoryOtherWrap: document.getElementById('article-category-other-wrap'),
+        categoryOther: document.getElementById('article-category-other'),
         content: document.getElementById('article-content'),
         published: document.getElementById('article-published'),
         form: document.getElementById('create-article-form')
@@ -27,6 +45,8 @@ const dom = {
         id: document.getElementById('edit-article-id'),
         title: document.getElementById('edit-article-title'),
         category: document.getElementById('edit-article-category'),
+        categoryOtherWrap: document.getElementById('edit-article-category-other-wrap'),
+        categoryOther: document.getElementById('edit-article-category-other'),
         content: document.getElementById('edit-article-content'),
         published: document.getElementById('edit-article-published')
     }
@@ -68,10 +88,29 @@ function getCategoryName(category) {
         identity_theft: 'Кражба на самоличност',
         tech_support: 'Техническа поддръжка',
         job_scams: 'Работа',
-        social: 'Социални мрежи'
+        phone: 'Телефонна измама',
+        romance: 'Романтична измама',
+        social: 'Социални мрежи',
+        crypto: 'Крипто измама',
+        marketplace: 'Marketplace измама'
     };
 
     return map[category] || category || 'Общи';
+}
+
+function toggleOtherCategoryInput(selectEl, inputWrap, inputEl) {
+    if (!selectEl || !inputWrap || !inputEl) return;
+    const isOther = selectEl.value === 'other';
+    inputWrap.classList.toggle('d-none', !isOther);
+    if (!isOther) {
+        inputEl.value = '';
+    }
+}
+
+function resolveCategoryValue(selectEl, otherInputEl) {
+    if (!selectEl) return '';
+    if (selectEl.value !== 'other') return selectEl.value;
+    return otherInputEl?.value.trim() || '';
 }
 
 function closeModal(modalId) {
@@ -212,20 +251,28 @@ function initArticleCreation() {
 	const saveBtn = dom.createSaveBtn;
     if (!saveBtn) return;
 
+	if (dom.create.category) {
+		dom.create.category.addEventListener('change', () => {
+			toggleOtherCategoryInput(dom.create.category, dom.create.categoryOtherWrap, dom.create.categoryOther);
+		});
+	}
+
     saveBtn.addEventListener('click', async () => {
         const titleInput = dom.create.title;
         const categoryInput = dom.create.category;
+        const categoryOtherInput = dom.create.categoryOther;
         const contentInput = dom.create.content;
         const publishedInput = dom.create.published;
+        const categoryValue = resolveCategoryValue(categoryInput, categoryOtherInput);
 
-        if (!titleInput?.value || !categoryInput?.value || !contentInput?.value) {
+        if (!titleInput?.value || !categoryInput?.value || !contentInput?.value || !categoryValue) {
             showToast('Моля попълнете всички полета.', 'warning');
             return;
         }
 
         const newArticle = {
             title: titleInput.value,
-            category: categoryInput.value,
+            category: categoryValue,
             content: contentInput.value,
             is_published: publishedInput.checked,
             tags: [] // default empty tags
@@ -243,6 +290,7 @@ function initArticleCreation() {
 
             // Clear form
             dom.create.form?.reset();
+			toggleOtherCategoryInput(dom.create.category, dom.create.categoryOtherWrap, dom.create.categoryOther);
             await loadAdminArticles();
 
         } catch (error) {
@@ -283,7 +331,14 @@ function initArticleEditing() {
 
                 dom.edit.id.value = article.id;
                 dom.edit.title.value = article.title || '';
-                dom.edit.category.value = article.category || '';
+                if (predefinedCategories.has(article.category)) {
+                    dom.edit.category.value = article.category;
+                    toggleOtherCategoryInput(dom.edit.category, dom.edit.categoryOtherWrap, dom.edit.categoryOther);
+                } else {
+                    dom.edit.category.value = 'other';
+                    toggleOtherCategoryInput(dom.edit.category, dom.edit.categoryOtherWrap, dom.edit.categoryOther);
+                    dom.edit.categoryOther.value = article.category || '';
+                }
                 dom.edit.content.value = article.content || '';
                 dom.edit.published.checked = Boolean(article.is_published);
 
@@ -298,10 +353,16 @@ function initArticleEditing() {
     }
 
     if (dom.updateBtn) {
+		if (dom.edit.category) {
+			dom.edit.category.addEventListener('change', () => {
+				toggleOtherCategoryInput(dom.edit.category, dom.edit.categoryOtherWrap, dom.edit.categoryOther);
+			});
+		}
+
         dom.updateBtn.addEventListener('click', async () => {
             const articleId = dom.edit.id.value;
             const title = dom.edit.title.value.trim();
-            const category = dom.edit.category.value;
+			const category = resolveCategoryValue(dom.edit.category, dom.edit.categoryOther);
             const content = dom.edit.content.value.trim();
             const isPublished = dom.edit.published.checked;
 

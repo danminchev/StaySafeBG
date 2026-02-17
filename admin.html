@@ -151,13 +151,27 @@
                         <option value="">Избери категория...</option>
                         <option value="phishing">Фишинг</option>
                         <option value="shopping">Пазаруване</option>
+                    <option value="online_shopping">Онлайн пазаруване</option>
                         <option value="investment">Инвестиции</option>
                         <option value="security">Сигурност</option>
+                    <option value="identity_theft">Кражба на самоличност</option>
+                    <option value="tech_support">Техническа поддръжка</option>
+                    <option value="job_scams">Измами с работа</option>
+                    <option value="phone">Телефонна измама</option>
+                    <option value="romance">Романтична измама</option>
                         <option value="social">Социални мрежи</option>
+                    <option value="crypto">Крипто измама</option>
+                    <option value="marketplace">Marketplace измама</option>
+                    <option value="other">Друго</option>
                     </select>
                 </div>
                 <!-- Future improvement: Tag input -->
             </div>
+
+              <div class="mb-3 d-none" id="article-category-other-wrap">
+                <label for="article-category-other" class="form-label">Друга категория</label>
+                <input type="text" class="form-control" id="article-category-other" maxlength="80" placeholder="Въведете категорията...">
+              </div>
 
             <div class="mb-3">
               <label for="article-content" class="form-label">Съдържание</label>
@@ -209,9 +223,19 @@
                   <option value="identity_theft">Кражба на самоличност</option>
                   <option value="tech_support">Техническа поддръжка</option>
                   <option value="job_scams">Работа</option>
+                  <option value="phone">Телефонна измама</option>
+                  <option value="romance">Романтична измама</option>
                   <option value="social">Социални мрежи</option>
+                  <option value="crypto">Крипто измама</option>
+                  <option value="marketplace">Marketplace измама</option>
+                  <option value="other">Друго</option>
                 </select>
               </div>
+            </div>
+
+            <div class="mb-3 d-none" id="edit-article-category-other-wrap">
+              <label for="edit-article-category-other" class="form-label">Друга категория</label>
+              <input type="text" class="form-control" id="edit-article-category-other" maxlength="80" placeholder="Въведете категорията...">
             </div>
 
             <div class="mb-3">
