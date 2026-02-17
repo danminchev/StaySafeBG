@@ -183,7 +183,7 @@ function createCard(article) {
 	}
 	
 	const link = clone.querySelector('.article-link-overlay');
-	if(link) link.href = `article-details.html?id=${article.id}`;
+	if(link) link.href = `news-details.html?id=${article.id}`;
 	
 	const badge = clone.querySelector('.category-badge');
 	if(badge) {

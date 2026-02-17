@@ -99,7 +99,7 @@ function renderHeaderHtml(currentUser) {
 
   const checkIsActive = activePage === 'scam-check.html';
   const reportIsActive = activePage === 'report-scam.html';
-  const articlesIsActive = activePage === 'news.html' || activePage === 'article-details.html';
+  const articlesIsActive = activePage === 'news.html' || activePage === 'news-details.html';
   const communityIsActive = activePage === 'community.html';
 
   const accountActionsHtml = loggedIn

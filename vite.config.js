@@ -12,7 +12,7 @@ export default defineConfig({
         login: resolve(__dirname, 'login.html'),
         register: resolve(__dirname, 'register.html'),
         news: resolve(__dirname, 'news.html'),
-        articleDetails: resolve(__dirname, 'article-details.html'),
+        newsDetails: resolve(__dirname, 'news-details.html'),
         scamCheck: resolve(__dirname, 'scam-check.html'),
         reportScam: resolve(__dirname, 'report-scam.html'),
         community: resolve(__dirname, 'community.html'),

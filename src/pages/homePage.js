@@ -85,7 +85,7 @@ function renderLatestArticles(articles) {
                 </time>
             </div>
             <h3 class="news-title h5 mb-0">
-                <a href="article-details.html?id=${article.id}" class="stretched-link article-link"></a>
+                <a href="news-details.html?id=${article.id}" class="stretched-link article-link"></a>
             </h3>
             <i class="bi bi-arrow-right news-arrow"></i>
         `;
