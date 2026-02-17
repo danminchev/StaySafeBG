@@ -1,0 +1,147 @@
+/* Professional Home Page Styles */
+
+/* Latest News Container - Added style for the "popup" */
+.latest-news-container {
+    /* Using a gradient for depth and modern look */
+    background: linear-gradient(135deg, #475569 0%, #334155 100%);
+    color: white; /* Ensure text is readable */
+}
+
+/* Base reset for list spacing */
+#home-articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Individual News Card "Popup" Effect */
+.news-card {
+    background: rgba(51, 65, 85, 0.8); /* Lighter slate, more opaque */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy spring */
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Hover State - Lifting "Popup" */
+.news-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    background: rgba(71, 85, 105, 0.9); /* Even lighter on hover */
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 
+        0 20px 25px -5px rgba(0, 0, 0, 0.2), 
+        0 10px 10px -5px rgba(0, 0, 0, 0.1),
+        0 0 20px rgba(79, 70, 229, 0.15); /* Subtle glow */
+    z-index: 10;
+}
+
+/* Left Accent Border based on interaction */
+.news-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.news-card:hover::before {
+    opacity: 1;
+}
+
+/* Typography & Content */
+.news-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.news-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.35em 0.8em;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: background 0.3s ease;
+}
+
+.news-card:hover .news-badge {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.news-date {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.news-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.4;
+    transition: color 0.3s ease;
+}
+
+.news-title a {
+    color: white;
+    text-decoration: none;
+    background-image: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    background-size: 0% 2px;
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    transition: background-size 0.3s ease;
+    padding-bottom: 2px;
+}
+
+.news-card:hover .news-title a {
+    background-size: 100% 2px;
+    color: white; /* Ensure text stays white */
+}
+
+/* Arrow Icon on Hover */
+.news-arrow {
+    position: absolute;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.news-card:hover .news-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Category Badge Colors */
+.news-badge[data-category="phishing"] { background: rgba(79, 70, 229, 0.2); color: #818cf8; border-color: rgba(79, 70, 229, 0.3); }
+.news-badge[data-category="identity_theft"] { background: rgba(225, 29, 72, 0.2); color: #fda4af; border-color: rgba(225, 29, 72, 0.3); }
+.news-badge[data-category="online_shopping"] { background: rgba(37, 99, 235, 0.2); color: #93c5fd; border-color: rgba(37, 99, 235, 0.3); }
+.news-badge[data-category="investment"] { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.3); }
+.news-badge[data-category="tech_support"] { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border-color: rgba(245, 158, 11, 0.3); }
+.news-badge[data-category="crypto_scams"] { background: rgba(124, 58, 237, 0.2); color: #c4b5fd; border-color: rgba(124, 58, 237, 0.3); }
+.news-badge[data-category="other"] { background: rgba(71, 85, 105, 0.4); color: #cbd5e1; border-color: rgba(71, 85, 105, 0.5); }

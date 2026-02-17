@@ -1,13 +1,28 @@
+html,
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 body {
     background-color: var(--body-bg);
     color: var(--body-color);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+  overflow-x: hidden;
 }
 
 #app-header {
     width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1100;
 }
 
 .ss-navbar {
