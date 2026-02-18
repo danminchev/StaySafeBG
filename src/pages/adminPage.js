@@ -360,7 +360,7 @@ function renderReportsTable() {
 
         const editBtn = document.createElement('button');
         editBtn.type = 'button';
-        editBtn.className = 'btn btn-sm btn-outline-secondary';
+        editBtn.className = 'btn btn-sm btn-outline-success';
         editBtn.dataset.action = 'edit-report';
         editBtn.dataset.reportId = report.id;
         editBtn.textContent = 'Редактирай';
