@@ -68,6 +68,7 @@ const dom = {
         description: document.getElementById('review-report-description'),
         status: document.getElementById('review-report-status'),
         files: document.getElementById('review-report-files'),
+        pendingBtn: document.getElementById('btn-pending-report'),
         approveBtn: document.getElementById('btn-approve-report'),
         rejectBtn: document.getElementById('btn-reject-report')
     },
@@ -673,6 +674,23 @@ function setReportReviewLoadingState(message = 'Зареждане...') {
     dom.reportReview.status.className = 'badge bg-secondary';
     dom.reportReview.status.textContent = '-';
     dom.reportReview.files.textContent = 'Зареждане...';
+    if (dom.reportReview.pendingBtn) dom.reportReview.pendingBtn.disabled = true;
+    if (dom.reportReview.approveBtn) dom.reportReview.approveBtn.disabled = true;
+    if (dom.reportReview.rejectBtn) dom.reportReview.rejectBtn.disabled = true;
+}
+
+function setReviewStatusActionState(currentStatus) {
+    if (dom.reportReview.pendingBtn) {
+        dom.reportReview.pendingBtn.disabled = currentStatus === 'pending';
+    }
+
+    if (dom.reportReview.approveBtn) {
+        dom.reportReview.approveBtn.disabled = currentStatus === 'approved';
+    }
+
+    if (dom.reportReview.rejectBtn) {
+        dom.reportReview.rejectBtn.disabled = currentStatus === 'rejected';
+    }
 }
 
 async function renderReportFiles(files) {
@@ -744,15 +762,11 @@ async function openReportReview(reportId) {
 
         await renderReportFiles(report.files);
 
-        const isPending = report.status === 'pending';
-        dom.reportReview.approveBtn.disabled = !isPending;
-        dom.reportReview.rejectBtn.disabled = !isPending;
+        setReviewStatusActionState(report.status);
     } catch (error) {
         console.error('Error loading report details:', error);
         setReportReviewLoadingState('Грешка при зареждане');
         dom.reportReview.files.textContent = 'Неуспешно зареждане на файлове.';
-        dom.reportReview.approveBtn.disabled = true;
-        dom.reportReview.rejectBtn.disabled = true;
         showToast('Неуспешно зареждане на доклада.', 'error');
     }
 }
@@ -761,18 +775,33 @@ async function changeSelectedReportStatus(status) {
     const reportId = state.selectedReportId || dom.reportReview.id?.value;
     if (!reportId) return;
 
-    const button = status === 'approved' ? dom.reportReview.approveBtn : dom.reportReview.rejectBtn;
-    const otherButton = status === 'approved' ? dom.reportReview.rejectBtn : dom.reportReview.approveBtn;
+    const statusButtons = {
+        pending: dom.reportReview.pendingBtn,
+        approved: dom.reportReview.approveBtn,
+        rejected: dom.reportReview.rejectBtn
+    };
+
+    const button = statusButtons[status];
+    if (!button) return;
+
+    const allButtons = Object.values(statusButtons).filter(Boolean);
     const originalText = button.textContent;
 
     try {
-        button.disabled = true;
-        otherButton.disabled = true;
+        allButtons.forEach((currentButton) => {
+            currentButton.disabled = true;
+        });
         button.textContent = 'Запазване...';
 
         await updateReportStatus(reportId, status);
 
-        showToast(status === 'approved' ? 'Докладът е добавен като потвърдена измама.' : 'Докладът е отхвърлен.', 'success');
+        const successMessageMap = {
+            pending: 'Докладът е маркиран като чакащ.',
+            approved: 'Докладът е маркиран като потвърден.',
+            rejected: 'Докладът е маркиран като отхвърлен.'
+        };
+
+        showToast(successMessageMap[status] || 'Статусът е променен успешно.', 'success');
 
         closeModal('reportReviewModal');
         state.selectedReportId = null;
@@ -1108,6 +1137,10 @@ function initReportReviewing() {
 
     if (dom.reportReview.approveBtn) {
         dom.reportReview.approveBtn.addEventListener('click', () => changeSelectedReportStatus('approved'));
+    }
+
+    if (dom.reportReview.pendingBtn) {
+        dom.reportReview.pendingBtn.addEventListener('click', () => changeSelectedReportStatus('pending'));
     }
 
     if (dom.reportReview.rejectBtn) {
