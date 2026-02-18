@@ -105,6 +105,7 @@ const dom = {
     },
     userView: {
         id: document.getElementById('view-user-id'),
+        title: document.getElementById('viewUserModalLabel'),
         name: document.getElementById('view-user-name'),
         email: document.getElementById('view-user-email'),
         created: document.getElementById('view-user-created'),
@@ -239,9 +240,17 @@ function renderUsersTable() {
 
         const roleCell = document.createElement('td');
         const roleBadge = document.createElement('span');
-        const isAdmin = user.role === 'admin';
-        roleBadge.className = `badge ${isAdmin ? 'bg-primary' : 'bg-secondary'}`;
-        roleBadge.textContent = isAdmin ? 'Админ' : 'Потребител';
+        const normalizedRole = user.role || 'user';
+        if (normalizedRole === 'admin') {
+            roleBadge.className = 'badge bg-primary';
+            roleBadge.textContent = 'Админ';
+        } else if (normalizedRole === 'moderator') {
+            roleBadge.className = 'badge bg-success';
+            roleBadge.textContent = 'Модератор';
+        } else {
+            roleBadge.className = 'badge bg-secondary';
+            roleBadge.textContent = 'Потребител';
+        }
         roleCell.appendChild(roleBadge);
 
         const createdCell = document.createElement('td');
@@ -251,8 +260,9 @@ function renderUsersTable() {
         lastLoginCell.textContent = formatDateTime(user.last_sign_in_at);
 
         const actionsCell = document.createElement('td');
+        actionsCell.className = 'text-end';
         const actionsWrap = document.createElement('div');
-        actionsWrap.className = 'd-inline-flex gap-2';
+        actionsWrap.className = 'd-inline-flex justify-content-end gap-2';
         
         const viewBtn = document.createElement('button');
         viewBtn.type = 'button';
@@ -260,6 +270,13 @@ function renderUsersTable() {
         viewBtn.dataset.action = 'view-user';
         viewBtn.dataset.userId = user.user_id;
         viewBtn.textContent = 'Преглед';
+
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'btn btn-sm btn-outline-success';
+        editBtn.dataset.action = 'edit-user';
+        editBtn.dataset.userId = user.user_id;
+        editBtn.textContent = 'Редактирай';
 
         const deleteBtn = document.createElement('button');
         deleteBtn.type = 'button';
@@ -274,6 +291,7 @@ function renderUsersTable() {
         }
         
         actionsWrap.appendChild(viewBtn);
+        actionsWrap.appendChild(editBtn);
         actionsWrap.appendChild(deleteBtn);
         actionsCell.appendChild(actionsWrap);
 
@@ -288,7 +306,7 @@ function renderUsersTable() {
     });
 }
 
-async function openViewUserModal(userId) {
+async function openUserModal(userId, mode = 'view') {
     if (!userId) return;
     const user = state.users.find(u => u.user_id === userId);
     if (!user) {
@@ -311,6 +329,17 @@ async function openViewUserModal(userId) {
         } else {
             dom.userView.roleSelect.value = 'user';
         }
+    }
+
+    const isEditMode = mode === 'edit';
+    if (dom.userView.title) {
+        dom.userView.title.textContent = isEditMode ? 'Редакция на потребител' : 'Преглед на потребител';
+    }
+    if (dom.userView.roleSelect) {
+        dom.userView.roleSelect.disabled = !isEditMode;
+    }
+    if (dom.userView.saveRoleBtn) {
+        dom.userView.saveRoleBtn.classList.toggle('d-none', !isEditMode);
     }
 
     openModal('viewUserModal');
@@ -992,7 +1021,12 @@ function initUserManagement() {
             }
 
             if (action === 'view-user') {
-                await openViewUserModal(userId);
+                await openUserModal(userId, 'view');
+                return;
+            }
+
+            if (action === 'edit-user') {
+                await openUserModal(userId, 'edit');
                 return;
             }
         });
