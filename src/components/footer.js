@@ -19,7 +19,7 @@ export function renderFooter() {
             <div class="ss-footer-block">
               <h6 class="ss-footer-title">Контакт</h6>
               <ul class="ss-footer-meta list-unstyled mb-0">
-                <li><strong>Телефон:</strong> +359 888 123 456</li>
+                <li><strong>Телефон:</strong> +359 889 153 077</li>
                 <li><strong>Имейл:</strong> support@staysafebg.bg</li>
                 <li><strong>Адрес:</strong> България</li>
               </ul>
@@ -40,6 +40,7 @@ export function renderFooter() {
                 <li><a href="scam-check.html">Провери измама</a></li>
                 <li><a href="report-scam.html">Докладвай измама</a></li>
                 <li><a href="news.html">Новини</a></li>
+                <li><a href="community.html">Общност</a></li>
               </ul>
             </div>
           </div>
