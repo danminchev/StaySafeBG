@@ -6,7 +6,7 @@ import { uploadEvidenceFile } from '../services/storageService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
 function showMessage(message, type = 'danger') {
-	const form = document.querySelector('form');
+	const form = document.getElementById('report-scam-form');
 	if (!form) return;
 
 	let alertEl = document.getElementById('report-message');
@@ -162,7 +162,7 @@ async function initReportScamPage() {
 	await renderHeader();
 	renderFooter();
 
-	const form = document.querySelector('form');
+	const form = document.getElementById('report-scam-form');
 	const scamTypeSelect = document.getElementById('scamType');
 	const scamTypeOtherWrap = document.getElementById('scamTypeOtherWrap');
 	const scamTypeOtherInput = document.getElementById('scamTypeOther');

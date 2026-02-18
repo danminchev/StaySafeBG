@@ -134,6 +134,163 @@ main {
   z-index: 1200;
 }
 
+.ss-report-intro {
+  width: 100%;
+  max-width: 1296px;
+  background: linear-gradient(120deg, #071735 0%, #102e52 52%, #1d2454 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 16px 34px rgba(3, 12, 32, 0.35);
+  color: #e5eefb;
+}
+
+.ss-report-intro h1 {
+  color: #f8fafc;
+}
+
+.ss-report-title {
+  position: relative;
+  display: inline-block;
+}
+
+.ss-report-brand {
+  color: #c4e6f8;
+}
+
+.ss-report-brand-bg {
+  color: #7fdc72;
+}
+
+.ss-report-title-line {
+  width: min(100%, 710px);
+  height: 3px;
+  border-radius: 999px;
+  background-color: #c9a45a;
+  margin: 0 auto 1.15rem;
+  transition: box-shadow 0.28s ease;
+  cursor: pointer;
+}
+
+.ss-report-title-line:hover,
+.ss-report-title-line:focus-visible {
+  box-shadow: 0 0 10px rgba(201, 164, 90, 0.55);
+  outline: none;
+}
+
+.ss-report-subtitle {
+  color: #dbe7f5;
+  transition: color 0.28s ease;
+}
+
+.ss-report-title-line:hover + .ss-report-subtitle,
+.ss-report-title-line:focus-visible + .ss-report-subtitle {
+  color: #c9a45a;
+}
+
+.ss-report-intro .hero-btn-primary {
+  background-color: #f4b63f;
+  border-color: #f4b63f;
+  color: #0d253d;
+}
+
+.ss-report-intro .hero-btn-primary:hover,
+.ss-report-intro .hero-btn-primary:focus {
+  background-color: #e3a631;
+  border-color: #e3a631;
+  color: #0d253d;
+}
+
+.ss-report-modal-theme .modal-content {
+  background: linear-gradient(120deg, #071735 0%, #102e52 52%, #1d2454 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 38px rgba(3, 12, 32, 0.44);
+  color: #e5eefb;
+}
+
+.ss-report-popup {
+  max-width: 980px;
+}
+
+.ss-report-popup .modal-content {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.ss-report-popup .modal-header {
+  padding: 1.25rem 1.5rem;
+}
+
+.ss-report-popup .modal-body {
+  padding: 1.5rem;
+}
+
+.ss-report-modal-theme .modal-header {
+  border-bottom-color: rgba(255, 255, 255, 0.16);
+}
+
+.ss-report-modal-theme .modal-title,
+.ss-report-modal-theme .form-label,
+.ss-report-modal-theme .form-check-label {
+  color: #f8fafc;
+}
+
+.ss-report-modal-theme p {
+  color: #dbe7f5;
+}
+
+.ss-report-modal-theme .form-control,
+.ss-report-modal-theme .form-select {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #f8fafc;
+}
+
+.ss-report-modal-theme .form-control::placeholder {
+  color: #c4d4ea;
+}
+
+.ss-report-modal-theme .form-control:focus,
+.ss-report-modal-theme .form-select:focus {
+  border-color: #7fdc72;
+  box-shadow: 0 0 0 0.2rem rgba(127, 220, 114, 0.25);
+}
+
+.ss-report-modal-theme .form-select option {
+  color: #0d253d;
+}
+
+.ss-report-modal-theme .form-check-input {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.ss-report-modal-theme .form-check-input:checked {
+  background-color: #7fdc72;
+  border-color: #7fdc72;
+}
+
+.ss-report-modal-theme .form-control[type="file"]::file-selector-button {
+  background-color: #f4b63f;
+  border: 0;
+  color: #0d253d;
+}
+
+.ss-report-modal-theme .form-control[type="file"]::file-selector-button:hover {
+  background-color: #e3a631;
+}
+
+.ss-report-modal-theme .btn-primary {
+  background-color: #f4b63f;
+  border-color: #f4b63f;
+  color: #0d253d;
+}
+
+.ss-report-modal-theme .btn-primary:hover,
+.ss-report-modal-theme .btn-primary:focus {
+  background-color: #e3a631;
+  border-color: #e3a631;
+  color: #0d253d;
+}
+
 .ss-footer {
   background:
     radial-gradient(circle at 50% 50%, rgba(42, 157, 143, 0.16) 0%, rgba(42, 157, 143, 0) 44%),

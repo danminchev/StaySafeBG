@@ -13,62 +13,70 @@
 <body class="d-flex flex-column min-vh-100">
   <header id="app-header"></header>
   
-  <main class="container py-4" id="page-content">
-      <div class="row justify-content-center">
-          <div class="col-md-8">
-              <h2 class="mb-4">Докладвай измама</h2>
-              <p class="text-muted mb-4">Помогнете ни да защитим другите, като докладвате подозрителни дейности. Вашата информация ще бъде прегледана от нашия екип.</p>
-              
-              <form>
-                  <div class="mb-3">
-                      <label for="scamType" class="form-label">Тип измама</label>
-                      <select class="form-select" id="scamType">
-                          <option selected>Изберете тип измама...</option>
-                          <option value="phishing">Фишинг (Имейл/Сайт)</option>
-                          <option value="phone">Телефонна измама</option>
-                          <option value="investment">Инвестиционна измама</option>
-                          <option value="shopping">Онлайн пазаруване</option>
-                          <option value="social_media">Социални мрежи</option>
-                          <option value="identity_theft">Кражба на самоличност</option>
-                          <option value="job_scam">Измама с работа</option>
-                          <option value="crypto">Крипто измама</option>
-                          <option value="marketplace">Marketplace измама</option>
-                          <option value="romance">Романтична измама</option>
-                          <option value="other">Друго</option>
-                      </select>
-                  </div>
+  <main class="container py-5" id="page-content">
+      <section class="ss-report-intro rounded-4 text-center p-5 mx-auto">
+          <h1 class="display-4 fw-bold mb-3 ss-report-title">Докладвай измама в <span class="ss-report-brand">StaySafe</span><span class="ss-report-brand-bg">BG</span></h1>
+          <div class="ss-report-title-line" tabindex="0" aria-label="Подчертаване на заглавието"></div>
+          <p class="col-md-8 mx-auto fs-5 mb-0 ss-report-subtitle">Помогнете ни да защитим другите, като докладвате подозрителни дейности. Вашата информация ще бъде прегледана от нашия екип.</p>
+      </section>
 
-                  <div class="mb-3 d-none" id="scamTypeOtherWrap">
-                      <label for="scamTypeOther" class="form-label">Какъв тип измама?</label>
-                      <input type="text" class="form-control" id="scamTypeOther" maxlength="80" placeholder="Напишете типа измама...">
-                  </div>
-                  
-                  <div class="mb-3">
-                      <label for="scamSource" class="form-label">Източник (Уебсайт, Телефон, Имейл)</label>
-                      <input type="text" class="form-control" id="scamSource" placeholder="напр. www.fake-bank.com или +359...">
-                  </div>
-                  
-                  <div class="mb-3">
-                      <label for="description" class="form-label">Описание на ситуацията</label>
-                      <textarea class="form-control" id="description" rows="5" placeholder="Моля, опишете какво се случи..."></textarea>
-                  </div>
-                  
-                  <div class="mb-3">
-                      <label for="evidence" class="form-label">Прикачи доказателство (Снимки на екрана)</label>
-                      <input class="form-control" type="file" id="evidence" multiple>
-                  </div>
-                  
-                  <div class="form-check mb-3">
-                      <input class="form-check-input" type="checkbox" value="" id="anonymous">
-                      <label class="form-check-label" for="anonymous">
-                          Искам да остана анонимен
-                      </label>
-                  </div>
-                  
-                  <button type="submit" class="btn btn-primary btn-lg">Изпрати доклад</button>
-              </form>
+      <section class="ss-report-modal-theme ss-report-popup mt-4 mx-auto">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h2 class="modal-title h4 mb-0">Форма за доклад</h2>
+              </div>
+              <div class="modal-body">
+                  <form id="report-scam-form">
+                      <div class="mb-3">
+                          <label for="scamType" class="form-label">Тип измама</label>
+                          <select class="form-select" id="scamType">
+                              <option selected>Изберете тип измама...</option>
+                              <option value="phishing">Фишинг (Имейл/Сайт)</option>
+                              <option value="phone">Телефонна измама</option>
+                              <option value="investment">Инвестиционна измама</option>
+                              <option value="shopping">Онлайн пазаруване</option>
+                              <option value="social_media">Социални мрежи</option>
+                              <option value="identity_theft">Кражба на самоличност</option>
+                              <option value="job_scam">Измама с работа</option>
+                              <option value="crypto">Крипто измама</option>
+                              <option value="marketplace">Marketplace измама</option>
+                              <option value="romance">Романтична измама</option>
+                              <option value="other">Друго</option>
+                          </select>
+                      </div>
+
+                      <div class="mb-3 d-none" id="scamTypeOtherWrap">
+                          <label for="scamTypeOther" class="form-label">Какъв тип измама?</label>
+                          <input type="text" class="form-control" id="scamTypeOther" maxlength="80" placeholder="Напишете типа измама...">
+                      </div>
+
+                      <div class="mb-3">
+                          <label for="scamSource" class="form-label">Източник (Уебсайт, Телефон, Имейл)</label>
+                          <input type="text" class="form-control" id="scamSource" placeholder="напр. www.fake-bank.com или +359...">
+                      </div>
+
+                      <div class="mb-3">
+                          <label for="description" class="form-label">Описание на ситуацията</label>
+                          <textarea class="form-control" id="description" rows="5" placeholder="Моля, опишете какво се случи..."></textarea>
+                      </div>
+
+                      <div class="mb-3">
+                          <label for="evidence" class="form-label">Прикачи доказателство (Снимки на екрана)</label>
+                          <input class="form-control" type="file" id="evidence" multiple>
+                      </div>
+
+                      <div class="form-check mb-4">
+                          <input class="form-check-input" type="checkbox" value="" id="anonymous">
+                          <label class="form-check-label" for="anonymous">
+                              Искам да остана анонимен
+                          </label>
+                      </div>
+
+                      <button type="submit" class="btn btn-primary btn-lg">Изпрати доклад</button>
+                  </form>
+              </div>
           </div>
-      </div>
+      </section>
   </main>
   
   <footer id="app-footer"></footer>
