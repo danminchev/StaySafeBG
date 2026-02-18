@@ -78,43 +78,47 @@ async function renderReportDetails(report) {
   const description = escapeHtml(report.description || 'Няма допълнително описание.');
 
   pageContent.innerHTML = `
-    <nav aria-label="breadcrumb" class="mb-4">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="community.html">Общност</a></li>
-        <li class="breadcrumb-item active" aria-current="page">${title}</li>
-      </ol>
-    </nav>
+    <div class="ss-report-details-stack">
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="community.html">Общност</a></li>
+          <li class="breadcrumb-item active" aria-current="page">${title}</li>
+        </ol>
+      </nav>
 
-    <article class="card border-0 shadow-sm mb-4">
-      <div class="card-body p-4 p-md-5">
-        <div class="d-flex flex-wrap gap-2 mb-3">
-          <span class="badge text-bg-light">${category}</span>
-          <span class="badge text-bg-light"><i class="bi bi-calendar3 me-1"></i>${dateText}</span>
-          <span class="badge text-bg-light"><i class="bi bi-link-45deg me-1"></i>${sourceText}</span>
+      <article class="ss-details-popup mb-4">
+        <div class="ss-details-popup-body p-4 p-md-5">
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge modal-category-badge">${category}</span>
+            <span class="badge modal-category-badge"><i class="bi bi-calendar3 me-1"></i>${dateText}</span>
+            <span class="badge modal-category-badge"><i class="bi bi-link-45deg me-1"></i>${sourceText}</span>
+          </div>
+          <h1 class="h2 fw-bold mb-3">${title}</h1>
+          <p class="mb-0 ss-details-description">${description}</p>
         </div>
-        <h1 class="h2 fw-bold mb-3">${title}</h1>
-        <p class="mb-0" style="white-space: pre-line;">${description}</p>
-      </div>
-    </article>
+      </article>
 
-    <section id="report-images-section" class="mb-4">
-      <h2 class="h4 mb-3">Прикачени снимки</h2>
-      <div id="report-images-grid" class="row g-3"></div>
-      <p id="report-images-empty" class="text-muted mb-0 d-none">Няма прикачени изображения към този доклад.</p>
-    </section>
+      <section id="report-images-section" class="ss-details-popup ss-details-images-popup mb-4 d-none">
+        <div class="ss-details-popup-body p-4 p-md-4">
+          <h2 class="h4 mb-3">Прикачени снимки</h2>
+          <div id="report-images-grid" class="row g-3"></div>
+        </div>
+      </section>
 
-    <a href="community.html" class="btn btn-secondary">Обратно към общността</a>
+      <a href="community.html" class="btn btn-secondary">Обратно към общността</a>
+    </div>
   `;
 
+  const imageSection = document.getElementById('report-images-section');
   const imageGrid = document.getElementById('report-images-grid');
-  const emptyEl = document.getElementById('report-images-empty');
-  if (!imageGrid || !emptyEl) return;
+  if (!imageGrid || !imageSection) return;
 
   const imageFiles = (report.files || []).filter(isImageFile);
   if (!imageFiles.length) {
-    emptyEl.classList.remove('d-none');
     return;
   }
+
+  imageSection.classList.remove('d-none');
 
   const filesWithUrls = await Promise.all(imageFiles.map(async (file) => {
     try {
