@@ -163,11 +163,29 @@ Recommended pages:
 
 ---
 
-## 13) Migration Discipline (Mandatory)
+## 13) Migration Discipline (Strict Append-Only)
 
-- Never edit or overwrite an already created/applied migration.
-- Every schema change must be done in a **new** migration file (append-only migration history).
-- Always apply each new local migration to Supabase immediately after creation, and re-check migration history.
-- Keep local migrations and database migration history in sync at all times (no migration drift).
-- Before and after DB-related changes, verify local migration files match the migrations applied in Supabase.
-- If drift is detected, resolve it with a **new corrective migration** (or safe rebase/reset flow), not by changing old migrations.
+**Core Rule:** Never edit an existing migration file. Ever.
+
+1.  **Immutable History:**
+    *   Once a migration file is created (`YYYYMMDDHHMMSS_name.sql`), it is **frozen**.
+    *   Do not modify it to fix bugs or add columns.
+    *   Do not delete it.
+
+2.  **Changes = New Files:**
+    *   Any change to the database (schema, RLS policies, functions, triggers) must go into a **new** migration file with a fresh timestamp.
+    *   Example: If `01_init.sql` has a typo, create `02_fix_typo.sql`. Do not edit `01_init.sql`.
+
+3.  **Process:**
+    *   Create new file: `supabase/migrations/<timestamp>_<description>.sql`.
+    *   Write the SQL change.
+    *   Apply to local database (if running locally) or push to remote.
+    *   verify the change works.
+
+4.  **Drift Prevention:**
+    *   If the remote database has migrations that are not local, sync them down (rename local files to match remote timestamps if strictly necessary for tools, or likely just ensure the content logic is applied).
+    *   If you see a mismatch, **do not** change history. Add a new migration to bring the state in sync.
+
+5.  **Why?**
+    *   Editing old migrations breaks deployment consistency between environments (dev, staging, prod).
+    *   It prevents "it works on my machine" issues where your local DB has a different version of "migration 1" than production.
