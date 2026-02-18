@@ -208,6 +208,7 @@ function createCard(article) {
 	const badge = clone.querySelector('.category-badge');
 	if(badge) {
 		badge.textContent = getCategoryName(article.category);
+		badge.dataset.category = article.category || 'other';
 		// Note: The color is handled by CSS based on data-category
 	}
 	

@@ -57,11 +57,13 @@
 
 /* Card Styling */
 .article-card {
-  border: 1px solid var(--border-color);
-  border-left-width: 5px; /* Significant accent border */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-left-width: 4px;
   border-radius: var(--border-radius-lg);
-  background: var(--bg-surface);
-  box-shadow: var(--shadow-sm);
+  background: rgba(51, 65, 85, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 25px rgba(3, 12, 32, 0.22);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
   height: 100%;
   display: flex;
@@ -71,12 +73,13 @@
 }
 
 .article-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-hover);
+  transform: translateY(-7px);
+  box-shadow: 0 18px 36px rgba(3, 12, 32, 0.3);
+  background: rgba(71, 85, 105, 0.92);
 }
 
 .article-card:focus-within {
-  outline: 2px solid var(--primary-color);
+  outline: 2px solid var(--secondary-color);
   outline-offset: 4px;
 }
 
@@ -84,36 +87,61 @@
 /* Default */
 .article-card { border-left-color: var(--secondary-color); }
 .category-badge { 
-    background-color: var(--bg-surface-secondary); 
-    color: var(--text-muted); 
-    border: 1px solid var(--bg-surface-secondary); 
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Category Mapping */
 /* Phishing */
 .article-card[data-category="phishing"] { border-left-color: var(--cat-phishing-border); }
-.article-card[data-category="phishing"] .category-badge { background-color: var(--cat-phishing-bg); color: var(--cat-phishing-text); border-color: var(--cat-phishing-bg); }
-.article-card[data-category="phishing"] .article-title { color: var(--cat-phishing-text); }
+.article-card[data-category="phishing"] .category-badge { background-color: rgba(79, 70, 229, 0.2); color: #c7d2fe; border-color: rgba(79, 70, 229, 0.35); }
 
 /* Identity Theft */
 .article-card[data-category="identity_theft"] { border-left-color: var(--cat-identity-border); }
-.article-card[data-category="identity_theft"] .category-badge { background-color: var(--cat-identity-bg); color: var(--cat-identity-text); border-color: var(--cat-identity-bg); }
+.article-card[data-category="identity_theft"] .category-badge { background-color: rgba(225, 29, 72, 0.2); color: #fecdd3; border-color: rgba(225, 29, 72, 0.35); }
 
 /* Online Shopping */
 .article-card[data-category="online_shopping"] { border-left-color: var(--cat-shopping-border); }
-.article-card[data-category="online_shopping"] .category-badge { background-color: var(--cat-shopping-bg); color: var(--cat-shopping-text); border-color: var(--cat-shopping-bg); }
+.article-card[data-category="online_shopping"] .category-badge { background-color: rgba(37, 99, 235, 0.2); color: #bfdbfe; border-color: rgba(37, 99, 235, 0.35); }
+
+.article-card[data-category="shopping"] { border-left-color: var(--cat-shopping-border); }
+.article-card[data-category="shopping"] .category-badge { background-color: rgba(37, 99, 235, 0.2); color: #bfdbfe; border-color: rgba(37, 99, 235, 0.35); }
 
 /* Investment */
 .article-card[data-category="investment"] { border-left-color: var(--cat-investment-border); }
-.article-card[data-category="investment"] .category-badge { background-color: var(--cat-investment-bg); color: var(--cat-investment-text); border-color: var(--cat-investment-bg); }
+.article-card[data-category="investment"] .category-badge { background-color: rgba(16, 185, 129, 0.2); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.35); }
 
 /* Tech Support */
 .article-card[data-category="tech_support"] { border-left-color: var(--cat-tech-border); }
-.article-card[data-category="tech_support"] .category-badge { background-color: var(--cat-tech-bg); color: var(--cat-tech-text); border-color: var(--cat-tech-bg); }
+.article-card[data-category="tech_support"] .category-badge { background-color: rgba(245, 158, 11, 0.2); color: #fde68a; border-color: rgba(245, 158, 11, 0.35); }
 
 /* Job Scams */
 .article-card[data-category="job_scams"] { border-left-color: var(--cat-job-border); }
-.article-card[data-category="job_scams"] .category-badge { background-color: var(--cat-job-bg); color: var(--cat-job-text); border-color: var(--cat-job-bg); }
+.article-card[data-category="job_scams"] .category-badge { background-color: rgba(20, 184, 166, 0.2); color: #99f6e4; border-color: rgba(20, 184, 166, 0.35); }
+
+.article-card[data-category="phone"] { border-left-color: #f97316; }
+.article-card[data-category="phone"] .category-badge { background-color: rgba(249, 115, 22, 0.2); color: #fed7aa; border-color: rgba(249, 115, 22, 0.35); }
+
+.article-card[data-category="security"] { border-left-color: #0ea5e9; }
+.article-card[data-category="security"] .category-badge { background-color: rgba(14, 165, 233, 0.2); color: #bae6fd; border-color: rgba(14, 165, 233, 0.35); }
+
+.article-card[data-category="social"],
+.article-card[data-category="social_media"] { border-left-color: #8b5cf6; }
+.article-card[data-category="social"] .category-badge,
+.article-card[data-category="social_media"] .category-badge { background-color: rgba(139, 92, 246, 0.2); color: #ddd6fe; border-color: rgba(139, 92, 246, 0.35); }
+
+.article-card[data-category="crypto"] { border-left-color: #a855f7; }
+.article-card[data-category="crypto"] .category-badge { background-color: rgba(168, 85, 247, 0.2); color: #e9d5ff; border-color: rgba(168, 85, 247, 0.35); }
+
+.article-card[data-category="marketplace"] { border-left-color: #f59e0b; }
+.article-card[data-category="marketplace"] .category-badge { background-color: rgba(245, 158, 11, 0.2); color: #fde68a; border-color: rgba(245, 158, 11, 0.35); }
+
+.article-card[data-category="romance"] { border-left-color: #ec4899; }
+.article-card[data-category="romance"] .category-badge { background-color: rgba(236, 72, 153, 0.2); color: #fbcfe8; border-color: rgba(236, 72, 153, 0.35); }
+
+.article-card[data-category="other"] { border-left-color: #64748b; }
+.article-card[data-category="other"] .category-badge { background-color: rgba(148, 163, 184, 0.2); color: #e2e8f0; border-color: rgba(148, 163, 184, 0.35); }
 
 
 /* Card Body Layout */
@@ -151,12 +179,13 @@
     margin-bottom: 0.75rem;
     line-height: 1.4;
     transition: color var(--transition-fast);
+  color: #f8fafc;
     width: 100%;
     overflow-wrap: break-word;
 }
 
 .article-excerpt {
-    color: var(--text-muted);
+  color: #cbd5e1;
     font-size: 0.95rem;
     margin-bottom: 1.5rem;
     flex-grow: 1; /* Pushes meta to bottom */
@@ -165,13 +194,13 @@
 /* Card Meta/Footer */
 .article-meta {
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: #cbd5e1;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid var(--bg-surface-secondary);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .meta-item {
@@ -184,7 +213,7 @@
     font-size: 0.85rem;
     font-weight: 600;
     text-decoration: none;
-    color: var(--primary-color);
+  color: #f4b63f;
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -194,6 +223,7 @@
 .article-card:hover .read-more-btn {
     gap: 0.5rem;
     text-decoration: underline;
+  color: #ffd782;
 }
 
 .article-link-overlay {
