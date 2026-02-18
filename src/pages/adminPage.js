@@ -96,6 +96,12 @@ const dom = {
         categoryOther: document.getElementById('edit-article-category-other'),
         content: document.getElementById('edit-article-content'),
         published: document.getElementById('edit-article-published')
+    },
+    view: {
+        title: document.getElementById('view-article-title'),
+        category: document.getElementById('view-article-category'),
+        date: document.getElementById('view-article-date'),
+        content: document.getElementById('view-article-content')
     }
 };
 
@@ -771,6 +777,42 @@ function renderArticlesTable() {
     });
 }
 
+async function openViewArticleModal(articleId) {
+    if (!articleId || !dom.view.title) return;
+
+    try {
+        const article = await getArticleById(articleId);
+        if (!article) {
+            showToast('Новината не е намерена.', 'warning');
+            return;
+        }
+
+        dom.view.title.textContent = article.title || 'Без заглавие';
+        
+        if (dom.view.category) {
+            dom.view.category.textContent = getCategoryName(article.category);
+            dom.view.category.className = 'badge bg-primary'; 
+        }
+
+        if (dom.view.date) {
+            dom.view.date.textContent = formatDate(article.created_at);
+        }
+
+        if (dom.view.content) {
+             // Handle simple text formatting
+            const safeContent = article.content 
+                ? article.content.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, '<br>')
+                : 'Няма съдържание.';
+            dom.view.content.innerHTML = safeContent;
+        }
+
+        openModal('viewArticleModal');
+    } catch (error) {
+        console.error('Error opening article details:', error);
+        showToast('Неуспешно зареждане на детайли за новината.', 'error');
+    }
+}
+
 async function loadAdminArticles() {
     if (!dom.articlesBody) return;
 
@@ -999,7 +1041,14 @@ function initArticleEditing() {
             if (!action || !articleId) return;
 
             if (action === 'view-article') {
-                window.open(`news-details.html?id=${articleId}`, '_blank');
+                // Modified: Open in modal instead of new tab
+                // window.open(`news-details.html?id=${articleId}`, '_blank');
+                try {
+                    button.disabled = true;
+                    await openViewArticleModal(articleId);
+                } finally {
+                    button.disabled = false;
+                }
                 return;
             }
 

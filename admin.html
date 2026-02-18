@@ -263,6 +263,29 @@
     </div>
   </div>
 
+  <!-- View Article Modal -->
+  <div class="modal fade" id="viewArticleModal" tabindex="-1" aria-labelledby="viewArticleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewArticleModalLabel">Преглед на новина</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <h4 id="view-article-title" class="mb-3"></h4>
+            <div class="mb-3">
+                <span class="badge" id="view-article-category"></span>
+                <span class="text-muted ms-2" id="view-article-date"></span>
+            </div>
+            <div id="view-article-content" class="article-content"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="reportReviewModal" tabindex="-1" aria-labelledby="reportReviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
