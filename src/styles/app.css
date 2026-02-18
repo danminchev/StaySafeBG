@@ -440,8 +440,12 @@ main {
 
 .ss-report-details-stack {
   width: 100%;
-  max-width: 980px;
+  max-width: 1160px;
   margin-right: auto;
+}
+
+.ss-report-details-row {
+  margin-bottom: 1.5rem;
 }
 
 .ss-details-popup {
@@ -476,4 +480,19 @@ main {
 
 .ss-details-images-popup img {
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.ss-report-evidence-image {
+  height: auto;
+  object-fit: contain;
+}
+
+@media (min-width: 992px) {
+  .ss-report-details-row {
+    align-items: stretch !important;
+  }
+
+  .ss-report-details-row .ss-details-popup {
+    height: 100%;
+  }
 }

@@ -86,24 +86,30 @@ async function renderReportDetails(report) {
         </ol>
       </nav>
 
-      <article class="ss-details-popup mb-4">
-        <div class="ss-details-popup-body p-4 p-md-5">
-          <div class="d-flex flex-wrap gap-2 mb-3">
-            <span class="badge modal-category-badge">${category}</span>
-            <span class="badge modal-category-badge"><i class="bi bi-calendar3 me-1"></i>${dateText}</span>
-            <span class="badge modal-category-badge"><i class="bi bi-link-45deg me-1"></i>${sourceText}</span>
-          </div>
-          <h1 class="h2 fw-bold mb-3">${title}</h1>
-          <p class="mb-0 ss-details-description">${description}</p>
+      <div class="row g-4 align-items-start mb-4 ss-report-details-row">
+        <div class="col-12 col-lg-8">
+          <article class="ss-details-popup h-100">
+            <div class="ss-details-popup-body p-4 p-md-5">
+              <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge modal-category-badge">${category}</span>
+                <span class="badge modal-category-badge"><i class="bi bi-calendar3 me-1"></i>${dateText}</span>
+                <span class="badge modal-category-badge"><i class="bi bi-link-45deg me-1"></i>${sourceText}</span>
+              </div>
+              <h1 class="h2 fw-bold mb-3">${title}</h1>
+              <p class="mb-0 ss-details-description">${description}</p>
+            </div>
+          </article>
         </div>
-      </article>
 
-      <section id="report-images-section" class="ss-details-popup ss-details-images-popup mb-4 d-none">
-        <div class="ss-details-popup-body p-4 p-md-4">
-          <h2 class="h4 mb-3">Прикачени снимки</h2>
-          <div id="report-images-grid" class="row g-3"></div>
+        <div class="col-12 col-lg-4">
+          <section id="report-images-section" class="ss-details-popup ss-details-images-popup d-none">
+            <div class="ss-details-popup-body p-4 p-md-4">
+              <h2 class="h4 mb-3">Прикачени снимки</h2>
+              <div id="report-images-grid" class="row g-3"></div>
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
 
       <a href="community.html" class="btn btn-secondary">Обратно към общността</a>
     </div>
@@ -131,7 +137,7 @@ async function renderReportDetails(report) {
 
   filesWithUrls.forEach(({ file, url }) => {
     const col = document.createElement('div');
-    col.className = 'col-12 col-md-6 col-lg-4';
+    col.className = 'col-12';
 
     if (!url) {
       col.innerHTML = `
@@ -146,7 +152,7 @@ async function renderReportDetails(report) {
 
     col.innerHTML = `
       <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="d-block text-decoration-none">
-        <img src="${escapeHtml(url)}" alt="Прикачено изображение" class="img-fluid rounded border w-100" style="aspect-ratio: 4 / 3; object-fit: cover;">
+        <img src="${escapeHtml(url)}" alt="Прикачено изображение" class="img-fluid rounded border w-100 ss-report-evidence-image">
       </a>
     `;
 
