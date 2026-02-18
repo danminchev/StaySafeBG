@@ -50,6 +50,8 @@ body {
   background-color: #f4b63f;
   border-color: #f4b63f;
   color: #0d253d;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px rgba(244, 182, 63, 0.25), inset 0 -2px 0 rgba(13, 37, 61, 0.35);
 }
 
 .ss-navbar .ss-account-solid {

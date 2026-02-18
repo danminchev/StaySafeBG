@@ -150,19 +150,19 @@ function renderHeaderHtml(currentUser) {
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav mx-lg-auto mb-2 mb-lg-0 align-items-lg-center">
             <li class="nav-item mt-2 mt-lg-0 me-lg-2">
-              <a class="${ctaClass} ${homeIsActive ? 'ss-nav-btn-active' : ''}" href="index.html">Начало</a>
+              <a class="${ctaClass} ${homeIsActive ? 'ss-nav-btn-active' : ''}" href="index.html" ${homeIsActive ? 'aria-current="page"' : ''}>Начало</a>
             </li>
             <li class="nav-item mt-2 mt-lg-0 me-lg-2">
-              <a class="${ctaClass} ${checkIsActive ? 'ss-nav-btn-active' : ''}" href="scam-check.html">Провери</a>
+              <a class="${ctaClass} ${checkIsActive ? 'ss-nav-btn-active' : ''}" href="scam-check.html" ${checkIsActive ? 'aria-current="page"' : ''}>Провери</a>
             </li>
             <li class="nav-item mt-2 mt-lg-0 me-lg-2">
-              <a class="${ctaClass} ${reportIsActive ? 'ss-nav-btn-active' : ''}" href="report-scam.html">Докладвай</a>
+              <a class="${ctaClass} ${reportIsActive ? 'ss-nav-btn-active' : ''}" href="report-scam.html" ${reportIsActive ? 'aria-current="page"' : ''}>Докладвай</a>
             </li>
             <li class="nav-item mt-2 mt-lg-0">
-              <a class="${ctaClass} ${articlesIsActive ? 'ss-nav-btn-active' : ''}" href="news.html">Новини</a>
+              <a class="${ctaClass} ${articlesIsActive ? 'ss-nav-btn-active' : ''}" href="news.html" ${articlesIsActive ? 'aria-current="page"' : ''}>Новини</a>
             </li>
             <li class="nav-item mt-2 mt-lg-0 ms-lg-2">
-              <a class="${ctaClass} ${communityIsActive ? 'ss-nav-btn-active' : ''}" href="community.html">Общност</a>
+              <a class="${ctaClass} ${communityIsActive ? 'ss-nav-btn-active' : ''}" href="community.html" ${communityIsActive ? 'aria-current="page"' : ''}>Общност</a>
             </li>
           </ul>
 

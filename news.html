@@ -17,12 +17,22 @@
   
   <div class="articles-toolbar" id="articles-toolbar">
     <div class="container">
+      <div class="articles-page-indicator">
+        <span class="articles-page-kicker">StaySafeBG</span>
+        <div class="articles-page-title-wrap">
+          <img src="/logo-nav.png" alt="StaySafeBG" class="articles-page-logo" />
+          <h1 class="articles-page-title mb-1">Новини</h1>
+        </div>
+        <div class="articles-page-title-line" tabindex="0" aria-label="Акцентна линия за заглавието"></div>
+        <p class="articles-page-subtitle mb-0">Актуални новини и анализи за онлайн сигурност</p>
+      </div>
+
       <div class="row g-3 align-items-center justify-content-between">
         <!-- Search -->
         <div class="col-md-5 col-lg-5 search-container">
           <div class="input-group search-input-group">
             <input type="text" id="params-search" class="form-control" placeholder="Търсене на новини..." aria-label="Търсене">
-            <button class="btn btn-outline-secondary border-start-0 border" type="button">
+            <button class="btn ss-search-btn" type="button" aria-label="Търси">
                 <i class="bi bi-search"></i>
             </button>
           </div>
@@ -56,7 +66,7 @@
               <option value="az">🔤 А-Я</option>
             </select>
 
-            <button class="btn btn-outline-danger rounded-circle shadow-sm" id="btn-clear" title="Изчисти филтрите" style="width: 2.8rem; height: 2.8rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+            <button class="btn ss-toolbar-clear-btn rounded-circle shadow-sm" id="btn-clear" title="Изчисти филтрите" style="width: 2.8rem; height: 2.8rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
                <i class="bi bi-x-lg"></i>
             </button>
            </div>
