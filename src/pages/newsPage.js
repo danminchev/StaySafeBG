@@ -164,13 +164,15 @@ function openNewsModal(article) {
         console.warn('Cannot open modal: missing article, bootstrap or modal element');
         return;
     }
+
+	dom.modal.el.dataset.category = article.category || 'other';
     
     if(dom.modal.title) dom.modal.title.textContent = article.title;
     if(dom.modal.date) dom.modal.date.textContent = formatDate(article.created_at);
     if(dom.modal.category) {
         dom.modal.category.textContent = getCategoryName(article.category);
-        const colorClass = getCategoryColor(article.category);
-        dom.modal.category.className = `badge ${colorClass}`;
+		dom.modal.category.className = 'badge modal-category-badge';
+		dom.modal.category.dataset.category = article.category || 'other';
     }
     if(dom.modal.content) {
         // Handle newlines for text content
