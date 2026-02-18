@@ -15,6 +15,7 @@ function formatDate(dateString) {
 }
 
 function getCategoryName(categoryKey) {
+    const normalizedKey = String(categoryKey || '').toLowerCase();
     const categories = {
         'phishing': 'Фишинг',
         'phone': 'Телефонна измама',
@@ -38,17 +39,43 @@ function getCategoryName(categoryKey) {
         'charity_scams': 'Фалшиви каузи',
         'other': 'Други'
     };
-    return categories[categoryKey] || categoryKey || 'Новини';
+    return categories[normalizedKey] || categoryKey || 'Новини';
+}
+
+function localizeReportTitle(report) {
+    const rawTitle = String(report?.title || report?.scam_type || '').trim();
+    if (!rawTitle) return 'Доклад от общността';
+
+    const titleParts = rawTitle.split(' - ');
+    const rawPrefix = titleParts[0] || '';
+    const remainder = titleParts.slice(1).join(' - ');
+
+    const normalizedPrefix = String(rawPrefix || '').toLowerCase().replace(/\s+/g, '_');
+    const normalizedCategory = String(report?.category || '').toLowerCase();
+    const keyToTranslate = normalizedCategory || normalizedPrefix;
+    const localizedPrefix = getCategoryName(keyToTranslate);
+
+    if (!remainder) {
+        return localizedPrefix !== keyToTranslate ? localizedPrefix : rawTitle;
+    }
+
+    if (localizedPrefix === keyToTranslate) {
+        return rawTitle;
+    }
+
+    return `${localizedPrefix} - ${remainder}`;
 }
 
 function getCategoryIcon(categoryKey) {
+    const normalizedKey = String(categoryKey || '').toLowerCase();
     const icons = {
         'phishing': 'bi-envelope-exclamation-fill',
         'phone': 'bi-telephone-fill',
-        'security': 'bi-shield-lock-fill'
+        'security': 'bi-shield-lock-fill',
+        'other': 'bi-question-circle-fill'
     };
 
-    return icons[categoryKey] || 'bi-tag-fill';
+    return icons[normalizedKey] || 'bi-tag-fill';
 }
 
 function renderLatestArticles(articles) {
@@ -169,7 +196,7 @@ function renderApprovedReports(reports) {
         }
 
         const titleEl = wrapper.querySelector('.community-report-title');
-        titleEl.textContent = report.title || report.scam_type || 'Доклад от общността';
+        titleEl.textContent = localizeReportTitle(report);
 
         listContainer.appendChild(wrapper);
     });

@@ -42,6 +42,27 @@ function parseSource(source) {
 	};
 }
 
+function getScamTypeLabel(scamTypeKey) {
+	const labels = {
+		phishing: 'Фишинг',
+		phone: 'Телефонна измама',
+		investment: 'Инвестиционна измама',
+		shopping: 'Онлайн пазаруване',
+		online_shopping: 'Онлайн пазаруване',
+		social_media: 'Социални мрежи',
+		identity_theft: 'Кражба на самоличност',
+		job_scam: 'Измама с работа',
+		job_scams: 'Измама с работа',
+		crypto: 'Крипто измама',
+		marketplace: 'Marketplace измама',
+		romance: 'Романтична измама',
+		other: 'Друго'
+	};
+
+	const normalizedKey = String(scamTypeKey || '').trim().toLowerCase();
+	return labels[normalizedKey] || scamTypeKey;
+}
+
 async function handleReportSubmit(event) {
 	event.preventDefault();
 
@@ -88,9 +109,12 @@ async function handleReportSubmit(event) {
 
 	const finalScamType = scamType === 'other' ? scamTypeOther : scamType;
 	const finalCategory = scamType === 'other' ? 'other' : scamType;
+	const scamTypeLabel = scamType === 'other'
+		? scamTypeOther
+		: getScamTypeLabel(finalScamType);
 
 	const sourceFields = parseSource(source);
-	const reportTitle = `${finalScamType.toUpperCase()} - ${source || 'Без източник'}`;
+	const reportTitle = `${scamTypeLabel} - ${source || 'Без източник'}`;
 
 	const submitButton = event.target.querySelector('button[type="submit"]');
 	if (submitButton) {

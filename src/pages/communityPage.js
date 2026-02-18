@@ -39,6 +39,30 @@ function getSourceText(report) {
   return report.url || report.phone || report.iban || report.scam_type || 'Не е посочен';
 }
 
+function localizeReportTitle(report) {
+  const rawTitle = String(report?.title || report?.scam_type || '').trim();
+  if (!rawTitle) return 'Доклад от общността';
+
+  const titleParts = rawTitle.split(' - ');
+  const rawPrefix = titleParts[0] || '';
+  const remainder = titleParts.slice(1).join(' - ');
+
+  const normalizedPrefix = String(rawPrefix || '').toLowerCase().replace(/\s+/g, '_');
+  const normalizedCategory = String(report?.category || '').toLowerCase();
+  const keyToTranslate = normalizedCategory || normalizedPrefix;
+  const localizedPrefix = getCategoryName(keyToTranslate);
+
+  if (!remainder) {
+    return localizedPrefix !== 'Общи' ? localizedPrefix : rawTitle;
+  }
+
+  if (localizedPrefix === 'Общи') {
+    return rawTitle;
+  }
+
+  return `${localizedPrefix} - ${remainder}`;
+}
+
 function renderEmptyState(message) {
   const list = document.getElementById('community-reports-list');
   if (!list) return;
@@ -87,7 +111,7 @@ function renderReports(reports) {
 
     categoryBadge.textContent = getCategoryName(report.category);
     dateEl.textContent = formatDate(report.created_at);
-    titleEl.textContent = report.title || report.scam_type || 'Доклад от общността';
+    titleEl.textContent = localizeReportTitle(report);
     excerptEl.textContent = report.description || 'Няма допълнително описание.';
     sourceEl.textContent = getSourceText(report);
 
