@@ -2,7 +2,7 @@ import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
 import { getCurrentUser } from '../services/authService.js';
 import { getUserRole } from '../services/rolesService.js';
-import { deleteUserByAdmin, getAdminUsers } from '../services/adminUsersService.js';
+import { deleteUserByAdmin, getAdminUsers, updateUserRole } from '../services/adminUsersService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 import { createArticle, getAdminArticles, getArticleById, updateArticle, deleteArticle } from '../services/newsService.js';
 import {
@@ -102,6 +102,14 @@ const dom = {
         category: document.getElementById('view-article-category'),
         date: document.getElementById('view-article-date'),
         content: document.getElementById('view-article-content')
+    },
+    userView: {
+        id: document.getElementById('view-user-id'),
+        name: document.getElementById('view-user-name'),
+        email: document.getElementById('view-user-email'),
+        created: document.getElementById('view-user-created'),
+        roleSelect: document.getElementById('view-user-role-select'),
+        saveRoleBtn: document.getElementById('btn-update-user-role')
     }
 };
 
@@ -243,6 +251,16 @@ function renderUsersTable() {
         lastLoginCell.textContent = formatDateTime(user.last_sign_in_at);
 
         const actionsCell = document.createElement('td');
+        const actionsWrap = document.createElement('div');
+        actionsWrap.className = 'd-inline-flex gap-2';
+        
+        const viewBtn = document.createElement('button');
+        viewBtn.type = 'button';
+        viewBtn.className = 'btn btn-sm btn-outline-primary';
+        viewBtn.dataset.action = 'view-user';
+        viewBtn.dataset.userId = user.user_id;
+        viewBtn.textContent = 'Преглед';
+
         const deleteBtn = document.createElement('button');
         deleteBtn.type = 'button';
         deleteBtn.className = 'btn btn-sm btn-outline-danger';
@@ -254,8 +272,10 @@ function renderUsersTable() {
             deleteBtn.disabled = true;
             deleteBtn.title = 'Не може да изтриете собствения си акаунт';
         }
-
-        actionsCell.appendChild(deleteBtn);
+        
+        actionsWrap.appendChild(viewBtn);
+        actionsWrap.appendChild(deleteBtn);
+        actionsCell.appendChild(actionsWrap);
 
         row.appendChild(nameCell);
         row.appendChild(emailCell);
@@ -266,6 +286,66 @@ function renderUsersTable() {
 
         dom.usersBody.appendChild(row);
     });
+}
+
+async function openViewUserModal(userId) {
+    if (!userId) return;
+    const user = state.users.find(u => u.user_id === userId);
+    if (!user) {
+        showToast('Потребителят не е намерен.', 'error');
+        return;
+    }
+
+    if (dom.userView.id) dom.userView.id.value = user.user_id;
+    if (dom.userView.name) dom.userView.name.textContent = user.full_name || 'Няма име';
+    if (dom.userView.email) dom.userView.email.textContent = user.email || 'Няма имейл';
+    if (dom.userView.created) dom.userView.created.textContent = formatDate(user.created_at);
+    
+    // Set current role in dropdown
+    if (dom.userView.roleSelect) {
+        const currentRole = user.role || 'user';
+        // Ensure options exist for non-standard roles or just default to user
+        const options = Array.from(dom.userView.roleSelect.options).map(o => o.value);
+        if (options.includes(currentRole)) {
+            dom.userView.roleSelect.value = currentRole;
+        } else {
+            dom.userView.roleSelect.value = 'user';
+        }
+    }
+
+    openModal('viewUserModal');
+}
+
+async function handleUpdateUserRole() {
+    const userId = dom.userView.id?.value;
+    const newRole = dom.userView.roleSelect?.value;
+    const btn = dom.userView.saveRoleBtn;
+
+    if (!userId || !newRole) return;
+
+    // Safety check
+    if (userId === state.currentUserId && newRole !== 'admin') {
+         if(!confirm('Внимание! Опитвате се да премахнете собствените си админ права. Сигурни ли сте? Това ще ви изхвърли от панела.')) {
+             return;
+         }
+    }
+
+    const originalText = btn.textContent;
+    try {
+        btn.disabled = true;
+        btn.textContent = 'Запазване...';
+
+        await updateUserRole(userId, newRole);
+        showToast(`Ролята е променена успешно на "${newRole}".`, 'success');
+        closeModal('viewUserModal');
+        await loadAdminUsers();
+    } catch (error) {
+        console.error('Failed to update role:', error);
+        showToast('Грешка при обновяване на ролята: ' + error.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
 }
 
 async function loadAdminUsers() {
@@ -889,18 +969,32 @@ function initUserManagement() {
         });
     }
 
+    if (dom.userView.saveRoleBtn) {
+        dom.userView.saveRoleBtn.addEventListener('click', () => {
+            handleUpdateUserRole();
+        });
+    }
+
     if (dom.usersBody) {
         dom.usersBody.addEventListener('click', async (event) => {
             const target = event.target;
             if (!(target instanceof HTMLElement)) return;
 
-            const deleteButton = target.closest('button[data-action="delete-user"]');
-            if (!deleteButton) return;
+            const btn = target.closest('button[data-action]');
+            if (!btn) return;
 
-            const userId = deleteButton.dataset.userId;
-            if (!userId) return;
+            const action = btn.dataset.action;
+            const userId = btn.dataset.userId;
 
-            await deleteAdminUser(userId, deleteButton);
+            if (action === 'delete-user') {
+                 await deleteAdminUser(userId, btn);
+                 return;
+            }
+
+            if (action === 'view-user') {
+                await openViewUserModal(userId);
+                return;
+            }
         });
     }
 }

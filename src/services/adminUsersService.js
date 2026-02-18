@@ -16,3 +16,13 @@ export async function deleteUserByAdmin(userId) {
 
   if (error) throw error;
 }
+
+export async function updateUserRole(userId, newRole) {
+  const supabase = requireSupabase();
+  const { error } = await supabase.rpc('admin_update_user_role', {
+    target_user_id: userId,
+    new_role: newRole
+  });
+
+  if (error) throw error;
+}

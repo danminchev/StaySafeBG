@@ -286,6 +286,49 @@
     </div>
   </div>
 
+  <!-- View User Modal -->
+  <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewUserModalLabel">Преглед на потребител</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="view-user-id">
+            <dl class="row mb-4">
+                <dt class="col-sm-4">Име</dt>
+                <dd class="col-sm-8" id="view-user-name">-</dd>
+
+                <dt class="col-sm-4">Имейл</dt>
+                <dd class="col-sm-8" id="view-user-email">-</dd>
+
+                <dt class="col-sm-4">Регистриран</dt>
+                <dd class="col-sm-8" id="view-user-created">-</dd>
+            </dl>
+            
+            <hr>
+            
+            <h6 class="mb-3">Управление на роля</h6>
+            <div class="d-flex gap-2 align-items-center">
+                <select class="form-select" id="view-user-role-select">
+                    <option value="user">Потребител</option>
+                    <option value="moderator">Модератор</option>
+                    <option value="admin">Администратор</option>
+                </select>
+                <button class="btn btn-primary text-nowrap" id="btn-update-user-role">Запази роля</button>
+            </div>
+            <div class="form-text text-muted mt-2">
+                Внимание: Промяната на роля влияе веднага върху достъпа на потребителя.
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="reportReviewModal" tabindex="-1" aria-labelledby="reportReviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
