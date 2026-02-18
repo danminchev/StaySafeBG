@@ -68,13 +68,6 @@ function formatDate(dateValue) {
 	}).format(date);
 }
 
-function calculateReadingTime(text) {
-	const wpm = 200;
-	const words = (text || '').trim().split(/\s+/).length;
-	const time = Math.ceil(words / wpm);
-	return `~${time} мин`;
-}
-
 function getCategoryColor(cat) {
 	const map = {
 		'phishing': 'bg-danger-subtle text-danger-emphasis',
@@ -227,9 +220,6 @@ function createCard(article) {
 	
 	const dateSpan = clone.querySelector('.date-text');
 	if(dateSpan) dateSpan.textContent = formatDate(article.created_at);
-	
-	const timeSpan = clone.querySelector('.reading-time');
-	if(timeSpan) timeSpan.textContent = article.reading_time || calculateReadingTime(article.content);
 
     // Also attach click to "Read More" button if user clicks that specifically
     const readMoreBtn = clone.querySelector('.read-more-btn');

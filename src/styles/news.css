@@ -398,9 +398,9 @@
 
 /* Skeleton Loading */
 .skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.14) 25%, rgba(203, 213, 225, 0.2) 50%, rgba(148, 163, 184, 0.14) 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.8s infinite;
   border-radius: var(--border-radius-sm);
 }
 
@@ -426,7 +426,8 @@
 }
 
 /* News Details Modal - match main news popup style */
-#newsDetailsModal .modal-content {
+#newsDetailsModal .modal-content,
+#communityReportModal .modal-content {
   background: linear-gradient(135deg, #475569 0%, #334155 100%);
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 20px 40px rgba(3, 12, 32, 0.35);
@@ -436,81 +437,99 @@
 }
 
 #newsDetailsModal .modal-header,
-#newsDetailsModal .modal-footer {
+#newsDetailsModal .modal-footer,
+#communityReportModal .modal-header,
+#communityReportModal .modal-footer {
   border-color: rgba(255, 255, 255, 0.16);
   background-color: rgba(15, 23, 42, 0.2);
 }
 
-#newsDetailsModal .modal-title {
-  color: #c4e6f8;
+#newsDetailsModal .modal-title,
+#communityReportModal .modal-title {
+  color: #f8fafc;
 }
 
-#newsDetailsModal[data-category="phishing"] .modal-title { color: var(--cat-phishing-border); }
-#newsDetailsModal[data-category="identity_theft"] .modal-title { color: var(--cat-identity-border); }
-#newsDetailsModal[data-category="online_shopping"] .modal-title,
-#newsDetailsModal[data-category="shopping"] .modal-title { color: var(--cat-shopping-border); }
-#newsDetailsModal[data-category="investment"] .modal-title { color: var(--cat-investment-border); }
-#newsDetailsModal[data-category="tech_support"] .modal-title { color: var(--cat-tech-border); }
-#newsDetailsModal[data-category="job_scams"] .modal-title { color: var(--cat-job-border); }
-#newsDetailsModal[data-category="phone"] .modal-title { color: #f97316; }
-#newsDetailsModal[data-category="security"] .modal-title { color: #0ea5e9; }
-#newsDetailsModal[data-category="social"] .modal-title,
-#newsDetailsModal[data-category="social_media"] .modal-title { color: #8b5cf6; }
-#newsDetailsModal[data-category="crypto"] .modal-title { color: #a855f7; }
-#newsDetailsModal[data-category="marketplace"] .modal-title { color: #f59e0b; }
-#newsDetailsModal[data-category="romance"] .modal-title { color: #ec4899; }
-#newsDetailsModal[data-category="other"] .modal-title { color: #c4e6f8; }
-
 #newsDetailsModal #newsDetailsModalDate {
+  color: #dbe7f5 !important;
+}
+
+#communityReportModal #communityReportModalDate,
+#communityReportModal #communityReportModalSource {
   color: #dbe7f5 !important;
 }
 
 #newsDetailsModal .article-content,
 #newsDetailsModal .article-content p,
 #newsDetailsModal .article-content li,
-#newsDetailsModal .article-content span {
+#newsDetailsModal .article-content span,
+#communityReportModal .article-content,
+#communityReportModal .article-content p,
+#communityReportModal .article-content li,
+#communityReportModal .article-content span {
   color: #e5eefb;
 }
 
-#newsDetailsModal .article-content {
+#newsDetailsModal .article-content,
+#communityReportModal .article-content {
   line-height: 1.7;
+  white-space: pre-line;
 }
 
-#newsDetailsModal .modal-category-badge {
+#newsDetailsModal .modal-category-badge,
+#communityReportModal .modal-category-badge {
   background-color: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 #newsDetailsModal .modal-category-badge[data-category="phishing"] { background-color: rgba(79, 70, 229, 0.2); color: #c7d2fe; border-color: rgba(79, 70, 229, 0.35); }
+#communityReportModal .modal-category-badge[data-category="phishing"] { background-color: rgba(79, 70, 229, 0.2); color: #c7d2fe; border-color: rgba(79, 70, 229, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="identity_theft"] { background-color: rgba(225, 29, 72, 0.2); color: #fecdd3; border-color: rgba(225, 29, 72, 0.35); }
+#communityReportModal .modal-category-badge[data-category="identity_theft"] { background-color: rgba(225, 29, 72, 0.2); color: #fecdd3; border-color: rgba(225, 29, 72, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="online_shopping"],
 #newsDetailsModal .modal-category-badge[data-category="shopping"] { background-color: rgba(37, 99, 235, 0.2); color: #bfdbfe; border-color: rgba(37, 99, 235, 0.35); }
+#communityReportModal .modal-category-badge[data-category="online_shopping"],
+#communityReportModal .modal-category-badge[data-category="shopping"] { background-color: rgba(37, 99, 235, 0.2); color: #bfdbfe; border-color: rgba(37, 99, 235, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="investment"] { background-color: rgba(16, 185, 129, 0.2); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.35); }
+#communityReportModal .modal-category-badge[data-category="investment"] { background-color: rgba(16, 185, 129, 0.2); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="tech_support"] { background-color: rgba(245, 158, 11, 0.2); color: #fde68a; border-color: rgba(245, 158, 11, 0.35); }
+#communityReportModal .modal-category-badge[data-category="tech_support"] { background-color: rgba(245, 158, 11, 0.2); color: #fde68a; border-color: rgba(245, 158, 11, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="job_scams"] { background-color: rgba(20, 184, 166, 0.2); color: #99f6e4; border-color: rgba(20, 184, 166, 0.35); }
+#communityReportModal .modal-category-badge[data-category="job_scams"] { background-color: rgba(20, 184, 166, 0.2); color: #99f6e4; border-color: rgba(20, 184, 166, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="phone"] { background-color: rgba(249, 115, 22, 0.2); color: #fed7aa; border-color: rgba(249, 115, 22, 0.35); }
+#communityReportModal .modal-category-badge[data-category="phone"] { background-color: rgba(249, 115, 22, 0.2); color: #fed7aa; border-color: rgba(249, 115, 22, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="security"] { background-color: rgba(14, 165, 233, 0.2); color: #bae6fd; border-color: rgba(14, 165, 233, 0.35); }
+#communityReportModal .modal-category-badge[data-category="security"] { background-color: rgba(14, 165, 233, 0.2); color: #bae6fd; border-color: rgba(14, 165, 233, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="social"],
 #newsDetailsModal .modal-category-badge[data-category="social_media"] { background-color: rgba(139, 92, 246, 0.2); color: #ddd6fe; border-color: rgba(139, 92, 246, 0.35); }
+#communityReportModal .modal-category-badge[data-category="social"],
+#communityReportModal .modal-category-badge[data-category="social_media"] { background-color: rgba(139, 92, 246, 0.2); color: #ddd6fe; border-color: rgba(139, 92, 246, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="crypto"] { background-color: rgba(168, 85, 247, 0.2); color: #e9d5ff; border-color: rgba(168, 85, 247, 0.35); }
+#communityReportModal .modal-category-badge[data-category="crypto"] { background-color: rgba(168, 85, 247, 0.2); color: #e9d5ff; border-color: rgba(168, 85, 247, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="marketplace"] { background-color: rgba(245, 158, 11, 0.2); color: #fde68a; border-color: rgba(245, 158, 11, 0.35); }
+#communityReportModal .modal-category-badge[data-category="marketplace"] { background-color: rgba(245, 158, 11, 0.2); color: #fde68a; border-color: rgba(245, 158, 11, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="romance"] { background-color: rgba(236, 72, 153, 0.2); color: #fbcfe8; border-color: rgba(236, 72, 153, 0.35); }
+#communityReportModal .modal-category-badge[data-category="romance"] { background-color: rgba(236, 72, 153, 0.2); color: #fbcfe8; border-color: rgba(236, 72, 153, 0.35); }
 #newsDetailsModal .modal-category-badge[data-category="other"] { background-color: rgba(148, 163, 184, 0.2); color: #e2e8f0; border-color: rgba(148, 163, 184, 0.35); }
+#communityReportModal .modal-category-badge[data-category="other"] { background-color: rgba(148, 163, 184, 0.2); color: #e2e8f0; border-color: rgba(148, 163, 184, 0.35); }
 
-#newsDetailsModal .btn-close {
+#newsDetailsModal .btn-close,
+#communityReportModal .btn-close {
   filter: invert(1) grayscale(1) brightness(1.8);
   opacity: 0.9;
 }
 
-#newsDetailsModal .btn-secondary {
+#newsDetailsModal .btn-secondary,
+#communityReportModal .btn-secondary {
   background-color: #f4b63f;
   border-color: #f4b63f;
   color: #0d253d;
 }
 
 #newsDetailsModal .btn-secondary:hover,
-#newsDetailsModal .btn-secondary:focus {
+#newsDetailsModal .btn-secondary:focus,
+#communityReportModal .btn-secondary:hover,
+#communityReportModal .btn-secondary:focus {
   background-color: #e3a631;
   border-color: #e3a631;
   color: #0d253d;

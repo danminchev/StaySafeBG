@@ -48,23 +48,48 @@
         <div class="card-body">
           <div class="article-header">
             <span class="category-badge">Категория</span>
-            <span class="meta-item text-muted small">
-              <i class="bi bi-calendar3"></i>
-              <span class="community-date">Дата</span>
-            </span>
           </div>
           <h3 class="article-title line-clamp-2 mb-2">Заглавие</h3>
           <p class="article-excerpt line-clamp-3 mb-3">Описание</p>
           <div class="article-meta">
             <span class="meta-item">
-              <i class="bi bi-link-45deg"></i>
-              <span class="community-source text-truncate">Източник</span>
+              <i class="bi bi-calendar3"></i>
+              <span class="community-date">Дата</span>
+            </span>
+            <span class="read-more-btn ms-auto">
+              Прочети
+              <i class="bi bi-arrow-right"></i>
             </span>
           </div>
         </div>
       </article>
     </div>
   </template>
+
+  <div class="modal fade" id="communityReportModal" tabindex="-1" aria-labelledby="communityReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title" id="communityReportModalLabel">Детайли за доклад</h5>
+            <small class="text-muted" id="communityReportModalDate">Дата</small>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+            <span class="badge modal-category-badge" id="communityReportModalCategory">Категория</span>
+            <span class="small" id="communityReportModalSource"></span>
+          </div>
+
+          <div class="article-content" id="communityReportModalContent"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script type="module" src="./src/pages/communityPage.js"></script>

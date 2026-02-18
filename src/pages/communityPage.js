@@ -3,6 +3,17 @@ import { renderFooter } from '../components/footer.js';
 import { getApprovedReportsFeed } from '../services/reportsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
+const dom = {
+  modal: {
+    el: document.getElementById('communityReportModal'),
+    title: document.getElementById('communityReportModalLabel'),
+    date: document.getElementById('communityReportModalDate'),
+    category: document.getElementById('communityReportModalCategory'),
+    source: document.getElementById('communityReportModalSource'),
+    content: document.getElementById('communityReportModalContent')
+  }
+};
+
 function formatDate(dateString) {
   if (!dateString) return 'Без дата';
 
@@ -35,8 +46,66 @@ function getCategoryName(category) {
   return map[category] || 'Общи';
 }
 
+function getCategoryIcon(category) {
+  const map = {
+    phishing: 'bi-bug-fill',
+    phone: 'bi-telephone-fill',
+    shopping: 'bi-cart-fill',
+    online_shopping: 'bi-cart-fill',
+    investment: 'bi-graph-up-arrow',
+    security: 'bi-shield-fill-check',
+    identity_theft: 'bi-person-vcard-fill',
+    tech_support: 'bi-tools',
+    job_scams: 'bi-briefcase-fill',
+    romance: 'bi-heart-fill',
+    social: 'bi-chat-dots-fill',
+    social_media: 'bi-chat-dots-fill',
+    crypto: 'bi-currency-bitcoin',
+    marketplace: 'bi-tag-fill',
+    other: 'bi-grid-fill'
+  };
+
+  return map[category] || 'bi-newspaper';
+}
+
 function getSourceText(report) {
   return report.url || report.phone || report.iban || report.scam_type || 'Не е посочен';
+}
+
+function openReportModal(report) {
+  if (!report || !window.bootstrap || !dom.modal.el) {
+    return;
+  }
+
+  const category = report.category || 'other';
+  const categoryName = getCategoryName(category);
+  const source = getSourceText(report);
+
+  dom.modal.el.dataset.category = category;
+
+  if (dom.modal.title) {
+    dom.modal.title.textContent = localizeReportTitle(report);
+  }
+
+  if (dom.modal.date) {
+    dom.modal.date.textContent = formatDate(report.created_at);
+  }
+
+  if (dom.modal.category) {
+    dom.modal.category.dataset.category = category;
+    dom.modal.category.textContent = categoryName;
+  }
+
+  if (dom.modal.source) {
+    dom.modal.source.textContent = `Източник: ${source}`;
+  }
+
+  if (dom.modal.content) {
+    dom.modal.content.textContent = report.description || 'Няма допълнително описание.';
+  }
+
+  const modal = window.bootstrap.Modal.getOrCreateInstance(dom.modal.el);
+  modal.show();
 }
 
 function localizeReportTitle(report) {
@@ -99,7 +168,6 @@ function renderReports(reports) {
     const dateEl = fragment.querySelector('.community-date');
     const titleEl = fragment.querySelector('.article-title');
     const excerptEl = fragment.querySelector('.article-excerpt');
-    const sourceEl = fragment.querySelector('.community-source');
 
     if (cardEl) {
       cardEl.dataset.category = report.category || 'other';
@@ -107,13 +175,23 @@ function renderReports(reports) {
 
     if (linkEl) {
       linkEl.href = `article-details.html?id=${report.id}`;
+      linkEl.addEventListener('click', (event) => {
+        event.preventDefault();
+        openReportModal(report);
+      });
     }
 
-    categoryBadge.textContent = getCategoryName(report.category);
+    if (categoryBadge) {
+      const category = report.category || 'other';
+      const categoryName = getCategoryName(category);
+      const iconClass = getCategoryIcon(category);
+
+      categoryBadge.dataset.category = category;
+      categoryBadge.innerHTML = `<i class="bi ${iconClass}"></i><span>${categoryName}</span>`;
+    }
     dateEl.textContent = formatDate(report.created_at);
     titleEl.textContent = localizeReportTitle(report);
     excerptEl.textContent = report.description || 'Няма допълнително описание.';
-    sourceEl.textContent = getSourceText(report);
 
     list.appendChild(fragment);
   });
