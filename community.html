@@ -15,11 +15,25 @@
 <body class="d-flex flex-column min-vh-100">
   <header id="app-header"></header>
 
-  <main class="container py-4" id="page-content">
-    <section class="p-4 p-md-5 mb-4 rounded-4 home-popup-theme shadow-sm">
-      <h1 class="h2 fw-bold mb-2 text-heading"><i class="bi bi-people-fill me-2 text-success"></i>Общност</h1>
-      <p class="text-muted mb-0">Тук ще намерите одобрените доклади от потребителите, за да се предпазвате от актуални измами.</p>
-    </section>
+  <div class="articles-toolbar" id="community-toolbar">
+    <div class="container">
+      <div class="articles-page-indicator">
+        <div class="articles-page-title-wrap">
+          <h1 class="articles-page-title mb-1">
+            Общност
+            <span class="community-title-icons" aria-hidden="true">
+              <i class="bi bi-person-fill community-icon-green"></i>
+              <i class="bi bi-person-fill community-icon-red"></i>
+            </span>
+          </h1>
+        </div>
+        <div class="articles-page-title-line" tabindex="0" aria-label="Акцентна линия за заглавието"></div>
+        <p class="articles-page-subtitle mb-0">Тук ще намерите одобрените доклади от потребителите, за да се предпазвате от актуални измами.</p>
+      </div>
+    </div>
+  </div>
+
+  <main class="container mb-5" id="page-content">
 
     <section>
       <div class="d-flex justify-content-between align-items-center mb-3">

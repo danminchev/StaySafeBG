@@ -92,6 +92,21 @@
   font-size: 0.96rem;
 }
 
+#community-toolbar .community-title-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-left: 0.5rem;
+}
+
+#community-toolbar .community-icon-green {
+  color: #22c55e;
+}
+
+#community-toolbar .community-icon-red {
+  color: #ef4444;
+}
+
 /* ToolBar Inputs */
 .search-input-group {
     position: relative;
