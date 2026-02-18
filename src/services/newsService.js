@@ -88,6 +88,17 @@ export async function getAdminArticles({ limit = 100, offset = 0 } = {}) {
   return { data: data || [], count: count || 0 };
 }
 
+export async function deleteArticle(articleId) {
+  const supabase = requireSupabase();
+
+  const { error } = await supabase
+    .from('news')
+    .delete()
+    .eq('id', articleId);
+
+  if (error) throw error;
+}
+
 export async function updateArticle(articleId, articleData) {
   const supabase = requireSupabase();
 

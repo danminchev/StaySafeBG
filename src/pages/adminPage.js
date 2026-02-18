@@ -4,7 +4,7 @@ import { getCurrentUser } from '../services/authService.js';
 import { getUserRole } from '../services/rolesService.js';
 import { deleteUserByAdmin, getAdminUsers } from '../services/adminUsersService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
-import { createArticle, getAdminArticles, getArticleById, updateArticle } from '../services/newsService.js';
+import { createArticle, getAdminArticles, getArticleById, updateArticle, deleteArticle } from '../services/newsService.js';
 import {
     deleteAdminReport,
     getAdminReports,
@@ -731,13 +731,35 @@ function renderArticlesTable() {
         dateCell.textContent = formatDate(article.created_at);
 
         const actionsCell = document.createElement('td');
+        actionsCell.className = 'text-end';
+        const actionsWrap = document.createElement('div');
+        actionsWrap.className = 'd-inline-flex justify-content-end gap-2';
+
+        const viewBtn = document.createElement('button');
+        viewBtn.type = 'button';
+        viewBtn.className = 'btn btn-sm btn-outline-primary';
+        viewBtn.dataset.action = 'view-article';
+        viewBtn.dataset.articleId = article.id;
+        viewBtn.textContent = 'Преглед';
+
         const editBtn = document.createElement('button');
         editBtn.type = 'button';
-        editBtn.className = 'btn btn-sm btn-outline-primary';
+        editBtn.className = 'btn btn-sm btn-outline-success';
         editBtn.dataset.action = 'edit-article';
         editBtn.dataset.articleId = article.id;
         editBtn.textContent = 'Редактирай';
-        actionsCell.appendChild(editBtn);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-sm btn-outline-danger';
+        deleteBtn.dataset.action = 'delete-article';
+        deleteBtn.dataset.articleId = article.id;
+        deleteBtn.textContent = 'Изтрий';
+
+        actionsWrap.appendChild(viewBtn);
+        actionsWrap.appendChild(editBtn);
+        actionsWrap.appendChild(deleteBtn);
+        actionsCell.appendChild(actionsWrap);
 
         row.appendChild(titleCell);
         row.appendChild(categoryCell);
@@ -968,39 +990,68 @@ function initArticleEditing() {
             const target = event.target;
             if (!(target instanceof HTMLElement)) return;
 
-            const editButton = target.closest('button[data-action="edit-article"]');
-            if (!editButton) return;
+            const button = target.closest('button[data-action]');
+            if (!button) return;
 
-            const articleId = editButton.dataset.articleId;
-            if (!articleId) return;
+            const action = button.dataset.action;
+            const articleId = button.dataset.articleId;
 
-            try {
-                editButton.disabled = true;
-                const article = await getArticleById(articleId);
-                if (!article) {
-                    showToast('Новината не беше намерена.', 'warning');
-                    return;
+            if (!action || !articleId) return;
+
+            if (action === 'view-article') {
+                window.open(`news-details.html?id=${articleId}`, '_blank');
+                return;
+            }
+
+            if (action === 'delete-article') {
+                if (confirm('Сигурни ли сте, че искате да изтриете тази новина?')) {
+                    const originalText = button.textContent;
+                    try {
+                        button.disabled = true;
+                        button.textContent = 'Изтриване...';
+                        await deleteArticle(articleId);
+                        showToast('Новината е изтрита успешно.', 'success');
+                        await loadAdminArticles();
+                    } catch (error) {
+                        console.error('Error deleting article:', error);
+                        showToast('Неуспешно изтриване на новина.', 'error');
+                    } finally {
+                        button.disabled = false;
+                        button.textContent = originalText;
+                    }
                 }
+                return;
+            }
 
-                dom.edit.id.value = article.id;
-                dom.edit.title.value = article.title || '';
-                if (predefinedCategories.has(article.category)) {
-                    dom.edit.category.value = article.category;
-                    toggleOtherCategoryInput(dom.edit.category, dom.edit.categoryOtherWrap, dom.edit.categoryOther);
-                } else {
-                    dom.edit.category.value = 'other';
-                    toggleOtherCategoryInput(dom.edit.category, dom.edit.categoryOtherWrap, dom.edit.categoryOther);
-                    dom.edit.categoryOther.value = article.category || '';
+            if (action === 'edit-article') {
+                try {
+                    button.disabled = true;
+                    const article = await getArticleById(articleId);
+                    if (!article) {
+                        showToast('Новината не беше намерена.', 'warning');
+                        return;
+                    }
+
+                    dom.edit.id.value = article.id;
+                    dom.edit.title.value = article.title || '';
+                    if (predefinedCategories.has(article.category)) {
+                        dom.edit.category.value = article.category;
+                        toggleOtherCategoryInput(dom.edit.category, dom.edit.categoryOtherWrap, dom.edit.categoryOther);
+                    } else {
+                        dom.edit.category.value = 'other';
+                        toggleOtherCategoryInput(dom.edit.category, dom.edit.categoryOtherWrap, dom.edit.categoryOther);
+                        dom.edit.categoryOther.value = article.category || '';
+                    }
+                    dom.edit.content.value = article.content || '';
+                    dom.edit.published.checked = Boolean(article.is_published);
+
+                    openModal('editArticleModal');
+                } catch (error) {
+                    console.error('Error opening article editor:', error);
+                    showToast('Неуспешно отваряне на новина за редакция.', 'error');
+                } finally {
+                    button.disabled = false;
                 }
-                dom.edit.content.value = article.content || '';
-                dom.edit.published.checked = Boolean(article.is_published);
-
-                openModal('editArticleModal');
-            } catch (error) {
-                console.error('Error opening article editor:', error);
-                showToast('Неуспешно отваряне на новина за редакция.', 'error');
-            } finally {
-                editButton.disabled = false;
             }
         });
     }
