@@ -21,7 +21,8 @@ const state = {
     reports: [],
     users: [],
     selectedReportId: null,
-    currentUserId: null
+    currentUserId: null,
+    currentUserRole: 'user'
 };
 
 const predefinedCategories = new Set([
@@ -42,6 +43,9 @@ const predefinedCategories = new Set([
 
 const dom = {
     container: document.getElementById('page-content'),
+    dashboardTitle: document.getElementById('dashboard-title'),
+    usersSection: document.getElementById('admin-users-section'),
+    usersStatCard: document.getElementById('admin-users-stat-card'),
     createSaveBtn: document.getElementById('btn-save-article'),
     updateBtn: document.getElementById('btn-update-article'),
     refreshBtn: document.getElementById('btn-refresh-articles'),
@@ -124,6 +128,10 @@ function showForbidden(message) {
 		<div class="alert alert-danger" role="alert">${message}</div>
 		<a href="index.html" class="btn btn-primary mt-2">Към началната страница</a>
 	`;
+}
+
+function canManageUsers() {
+    return state.currentUserRole === 'admin';
 }
 
 // Ensure bootstrap is available
@@ -959,13 +967,14 @@ async function initAdminPage() {
 		}
 
 		const role = await getUserRole(user.id);
-		if (role !== 'admin') {
+        if (role !== 'admin' && role !== 'moderator') {
 			// Redirect immediately if not admin
 			window.location.replace('index.html');
 			return;
 		}
 
         state.currentUserId = user.id;
+        state.currentUserRole = role;
 
 		// Proceed to render admin content...
 		renderAdminContent();
@@ -979,6 +988,19 @@ async function initAdminPage() {
 function renderAdminContent() {
     const container = dom.container;
 	if (!container) return;
+
+    if (dom.dashboardTitle) {
+        dom.dashboardTitle.textContent = state.currentUserRole === 'moderator' ? 'Модератор Панел' : 'Админ Панел';
+    }
+
+    if (!canManageUsers()) {
+        if (dom.usersSection) {
+            dom.usersSection.style.display = 'none';
+        }
+        if (dom.usersStatCard) {
+            dom.usersStatCard.style.display = 'none';
+        }
+    }
     
     container.style.display = 'block'; 
     // Instead of overwriting, we can just log success or initialize specific JS components if needed.
@@ -988,11 +1010,14 @@ function renderAdminContent() {
     initArticleCreation();
 	initArticleEditing();
 	initReportReviewing();
-	initUserManagement();
 	loadAdminReports();
 	loadAdminReportStats();
 	loadAdminArticles();
-	loadAdminUsers();
+
+    if (canManageUsers()) {
+        initUserManagement();
+        loadAdminUsers();
+    }
 }
 
 function initUserManagement() {

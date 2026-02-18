@@ -48,6 +48,12 @@ function isAdminUser(user) {
   return role === 'admin';
 }
 
+function isModeratorUser(user) {
+  if (!user) return false;
+  const role = typeof user.role === 'string' ? user.role.toLowerCase() : '';
+  return role === 'moderator';
+}
+
 function isLoggedIn(user) {
   if (user) return true;
   const token = localStorage.getItem('token') || localStorage.getItem('authToken');
@@ -92,6 +98,7 @@ async function resolveCurrentUser() {
 function renderHeaderHtml(currentUser) {
   const loggedIn = isLoggedIn(currentUser);
   const isAdmin = isAdminUser(currentUser);
+  const isModerator = isModeratorUser(currentUser);
   const userLabel = escapeHtml(currentUser?.email || currentUser?.username || 'Профил');
   const activePage = getActivePage();
   const ctaClass = 'btn ss-nav-btn fw-semibold px-4 py-2 fs-5 border-2';
@@ -121,10 +128,10 @@ function renderHeaderHtml(currentUser) {
       </li>
     `;
 
-  const adminActionHtml = isAdmin
+  const managementActionHtml = (isAdmin || isModerator)
     ? `
       <li class="nav-item mt-2 mt-lg-0 ms-lg-2">
-        <a class="btn ss-account-btn fw-semibold px-4 py-2 fs-6 border-2" href="admin.html">Админ</a>
+        <a class="btn ss-account-btn fw-semibold px-4 py-2 fs-6 border-2" href="admin.html">${isAdmin ? 'Админ' : 'Модератор'}</a>
       </li>
     `
     : '';
@@ -161,7 +168,7 @@ function renderHeaderHtml(currentUser) {
 
           <ul class="navbar-nav mb-2 mb-lg-0 align-items-lg-center ms-lg-3">
             ${accountActionsHtml}
-            ${adminActionHtml}
+            ${managementActionHtml}
           </ul>
         </div>
       </div>
