@@ -87,7 +87,10 @@
         </table>
       </div>
       
-      <h2>Последни доклади</h2>
+      <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
+        <h2 class="mb-0">Управление на доклади</h2>
+        <button class="btn btn-outline-primary" id="btn-refresh-reports" type="button">Обнови доклади</button>
+      </div>
       <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead>
@@ -296,6 +299,86 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
           <button type="button" class="btn btn-outline-danger" id="btn-reject-report">Отхвърли</button>
           <button type="button" class="btn btn-success" id="btn-approve-report">Добави като потвърдена</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="editReportModal" tabindex="-1" aria-labelledby="editReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editReportModalLabel">Редакция на доклад</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-report-form">
+            <input type="hidden" id="edit-report-id">
+
+            <div class="mb-3">
+              <label for="edit-report-title" class="form-label">Заглавие</label>
+              <input type="text" class="form-control" id="edit-report-title" required>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="edit-report-type" class="form-label">Тип измама</label>
+                <input type="text" class="form-control" id="edit-report-type" maxlength="100" placeholder="напр. Фишинг">
+              </div>
+              <div class="col-md-6">
+                <label for="edit-report-category" class="form-label">Категория</label>
+                <select class="form-select" id="edit-report-category" required>
+                  <option value="phishing">Фишинг</option>
+                  <option value="shopping">Пазаруване</option>
+                  <option value="online_shopping">Онлайн пазаруване</option>
+                  <option value="investment">Инвестиции</option>
+                  <option value="security">Сигурност</option>
+                  <option value="identity_theft">Кражба на самоличност</option>
+                  <option value="tech_support">Техническа поддръжка</option>
+                  <option value="job_scams">Измами с работа</option>
+                  <option value="phone">Телефонна измама</option>
+                  <option value="romance">Романтична измама</option>
+                  <option value="social">Социални мрежи</option>
+                  <option value="crypto">Крипто измама</option>
+                  <option value="marketplace">Marketplace измама</option>
+                  <option value="other">Друго</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label for="edit-report-url" class="form-label">URL</label>
+                <input type="url" class="form-control" id="edit-report-url" placeholder="https://...">
+              </div>
+              <div class="col-md-4">
+                <label for="edit-report-phone" class="form-label">Телефон</label>
+                <input type="text" class="form-control" id="edit-report-phone" maxlength="40" placeholder="+359...">
+              </div>
+              <div class="col-md-4">
+                <label for="edit-report-iban" class="form-label">IBAN</label>
+                <input type="text" class="form-control" id="edit-report-iban" maxlength="40" placeholder="BG..">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="edit-report-description" class="form-label">Описание</label>
+              <textarea class="form-control" id="edit-report-description" rows="5" required></textarea>
+            </div>
+
+            <div class="mb-0">
+              <label for="edit-report-status" class="form-label">Статус</label>
+              <select class="form-select" id="edit-report-status" required>
+                <option value="pending">Чакащ</option>
+                <option value="approved">Потвърден</option>
+                <option value="rejected">Отхвърлен</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
+          <button type="button" class="btn btn-primary" id="btn-update-report">Запази промените</button>
         </div>
       </div>
     </div>

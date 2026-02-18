@@ -5,7 +5,15 @@ import { getUserRole } from '../services/rolesService.js';
 import { deleteUserByAdmin, getAdminUsers } from '../services/adminUsersService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 import { createArticle, getAdminArticles, getArticleById, updateArticle } from '../services/newsService.js';
-import { getAdminReports, getAdminReportById, getAdminReportStats, getEvidenceFileSignedUrl, updateReportStatus } from '../services/reportsService.js';
+import {
+    deleteAdminReport,
+    getAdminReports,
+    getAdminReportById,
+    getAdminReportStats,
+    getEvidenceFileSignedUrl,
+    updateAdminReport,
+    updateReportStatus
+} from '../services/reportsService.js';
 import { showToast } from '../utils/notifications.js';
 
 const state = {
@@ -37,6 +45,7 @@ const dom = {
     createSaveBtn: document.getElementById('btn-save-article'),
     updateBtn: document.getElementById('btn-update-article'),
     refreshBtn: document.getElementById('btn-refresh-articles'),
+    reportsRefreshBtn: document.getElementById('btn-refresh-reports'),
     articlesBody: document.getElementById('admin-articles-body'),
     usersRefreshBtn: document.getElementById('btn-refresh-users'),
     usersBody: document.getElementById('admin-users-body'),
@@ -57,6 +66,18 @@ const dom = {
         files: document.getElementById('review-report-files'),
         approveBtn: document.getElementById('btn-approve-report'),
         rejectBtn: document.getElementById('btn-reject-report')
+    },
+    reportEdit: {
+        id: document.getElementById('edit-report-id'),
+        title: document.getElementById('edit-report-title'),
+        type: document.getElementById('edit-report-type'),
+        category: document.getElementById('edit-report-category'),
+        url: document.getElementById('edit-report-url'),
+        phone: document.getElementById('edit-report-phone'),
+        iban: document.getElementById('edit-report-iban'),
+        description: document.getElementById('edit-report-description'),
+        status: document.getElementById('edit-report-status'),
+        updateBtn: document.getElementById('btn-update-report')
     },
     create: {
         title: document.getElementById('article-title'),
@@ -176,6 +197,11 @@ function getReportStatusPriority(status) {
     };
 
     return priorityMap[status] ?? 99;
+}
+
+function toNullIfEmpty(value) {
+    const normalized = value?.trim();
+    return normalized ? normalized : null;
 }
 
 function renderUsersTable() {
@@ -321,6 +347,10 @@ function renderReportsTable() {
         statusCell.appendChild(statusBadge);
 
         const actionsCell = document.createElement('td');
+        actionsCell.className = 'text-end';
+        const actionsWrap = document.createElement('div');
+        actionsWrap.className = 'd-inline-flex justify-content-end gap-2';
+
         const viewBtn = document.createElement('button');
         viewBtn.type = 'button';
         viewBtn.className = 'btn btn-sm btn-outline-primary';
@@ -328,7 +358,24 @@ function renderReportsTable() {
         viewBtn.dataset.reportId = report.id;
         viewBtn.textContent = 'Преглед';
 
-        actionsCell.appendChild(viewBtn);
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'btn btn-sm btn-outline-secondary';
+        editBtn.dataset.action = 'edit-report';
+        editBtn.dataset.reportId = report.id;
+        editBtn.textContent = 'Редактирай';
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'btn btn-sm btn-outline-danger';
+        deleteBtn.dataset.action = 'delete-report';
+        deleteBtn.dataset.reportId = report.id;
+        deleteBtn.textContent = 'Изтрий';
+
+        actionsWrap.appendChild(viewBtn);
+        actionsWrap.appendChild(editBtn);
+        actionsWrap.appendChild(deleteBtn);
+        actionsCell.appendChild(actionsWrap);
 
         row.appendChild(indexCell);
         row.appendChild(dateCell);
@@ -339,6 +386,116 @@ function renderReportsTable() {
 
         dom.reportsBody.appendChild(row);
     });
+}
+
+async function openReportEdit(reportId) {
+    if (!reportId) return;
+
+    try {
+        const report = await getAdminReportById(reportId);
+        dom.reportEdit.id.value = report.id;
+        dom.reportEdit.title.value = report.title || '';
+        dom.reportEdit.type.value = report.scam_type || '';
+        dom.reportEdit.category.value = predefinedCategories.has(report.category) || report.category === 'other'
+            ? report.category
+            : 'other';
+        dom.reportEdit.url.value = report.url || '';
+        dom.reportEdit.phone.value = report.phone || '';
+        dom.reportEdit.iban.value = report.iban || '';
+        dom.reportEdit.description.value = report.description || '';
+        dom.reportEdit.status.value = report.status || 'pending';
+        openModal('editReportModal');
+    } catch (error) {
+        console.error('Error opening report editor:', error);
+        showToast('Неуспешно отваряне на доклада за редакция.', 'error');
+    }
+}
+
+async function saveEditedReport() {
+    const reportId = dom.reportEdit.id?.value;
+    if (!reportId) {
+        showToast('Липсва избран доклад за редакция.', 'warning');
+        return;
+    }
+
+    const title = dom.reportEdit.title.value.trim();
+    const category = dom.reportEdit.category.value;
+    const description = dom.reportEdit.description.value.trim();
+    const status = dom.reportEdit.status.value;
+
+    if (!title || !category || !description || !status) {
+        showToast('Моля попълнете задължителните полета.', 'warning');
+        return;
+    }
+
+    const button = dom.reportEdit.updateBtn;
+    const originalText = button?.textContent || 'Запази промените';
+
+    try {
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Запазване...';
+        }
+
+        await updateAdminReport(reportId, {
+            title,
+            category,
+            description,
+            scam_type: toNullIfEmpty(dom.reportEdit.type.value),
+            url: toNullIfEmpty(dom.reportEdit.url.value),
+            phone: toNullIfEmpty(dom.reportEdit.phone.value),
+            iban: toNullIfEmpty(dom.reportEdit.iban.value),
+            status
+        });
+
+        closeModal('editReportModal');
+        showToast('Докладът е редактиран успешно.', 'success');
+
+        await Promise.all([
+            loadAdminReports(),
+            loadAdminReportStats()
+        ]);
+    } catch (error) {
+        console.error('Error updating report:', error);
+        showToast('Неуспешно запазване на доклада.', 'error');
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+}
+
+async function deleteSelectedReport(reportId, button) {
+    if (!reportId) return;
+
+    const isConfirmed = window.confirm('Сигурни ли сте, че искате да изтриете този доклад?');
+    if (!isConfirmed) return;
+
+    const originalText = button?.textContent || 'Изтрий';
+
+    try {
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Изтриване...';
+        }
+
+        await deleteAdminReport(reportId);
+        showToast('Докладът е изтрит успешно.', 'success');
+
+        await Promise.all([
+            loadAdminReports(),
+            loadAdminReportStats()
+        ]);
+    } catch (error) {
+        console.error('Error deleting report:', error);
+        showToast('Неуспешно изтриване на доклада.', 'error');
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
 }
 
 async function loadAdminReports() {
@@ -685,22 +842,45 @@ function initUserManagement() {
 }
 
 function initReportReviewing() {
+    if (dom.reportsRefreshBtn) {
+        dom.reportsRefreshBtn.addEventListener('click', () => {
+            loadAdminReports();
+            loadAdminReportStats();
+        });
+    }
+
     if (dom.reportsBody) {
         dom.reportsBody.addEventListener('click', async (event) => {
             const target = event.target;
             if (!(target instanceof HTMLElement)) return;
 
-            const viewButton = target.closest('button[data-action="review-report"]');
-            if (!viewButton) return;
+            const reportButton = target.closest('button[data-action]');
+            if (!reportButton) return;
 
-            const reportId = viewButton.dataset.reportId;
+            const action = reportButton.dataset.action;
+            if (!action) return;
+
+            const reportId = reportButton.dataset.reportId;
             if (!reportId) return;
 
             try {
-                viewButton.disabled = true;
-                await openReportReview(reportId);
+                reportButton.disabled = true;
+
+                if (action === 'review-report') {
+                    await openReportReview(reportId);
+                    return;
+                }
+
+                if (action === 'edit-report') {
+                    await openReportEdit(reportId);
+                    return;
+                }
+
+                if (action === 'delete-report') {
+                    await deleteSelectedReport(reportId, reportButton);
+                }
             } finally {
-                viewButton.disabled = false;
+                reportButton.disabled = false;
             }
         });
     }
@@ -711,6 +891,12 @@ function initReportReviewing() {
 
     if (dom.reportReview.rejectBtn) {
         dom.reportReview.rejectBtn.addEventListener('click', () => changeSelectedReportStatus('rejected'));
+    }
+
+    if (dom.reportEdit.updateBtn) {
+        dom.reportEdit.updateBtn.addEventListener('click', () => {
+            saveEditedReport();
+        });
     }
 }
 

@@ -1,5 +1,7 @@
 import { requireSupabase } from './supabaseClient.js';
 
+const EVIDENCE_BUCKET = 'evidence';
+
 export async function createScamReport({
   title,
   description,
@@ -164,6 +166,60 @@ export async function updateReportStatus(reportId, status) {
 
   if (error) throw error;
   return data;
+}
+
+export async function updateAdminReport(reportId, updates) {
+  const supabase = requireSupabase();
+  const normalizedPayload = {
+    title: updates.title,
+    description: updates.description,
+    category: updates.category,
+    scam_type: updates.scam_type,
+    url: updates.url,
+    phone: updates.phone,
+    iban: updates.iban,
+    status: updates.status,
+  };
+
+  const { data, error } = await supabase
+    .from('scam_reports')
+    .update(normalizedPayload)
+    .eq('id', reportId)
+    .select('id, title, description, category, scam_type, url, phone, iban, status, created_at')
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteAdminReport(reportId) {
+  const supabase = requireSupabase();
+
+  const { data: files, error: filesError } = await supabase
+    .from('report_files')
+    .select('file_path')
+    .eq('report_id', reportId);
+
+  if (filesError) throw filesError;
+
+  const filePaths = (files || [])
+    .map((file) => file.file_path)
+    .filter(Boolean);
+
+  if (filePaths.length > 0) {
+    const { error: storageError } = await supabase.storage
+      .from(EVIDENCE_BUCKET)
+      .remove(filePaths);
+
+    if (storageError) throw storageError;
+  }
+
+  const { error: deleteError } = await supabase
+    .from('scam_reports')
+    .delete()
+    .eq('id', reportId);
+
+  if (deleteError) throw deleteError;
 }
 
 export async function getEvidenceFileSignedUrl(filePath, expiresIn = 3600) {
