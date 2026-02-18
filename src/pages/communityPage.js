@@ -13,7 +13,7 @@ function formatDate(dateString) {
   });
 }
 
-function getCategoryName(category) {
+function getCategoryLabel(category) {
   const map = {
     phishing: 'Фишинг',
     phone: 'Телефонна измама',
@@ -35,26 +35,26 @@ function getCategoryName(category) {
   return map[category] || 'Общи';
 }
 
-function getCategoryIcon(category) {
+function getCategoryBadgeName(category) {
   const map = {
-    phishing: 'bi-bug-fill',
-    phone: 'bi-telephone-fill',
-    shopping: 'bi-cart-fill',
-    online_shopping: 'bi-cart-fill',
-    investment: 'bi-graph-up-arrow',
-    security: 'bi-shield-fill-check',
-    identity_theft: 'bi-person-vcard-fill',
-    tech_support: 'bi-tools',
-    job_scams: 'bi-briefcase-fill',
-    romance: 'bi-heart-fill',
-    social: 'bi-chat-dots-fill',
-    social_media: 'bi-chat-dots-fill',
-    crypto: 'bi-currency-bitcoin',
-    marketplace: 'bi-tag-fill',
-    other: 'bi-grid-fill'
+    phishing: '🎣 Фишинг',
+    shopping: '🛒 Пазаруване',
+    online_shopping: '🛒 Онлайн пазаруване',
+    investment: '📈 Инвестиции',
+    security: '🛡️ Сигурност',
+    identity_theft: '🆔 Самоличност',
+    tech_support: '💻 Тех. поддръжка',
+    job_scams: '💼 Работа',
+    phone: '📞 Телефонна измама',
+    romance: '💘 Романтична измама',
+    social: '💬 Социални мрежи',
+    social_media: '💬 Социални мрежи',
+    crypto: '₿ Крипто измама',
+    marketplace: '🏷️ Marketplace измама',
+    other: '🧩 Друго'
   };
 
-  return map[category] || 'bi-newspaper';
+  return map[category] || '📰 Общи';
 }
 
 function getSourceText(report) {
@@ -72,7 +72,7 @@ function localizeReportTitle(report) {
   const normalizedPrefix = String(rawPrefix || '').toLowerCase().replace(/\s+/g, '_');
   const normalizedCategory = String(report?.category || '').toLowerCase();
   const keyToTranslate = normalizedCategory || normalizedPrefix;
-  const localizedPrefix = getCategoryName(keyToTranslate);
+  const localizedPrefix = getCategoryLabel(keyToTranslate);
 
   if (!remainder) {
     return localizedPrefix !== 'Общи' ? localizedPrefix : rawTitle;
@@ -132,11 +132,10 @@ function renderReports(reports) {
 
     if (categoryBadge) {
       const category = report.category || 'other';
-      const categoryName = getCategoryName(category);
-      const iconClass = getCategoryIcon(category);
+      const categoryName = getCategoryBadgeName(category);
 
       categoryBadge.dataset.category = category;
-      categoryBadge.innerHTML = `<i class="bi ${iconClass}"></i><span>${categoryName}</span>`;
+      categoryBadge.textContent = categoryName;
     }
     dateEl.textContent = formatDate(report.created_at);
     titleEl.textContent = localizeReportTitle(report);

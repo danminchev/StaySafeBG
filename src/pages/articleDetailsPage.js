@@ -24,26 +24,26 @@ function formatDate(dateValue) {
   }).format(date);
 }
 
-function getCategoryName(category) {
+function getCategoryBadgeName(category) {
   const map = {
-    phishing: 'Фишинг',
-    phone: 'Телефонна измама',
-    shopping: 'Пазаруване',
-    online_shopping: 'Онлайн пазаруване',
-    investment: 'Инвестиции',
-    security: 'Сигурност',
-    identity_theft: 'Кражба на самоличност',
-    tech_support: 'Техническа поддръжка',
-    job_scams: 'Работа',
-    romance: 'Романтична измама',
-    social: 'Социални мрежи',
-    social_media: 'Социални мрежи',
-    crypto: 'Крипто измама',
-    marketplace: 'Marketplace измама',
-    other: 'Друго'
+    phishing: '🎣 Фишинг',
+    shopping: '🛒 Пазаруване',
+    online_shopping: '🛒 Онлайн пазаруване',
+    investment: '📈 Инвестиции',
+    security: '🛡️ Сигурност',
+    identity_theft: '🆔 Самоличност',
+    tech_support: '💻 Тех. поддръжка',
+    job_scams: '💼 Работа',
+    phone: '📞 Телефонна измама',
+    romance: '💘 Романтична измама',
+    social: '💬 Социални мрежи',
+    social_media: '💬 Социални мрежи',
+    crypto: '₿ Крипто измама',
+    marketplace: '🏷️ Marketplace измама',
+    other: '🧩 Друго'
   };
 
-  return map[category] || 'Общи';
+  return map[category] || '📰 Общи';
 }
 
 function getSourceText(report) {
@@ -72,7 +72,7 @@ async function renderReportDetails(report) {
   if (!pageContent) return;
 
   const title = escapeHtml(report.title || 'Доклад от общността');
-  const category = escapeHtml(getCategoryName(report.category));
+  const category = escapeHtml(getCategoryBadgeName(report.category));
   const dateText = escapeHtml(formatDate(report.created_at));
   const sourceText = escapeHtml(getSourceText(report));
   const description = escapeHtml(report.description || 'Няма допълнително описание.');
