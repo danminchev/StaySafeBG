@@ -109,6 +109,7 @@ const dom = {
         name: document.getElementById('view-user-name'),
         email: document.getElementById('view-user-email'),
         created: document.getElementById('view-user-created'),
+        roleSection: document.getElementById('view-user-role-section'),
         roleSelect: document.getElementById('view-user-role-select'),
         saveRoleBtn: document.getElementById('btn-update-user-role')
     }
@@ -334,6 +335,9 @@ async function openUserModal(userId, mode = 'view') {
     const isEditMode = mode === 'edit';
     if (dom.userView.title) {
         dom.userView.title.textContent = isEditMode ? 'Редакция на потребител' : 'Преглед на потребител';
+    }
+    if (dom.userView.roleSection) {
+        dom.userView.roleSection.classList.toggle('d-none', !isEditMode);
     }
     if (dom.userView.roleSelect) {
         dom.userView.roleSelect.disabled = !isEditMode;
