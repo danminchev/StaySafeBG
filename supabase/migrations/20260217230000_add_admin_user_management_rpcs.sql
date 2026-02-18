@@ -1,4 +1,4 @@
-create or replace function public.admin_list_users()
+ create or replace function public.admin_list_users()
 returns table (
   user_id uuid,
   email text,
