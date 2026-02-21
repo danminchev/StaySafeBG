@@ -131,6 +131,19 @@
   font-weight: 600;
 }
 
+.tips-back-btn {
+  border: 1px solid rgba(233, 196, 106, 0.4);
+  background: rgba(233, 196, 106, 0.14);
+  color: #f6e9c5;
+}
+
+.tips-back-btn:hover,
+.tips-back-btn:focus {
+  border-color: rgba(255, 224, 154, 0.55);
+  background: rgba(233, 196, 106, 0.24);
+  color: #fff3d5;
+}
+
 .tips-status-card {
   max-width: 760px;
   margin: 0 auto;

@@ -3,7 +3,7 @@ import { renderFooter } from '../components/footer.js';
 import { getArticleById } from '../services/tipsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
-const AI_LABEL_TEXT = 'Тази статия е генерирана с изкуствен интелект и е с информационна цел. Прегледана е от модератор.';
+const AI_LABEL_TEXT = 'Тази статия е генерирана с изкуствен интелект (ИИ) и е само с информационна цел. Прегледана е от модератор.';
 
 function escapeHtml(value) {
 	return String(value)
@@ -54,7 +54,7 @@ function renderMessage(message) {
 	pageContent.innerHTML = `
 		<div class="tips-status-card">
 			<div class="alert alert-info mb-3">${message}</div>
-			<a href="tips.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Обратно към съветите</a>
+			<a href="tips.html" class="btn tips-back-btn"><i class="bi bi-arrow-left me-2"></i>Обратно към съветите</a>
 		</div>
 	`;
 }
@@ -93,7 +93,7 @@ function renderArticle(article) {
 				<div class="tips-article-content">${content}</div>
 
 				<div class="tips-footer-actions">
-					<a href="tips.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Обратно към съветите</a>
+					<a href="tips.html" class="btn tips-back-btn"><i class="bi bi-arrow-left me-2"></i>Обратно към съветите</a>
 				</div>
 			</article>
 		</div>
