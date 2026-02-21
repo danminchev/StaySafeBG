@@ -7,52 +7,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>StaySafeBG - Scam Check</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="./src/styles/theme.css">
   <link rel="stylesheet" href="./src/styles/app.css">
+  <link rel="stylesheet" href="./src/styles/scam-check.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
   <header id="app-header"></header>
   
   <main class="container py-4" id="page-content">
-      <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card text-center shadow">
-                    <div class="card-header bg-warning text-dark">
-                        <h3 class="mb-0">Провери съмнително съдържание</h3>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Поставете линк, телефонен номер или имейл за проверка</h5>
-                        <p class="card-text">Нашата система ще анализира въведените данни спрямо известни бази данни с измами.</p>
-                        <form class="py-3">
-                             <div class="input-group mb-3">
-                                <input type="text" class="form-control form-control-lg" placeholder="напр. +359 888 123 456 или suspicious-site.com" aria-label="Recipient's username" aria-describedby="button-addon2">
-                                <button class="btn btn-primary btn-lg" type="button" id="button-addon2">Провери</button>
-                            </div>
-                        </form>
-                        <div class="alert alert-info" role="alert">
-                            Забележка: Не всички измами са в нашата база данни. Винаги бъдете внимателни.
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mt-5">
-                    <h4>Последни проверки</h4>
-                     <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            suspicious-bank-login.com
-                            <span class="badge bg-danger rounded-pill">Съмнителен</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            +359 876 543 210
-                            <span class="badge bg-success rounded-pill">Безопасен</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            cheap-iphones-now.net
-                            <span class="badge bg-warning text-dark rounded-pill">Непотвърден</span>
-                        </li>
-                     </ul>
-                </div>
-            </div>
+      <div class="scam-check-wrapper fade-in">
+          <div class="scam-check-card">
+              <div class="scam-check-header">
+                  <h2><i class="bi bi-shield-check me-2"></i>Провери съмнително съдържание</h2>
+              </div>
+              <div class="scam-check-body">
+                  <h5 class="mb-3">Поставете линк, телефонен номер или имейл за проверка</h5>
+                  <p class="text-muted-light mb-4">Нашата система ще анализира въведените данни спрямо известни бази данни с измами.</p>
+                  <form class="scam-check-form mb-4">
+                       <div class="search-input-group input-group input-group-lg">
+                          <input type="text" class="form-control" placeholder="напр. +359 888 123 456 или suspicious-site.com" aria-label="Данни за проверка">
+                          <button class="btn ss-search-btn" type="button">
+                              <i class="bi bi-search me-2"></i>Провери
+                          </button>
+                      </div>
+                  </form>
+                  <div class="alert scam-alert-info mb-0" role="alert">
+                      <i class="bi bi-info-circle-fill me-2"></i> Забележка: Не всички измами са в нашата база данни. Винаги бъдете внимателни.
+                  </div>
+              </div>
+          </div>
+          
+          <div class="recent-checks-section mt-5">
+              <h4 class="mb-4"><i class="bi bi-clock-history me-2"></i>Последни проверки</h4>
+               <div class="recent-checks-list">
+                  <div class="recent-check-item">
+                      <span class="check-target"><i class="bi bi-globe"></i> suspicious-bank-login.com</span>
+                      <span class="badge bg-danger-subtle text-danger border border-danger rounded-pill">Съмнителен</span>
+                  </div>
+                  <div class="recent-check-item">
+                      <span class="check-target"><i class="bi bi-telephone"></i> +359 876 543 210</span>
+                      <span class="badge bg-success-subtle text-success border border-success rounded-pill">Безопасен</span>
+                  </div>
+                  <div class="recent-check-item">
+                      <span class="check-target"><i class="bi bi-globe"></i> cheap-iphones-now.net</span>
+                      <span class="badge bg-warning-subtle text-warning border border-warning rounded-pill">Непотвърден</span>
+                  </div>
+               </div>
+          </div>
       </div>
   </main>
   
