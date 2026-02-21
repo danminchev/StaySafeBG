@@ -12,6 +12,9 @@ const button = document.getElementById('scam-check-submit');
 const resultHost = document.getElementById('scam-check-result');
 const recentList = document.getElementById('recent-checks-list');
 
+const RECENT_CHECKS_STORAGE_KEY = 'staysafebg_recent_checks';
+const RECENT_CHECKS_LIMIT = 5;
+
 function escapeHtml(value) {
 	return String(value || '')
 		.replace(/&/g, '&amp;')
@@ -22,7 +25,7 @@ function escapeHtml(value) {
 }
 
 function detectTargetValue(item) {
-	return item.url || item.phone || item.title || 'Няма данни';
+	return item.input || item.url || item.phone || item.title || 'Няма данни';
 }
 
 function iconByValue(value) {
@@ -30,6 +33,58 @@ function iconByValue(value) {
 	if (value.startsWith('http') || value.includes('.')) return 'bi-globe';
 	if (value.includes('+') || /\d/.test(value)) return 'bi-telephone';
 	return 'bi-shield-check';
+}
+
+function readStoredRecentChecks() {
+	try {
+		const raw = localStorage.getItem(RECENT_CHECKS_STORAGE_KEY);
+		if (!raw) return [];
+		const parsed = JSON.parse(raw);
+		return Array.isArray(parsed) ? parsed : [];
+	} catch {
+		return [];
+	}
+}
+
+function saveStoredRecentChecks(items) {
+	try {
+		localStorage.setItem(
+			RECENT_CHECKS_STORAGE_KEY,
+			JSON.stringify((items || []).slice(0, RECENT_CHECKS_LIMIT)),
+		);
+	} catch {
+		// Ignore storage errors.
+	}
+}
+
+function rememberRecentCheck(target, result) {
+	const nextItem = {
+		input: target,
+		verdict: result?.verdict || 'unknown',
+		checkedAt: new Date().toISOString(),
+	};
+
+	const current = readStoredRecentChecks()
+		.filter((item) => typeof item?.input === 'string' && item.input.trim().length > 0)
+		.filter((item) => item.input !== nextItem.input);
+
+	saveStoredRecentChecks([nextItem, ...current]);
+}
+
+function badgeByVerdict(verdict) {
+	if (verdict === 'danger') {
+		return { label: 'Съмнителен', className: 'bg-danger text-white border border-danger-subtle' };
+	}
+
+	if (verdict === 'warning') {
+		return { label: 'Риск', className: 'bg-warning text-dark border border-warning-subtle' };
+	}
+
+	if (verdict === 'clean') {
+		return { label: 'Чист', className: 'bg-success text-white border border-success-subtle' };
+	}
+
+	return { label: 'Непълна', className: 'bg-secondary text-white border border-secondary-subtle' };
 }
 
 function renderResult(result) {
@@ -141,11 +196,14 @@ async function handleSubmit(event) {
 	try {
 		const result = await runScamCheck(value);
 		renderResult(result);
+		rememberRecentCheck(value, result);
+		renderRecentChecks(readStoredRecentChecks());
+
 		const toastMessage = result.verdict === 'unknown'
 			? 'Проверката е непълна: външните източници не отговориха надеждно.'
 			: result.isSuspicious
 				? `Открити са рискови сигнали (индекс ${result.riskScore}/100).`
-				: 'Проверката приключи без рисков сигнал.';
+				: 'Проверката приключи без рискови сигнали.';
 		showToast(toastMessage, result.verdict === 'unknown' ? 'warning' : result.isSuspicious ? 'warning' : 'success');
 	} catch (error) {
 		showToast(error?.message || 'Грешка при проверката. Опитайте отново.', 'error');
@@ -170,20 +228,33 @@ function renderRecentChecks(items) {
 	recentList.innerHTML = items.map((item) => {
 		const target = detectTargetValue(item);
 		const icon = iconByValue(target);
+		const badge = badgeByVerdict(item.verdict);
 
 		return `
 			<div class="recent-check-item">
 				<span class="check-target"><i class="bi ${icon}"></i>${escapeHtml(target)}</span>
-				<span class="badge bg-danger text-white border border-danger-subtle rounded-pill">Съмнителен</span>
+				<span class="badge ${badge.className} rounded-pill">${badge.label}</span>
 			</div>
 		`;
 	}).join('');
 }
 
 async function loadRecentChecks() {
+	const stored = readStoredRecentChecks();
+	if (stored.length) {
+		renderRecentChecks(stored);
+		return;
+	}
+
 	try {
-		const data = await getRecentApprovedScamChecks(5);
-		renderRecentChecks(data);
+		const data = await getRecentApprovedScamChecks(RECENT_CHECKS_LIMIT);
+		const normalized = (data || []).map((item) => ({
+			input: detectTargetValue(item),
+			verdict: 'danger',
+			checkedAt: item.created_at || null,
+		}));
+		saveStoredRecentChecks(normalized);
+		renderRecentChecks(normalized);
 	} catch {
 		renderRecentChecks([]);
 	}

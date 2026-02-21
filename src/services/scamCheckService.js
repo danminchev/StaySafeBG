@@ -259,8 +259,10 @@ export async function runScamCheck(rawInput) {
 
   const databaseResultPromise = checkAgainstDatabase(input, inputType);
   const internetResultPromise = checkInternetViaEdgeFunction(input, inputType)
-    .catch(async () => {
+    .catch(async (edgeError) => {
       const fallback = await checkAgainstInternet(input, inputType);
+      const edgeReason = edgeError?.message || 'Edge function unavailable';
+      const fallbackReason = fallback?.details?.error || 'No response from fallback source';
       return {
         ...fallback,
         riskScore: fallback.flagged ? 50 : 0,
@@ -272,12 +274,13 @@ export async function runScamCheck(rawInput) {
             flagged: fallback.flagged,
             confidence: fallback.flagged ? 0.7 : 0.5,
             details: fallback.details,
-            reason: 'Fallback direct check',
+            reason: `Fallback direct check (edge: ${edgeReason}; source: ${fallbackReason})`,
           },
         ],
         checkedCount: fallback.checked ? 1 : 0,
         flaggedCount: fallback.flagged ? 1 : 0,
         usedEdgeFunction: false,
+        edgeError: edgeReason,
       };
     });
 
