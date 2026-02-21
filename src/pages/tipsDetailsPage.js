@@ -1,6 +1,6 @@
 import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
-import { getArticleById } from '../services/newsService.js';
+import { getArticleById } from '../services/tipsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
 function escapeHtml(value) {
@@ -18,7 +18,7 @@ function renderMessage(message) {
 
 	pageContent.innerHTML = `
 		<div class="alert alert-info">${message}</div>
-		<a href="news.html" class="btn btn-secondary mt-3">Обратно към съветите</a>
+		<a href="tips.html" class="btn btn-secondary mt-3">Обратно към съветите</a>
 	`;
 }
 
@@ -33,7 +33,7 @@ function renderArticle(article) {
 	pageContent.innerHTML = `
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><a href="news.html">Съвети</a></li>
+				<li class="breadcrumb-item"><a href="tips.html">Съвети</a></li>
 				<li class="breadcrumb-item active" aria-current="page">${title}</li>
 			</ol>
 		</nav>
@@ -43,7 +43,7 @@ function renderArticle(article) {
 			<p style="white-space: pre-line;">${content}</p>
 		</article>
 		<div class="mt-4">
-			<a href="news.html" class="btn btn-secondary">Обратно към съветите</a>
+			<a href="tips.html" class="btn btn-secondary">Обратно към съветите</a>
 		</div>
 	`;
 }

@@ -1,6 +1,6 @@
 import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
-import { getPublishedArticles } from '../services/newsService.js';
+import { getPublishedArticles } from '../services/tipsService.js';
 import { getApprovedReports } from '../services/reportsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 import '../styles/home.css';
@@ -92,7 +92,7 @@ function renderLatestArticles(articles) {
                 </time>
             </div>
             <h3 class="news-title h5 mb-0">
-                <a href="news-details.html?id=${article.id}" class="stretched-link article-link"></a>
+                <a href="tips-details.html?id=${article.id}" class="stretched-link article-link"></a>
             </h3>
             <i class="bi bi-arrow-right news-arrow"></i>
         `;

@@ -56,8 +56,8 @@ Recommended pages:
 1. `index.html` — Home (latest articles/reports)
 2. `register.html` — Registration
 3. `login.html` — Login
-4. `news.html` — News list + filters/categories
-5. `news-details.html` — News details
+4. `tips.html` — Tips list + filters/categories
+5. `tips-details.html` — Tips details
 6. `scam-check.html` — Search/check scams
 7. `report-scam.html` — Submit a scam report + file upload
 8. `admin.html` — Moderation panel (admin only)

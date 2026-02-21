@@ -4,7 +4,7 @@ import { getCurrentUser } from '../services/authService.js';
 import { getUserRole } from '../services/rolesService.js';
 import { deleteUserByAdmin, getAdminUsers, updateUserRole } from '../services/adminUsersService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
-import { createArticle, getAdminArticles, getArticleById, updateArticle, deleteArticle } from '../services/newsService.js';
+import { createArticle, getAdminArticles, getArticleById, updateArticle, deleteArticle } from '../services/tipsService.js';
 import {
     deleteAdminReport,
     getAdminReports,
@@ -1232,7 +1232,7 @@ function initArticleEditing() {
 
             if (action === 'view-article') {
                 // Modified: Open in modal instead of new tab
-                // window.open(`news-details.html?id=${articleId}`, '_blank');
+                // window.open(`tips-details.html?id=${articleId}`, '_blank');
                 try {
                     button.disabled = true;
                     await openViewArticleModal(articleId);

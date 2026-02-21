@@ -1,6 +1,6 @@
 import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
-import { getPublishedArticles } from '../services/newsService.js';
+import { getPublishedArticles } from '../services/tipsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
 // --- State ---
@@ -188,7 +188,7 @@ function createCard(article) {
 	
 	const link = clone.querySelector('.article-link-overlay');
 	if(link) {
-        link.href = `news-details.html?id=${article.id}`;
+		link.href = `tips-details.html?id=${article.id}`;
         link.addEventListener('click', (e) => {
             // Allow opening in new tab with Ctrl/Cmd + Click
             if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
@@ -320,8 +320,8 @@ async function init() {
 	readURLParams();
 	
 	// Check if we should override the existing static HTML
-	// The requirement says "modernize news.html". 
-	// The static HTML in news.html IS the demo content.
+	// The requirement says "modernize tips.html". 
+	// The static HTML in tips.html IS the demo content.
 	// We should clear it initially IF we are going to fetch real data.
 	// But if DB is empty, maybe we want to keep it? 
     // New Logic: Always fetch. If DB empty, show empty state (per requirement), 
