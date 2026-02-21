@@ -48,6 +48,67 @@ function extractDomainFromEmail(email: string): string | null {
   return domain ? domain.toLowerCase() : null;
 }
 
+function analyzeHeuristicUrlRisk(rawInput: string, inputType: InputType): SourceResult[] {
+  if (inputType !== 'url') return [];
+
+  const urlCandidate = normalizeUrlCandidate(rawInput);
+  if (!urlCandidate) return [];
+
+  const parsed = new URL(urlCandidate);
+  const reasons: string[] = [];
+  let score = 0;
+
+  const isIpv4Host = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(parsed.hostname);
+  if (isIpv4Host) {
+    score += 0.65;
+    reasons.push('Direct IP host used instead of domain');
+  }
+
+  if (parsed.protocol === 'http:') {
+    score += 0.2;
+    reasons.push('Uses HTTP without TLS');
+  }
+
+  if (parsed.port && !['80', '443'].includes(parsed.port)) {
+    score += 0.3;
+    reasons.push(`Uses non-standard port ${parsed.port}`);
+  }
+
+  const hostParts = parsed.hostname.split('.').filter(Boolean);
+  if (hostParts.length >= 4) {
+    score += 0.1;
+    reasons.push('High subdomain depth');
+  }
+
+  const suspiciousKeywords = /(login|verify|secure|update|wallet|bank|signin|account|invoice|urgent)/i;
+  if (suspiciousKeywords.test(parsed.pathname) || suspiciousKeywords.test(parsed.hostname)) {
+    score += 0.1;
+    reasons.push('Contains common phishing keywords');
+  }
+
+  if (reasons.length === 0) {
+    return [{
+      source: 'Heuristic URL analysis',
+      checked: true,
+      flagged: false,
+      confidence: 0.55,
+      reason: 'No high-risk heuristic signals',
+    }];
+  }
+
+  const confidence = Math.min(0.95, score);
+  const isFlagged = confidence >= 0.45;
+
+  return [{
+    source: 'Heuristic URL analysis',
+    checked: true,
+    flagged: isFlagged,
+    confidence,
+    reason: reasons.join('; '),
+    details: { reasons },
+  }];
+}
+
 async function checkSinkingYachts(urlCandidate: string): Promise<SourceResult> {
   try {
     const response = await fetch(`https://phish.sinking.yachts/v2/check/${encodeURIComponent(urlCandidate)}`, {
@@ -58,9 +119,9 @@ async function checkSinkingYachts(urlCandidate: string): Promise<SourceResult> {
     if (!response.ok) {
       return {
         source: 'phish.sinking.yachts',
-        checked: true,
+        checked: false,
         flagged: false,
-        confidence: 0.35,
+        confidence: 0,
         reason: `HTTP ${response.status}`,
       };
     }
@@ -112,9 +173,9 @@ async function checkUrlhaus(urlCandidate: string): Promise<SourceResult> {
     if (!response.ok) {
       return {
         source: 'URLhaus',
-        checked: true,
+        checked: false,
         flagged: false,
-        confidence: 0.3,
+        confidence: 0,
         reason: `HTTP ${response.status}`,
       };
     }
@@ -181,9 +242,9 @@ async function checkGoogleSafeBrowsing(urlCandidate: string): Promise<SourceResu
     if (!response.ok) {
       return {
         source: 'Google Safe Browsing',
-        checked: true,
+        checked: false,
         flagged: false,
-        confidence: 0.4,
+        confidence: 0,
         reason: `HTTP ${response.status}`,
       };
     }
@@ -284,13 +345,16 @@ Deno.serve(async (request: Request) => {
       checkGoogleSafeBrowsing(urlCandidate),
     ]);
 
-    const aggregate = aggregateSources(sourceResults);
+    const heuristicResults = analyzeHeuristicUrlRisk(input, inputType);
+    const mergedSources = [...sourceResults, ...heuristicResults];
+
+    const aggregate = aggregateSources(mergedSources);
 
     return new Response(JSON.stringify({
       inputType,
       urlCandidate,
       ...aggregate,
-      sources: sourceResults,
+      sources: mergedSources,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

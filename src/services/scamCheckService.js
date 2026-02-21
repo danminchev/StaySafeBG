@@ -128,7 +128,7 @@ async function checkAgainstInternet(rawInput, type) {
 
     if (!response.ok) {
       return {
-        checked: true,
+        checked: false,
         flagged: false,
         source: 'phish.sinking.yachts',
         details: { error: `HTTP ${response.status}` },
@@ -170,12 +170,12 @@ function mapVerdictFromScore(score) {
 
 function analyzeHeuristicUrlRisk(rawInput, inputType) {
   if (inputType !== 'url') {
-    return { risk: 0, reasons: [] };
+    return { risk: 0, reasons: [], critical: false };
   }
 
   const candidate = normalizeUrlCandidate(rawInput);
   if (!candidate) {
-    return { risk: 0, reasons: [] };
+    return { risk: 0, reasons: [], critical: false };
   }
 
   const parsed = new URL(candidate);
@@ -198,9 +198,20 @@ function analyzeHeuristicUrlRisk(rawInput, inputType) {
     reasons.push(`URL използва нестандартен порт (${parsed.port})`);
   }
 
+  const hasCriticalPattern = isIpv4Host && parsed.protocol === 'http:' && Boolean(parsed.port) && !['80', '443'].includes(parsed.port);
+
+  if (hasCriticalPattern) {
+    return {
+      risk: 100,
+      reasons,
+      critical: true,
+    };
+  }
+
   return {
     risk: Math.min(65, risk),
     reasons,
+    critical: false,
   };
 }
 
@@ -274,25 +285,50 @@ export async function runScamCheck(rawInput) {
     internetResultPromise,
   ]);
 
-  const heuristic = analyzeHeuristicUrlRisk(input, inputType);
+  const edgeHasHeuristic = (internetResult.sources || [])
+    .some((source) => source?.source === 'Heuristic URL analysis');
+
+  const heuristic = edgeHasHeuristic
+    ? { risk: 0, reasons: [] }
+    : analyzeHeuristicUrlRisk(input, inputType);
+
   const dbRisk = databaseResult.matched ? Math.min(60, 20 + databaseResult.matches.length * 10) : 0;
   const internetRisk = Number.isFinite(internetResult.riskScore) ? internetResult.riskScore : 0;
-  const riskScore = Math.min(100, dbRisk + Math.round(internetRisk * 0.6) + heuristic.risk);
 
-  const hasInternetCoverage = Boolean(internetResult.checked) || (internetResult.checkedCount || 0) > 0;
-  const verdict = !hasInternetCoverage && !databaseResult.matched
-    ? 'unknown'
-    : mapVerdictFromScore(riskScore);
+  let riskScore = internetResult.usedEdgeFunction
+    ? Math.min(100, Math.max(internetRisk, dbRisk + heuristic.risk))
+    : Math.min(100, dbRisk + Math.round(internetRisk * 0.6) + heuristic.risk);
+
+  const hasInternetCoverage = Boolean(internetResult.checked) || (internetResult.checkedCount || 0) > 0 || heuristic.risk > 0;
+
+  let verdict = internetResult.usedEdgeFunction
+    ? (internetResult.verdict || mapVerdictFromScore(riskScore))
+    : (!hasInternetCoverage && !databaseResult.matched
+      ? 'unknown'
+      : mapVerdictFromScore(riskScore));
+
+  if (!internetResult.usedEdgeFunction && heuristic.critical) {
+    verdict = 'danger';
+    riskScore = 100;
+  }
+
+  if (databaseResult.matched && verdict === 'clean') {
+    verdict = 'warning';
+    riskScore = Math.max(riskScore, 35);
+  }
 
   const isSuspicious = verdict === 'danger' || verdict === 'warning' || verdict === 'unknown';
 
-  const heuristicSources = heuristic.reasons.map((reason) => ({
-    source: 'Heuristic URL analysis',
-    checked: true,
-    flagged: true,
-    confidence: 0.65,
-    reason,
-  }));
+  const heuristicSources = heuristic.reasons.length
+    ? [{
+      source: 'Heuristic URL analysis',
+      checked: true,
+      flagged: true,
+      confidence: heuristic.critical ? 0.95 : 0.65,
+      reason: heuristic.reasons.join('; '),
+      details: { reasons: heuristic.reasons, critical: heuristic.critical },
+    }]
+    : [];
 
   const mergedSources = [...(internetResult.sources || []), ...heuristicSources];
 

@@ -54,6 +54,13 @@ function renderResult(result) {
 			: result.verdict === 'unknown'
 				? 'Външните източници не отговориха. Резултатът не може да се приеме за безопасен.'
 				: 'Не е открито съвпадение в базата и външните източници.';
+	const meterClass = result.verdict === 'danger'
+		? 'risk-meter-fill-danger'
+		: result.verdict === 'warning'
+			? 'risk-meter-fill-warning'
+			: result.verdict === 'unknown'
+				? 'risk-meter-fill-unknown'
+				: 'risk-meter-fill-safe';
 
 	const dbLabel = result.database.matched
 		? `Намерени съвпадения в база: ${result.database.matches.length}`
@@ -92,6 +99,14 @@ function renderResult(result) {
 			</div>
 			<p class="mb-2">${summary}</p>
 			<div class="risk-score mb-2">Риск индекс: <strong>${result.riskScore}/100</strong></div>
+			<div class="risk-meter mb-3" role="progressbar" aria-label="Риск индекс" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${result.riskScore}">
+				<div class="risk-meter-fill ${meterClass}" style="width: ${Math.max(0, Math.min(100, result.riskScore))}%;"></div>
+			</div>
+			<div class="risk-meter-scale mb-3" aria-hidden="true">
+				<span>0</span>
+				<span>50</span>
+				<span>100</span>
+			</div>
 			<ul class="check-result-meta mb-0">
 				<li><i class="bi bi-database-check me-2"></i>${dbLabel}</li>
 				<li><i class="bi bi-globe2 me-2"></i>${internetLabel}</li>

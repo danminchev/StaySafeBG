@@ -145,6 +145,45 @@
     color: #f8fafc;
 }
 
+.risk-meter {
+    width: 100%;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.28);
+    overflow: hidden;
+}
+
+.risk-meter-fill {
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.35s ease;
+}
+
+.risk-meter-fill-danger {
+    background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+
+.risk-meter-fill-warning {
+    background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+.risk-meter-fill-unknown {
+    background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
+}
+
+.risk-meter-fill-safe {
+    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+}
+
+.risk-meter-scale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    line-height: 1;
+    margin-top: -0.15rem;
+}
+
 .check-result-warning {
     border-radius: 0.75rem;
     border: 1px solid rgba(251, 191, 36, 0.45);
