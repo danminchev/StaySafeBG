@@ -3,6 +3,8 @@ import { renderFooter } from '../components/footer.js';
 import { getArticleById } from '../services/tipsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
+const AI_LABEL_TEXT = 'Тази статия е генерирана с изкуствен интелект и е с информационна цел. Прегледана е от модератор.';
+
 function escapeHtml(value) {
 	return String(value)
 		.replaceAll('&', '&amp;')
@@ -83,6 +85,8 @@ function renderArticle(article) {
 					<span class="tips-meta-badge"><i class="bi bi-tag"></i>Категория: ${category}</span>
 					<span class="tips-meta-badge tips-meta-date"><i class="bi bi-calendar3"></i>${createdAt}</span>
 				</div>
+
+				<p class="tips-ai-label">${AI_LABEL_TEXT}</p>
 
 				<hr class="tips-separator">
 

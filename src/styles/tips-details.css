@@ -82,6 +82,21 @@
   background: rgba(98, 140, 214, 0.22);
 }
 
+.tips-ai-label {
+  margin: 0 0 0.35rem;
+  border: 1px solid rgba(233, 196, 106, 0.4);
+  background: rgba(233, 196, 106, 0.14);
+  color: #f6e9c5;
+  border-radius: 0.75rem;
+  padding: 0.58rem 0.8rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.tips-ai-label strong {
+  color: #ffe09a;
+}
+
 .tips-separator {
   border: 0;
   height: 1px;
