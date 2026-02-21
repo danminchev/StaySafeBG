@@ -57,6 +57,72 @@ function isImageFile(file) {
   return path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.png') || path.endsWith('.webp') || path.endsWith('.gif');
 }
 
+function getEvidenceLightboxElement() {
+  let lightbox = document.getElementById('ss-evidence-lightbox');
+  if (lightbox) return lightbox;
+
+  lightbox = document.createElement('div');
+  lightbox.id = 'ss-evidence-lightbox';
+  lightbox.className = 'ss-evidence-lightbox';
+  lightbox.setAttribute('aria-hidden', 'true');
+  lightbox.innerHTML = `
+    <div class="ss-evidence-lightbox-backdrop" data-lightbox-close="true"></div>
+    <div class="ss-evidence-lightbox-inner" role="dialog" aria-modal="true" aria-label="Преглед на прикачени снимки">
+      <button type="button" class="btn-close ss-evidence-lightbox-close" aria-label="Затвори" data-lightbox-close="true"></button>
+      <div class="ss-evidence-lightbox-content" id="ss-evidence-lightbox-content"></div>
+    </div>
+  `;
+
+  lightbox.addEventListener('click', (event) => {
+    if (event.target instanceof HTMLElement && event.target.dataset.lightboxClose === 'true') {
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('ss-evidence-lightbox-open');
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && lightbox.classList.contains('is-open')) {
+      lightbox.classList.remove('is-open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('ss-evidence-lightbox-open');
+    }
+  });
+
+  document.body.appendChild(lightbox);
+  return lightbox;
+}
+
+function openEvidenceLightbox(images, activeIndex = 0) {
+  if (!images.length) return;
+
+  const lightbox = getEvidenceLightboxElement();
+  const contentEl = lightbox.querySelector('#ss-evidence-lightbox-content');
+  if (!contentEl) return;
+
+  const activeImage = images[Math.max(0, Math.min(activeIndex, images.length - 1))];
+
+  if (images.length === 2) {
+    contentEl.className = 'ss-evidence-lightbox-content ss-evidence-two-popups';
+    contentEl.innerHTML = images.map((imageUrl) => `
+      <article class="ss-evidence-popup">
+        <img src="${escapeHtml(imageUrl)}" alt="Прикачено изображение" class="ss-evidence-popup-image">
+      </article>
+    `).join('');
+  } else {
+    contentEl.className = 'ss-evidence-lightbox-content';
+    contentEl.innerHTML = `
+      <article class="ss-evidence-popup ss-evidence-popup-single">
+        <img src="${escapeHtml(activeImage)}" alt="Прикачено изображение" class="ss-evidence-popup-image">
+      </article>
+    `;
+  }
+
+  lightbox.classList.add('is-open');
+  lightbox.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('ss-evidence-lightbox-open');
+}
+
 function renderMessage(message) {
   const pageContent = document.getElementById('page-content');
   if (!pageContent) return;
@@ -135,9 +201,21 @@ async function renderReportDetails(report) {
     }
   }));
 
+  const availableImageUrls = filesWithUrls
+    .filter(({ url }) => Boolean(url))
+    .map(({ url }) => url);
+
+  let resolvedImageIndex = 0;
+
   filesWithUrls.forEach(({ file, url }) => {
     const col = document.createElement('div');
-    col.className = 'col-12';
+    // If there are exactly 2 images, show them side by side (col-6)
+    // Otherwise keep them full width (col-12) or adjust as needed
+    if (filesWithUrls.length >= 2) {
+      col.className = 'col-12 col-md-6';
+    } else {
+      col.className = 'col-12';
+    }
 
     if (!url) {
       col.innerHTML = `
@@ -150,13 +228,27 @@ async function renderReportDetails(report) {
       return;
     }
 
+    const imageIndex = resolvedImageIndex;
+    resolvedImageIndex += 1;
+
     col.innerHTML = `
-      <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="d-block text-decoration-none">
+      <button type="button" class="ss-evidence-trigger d-block w-100" data-image-index="${imageIndex}">
         <img src="${escapeHtml(url)}" alt="Прикачено изображение" class="img-fluid rounded border w-100 ss-report-evidence-image">
-      </a>
+      </button>
     `;
 
     imageGrid.appendChild(col);
+  });
+
+  imageGrid.addEventListener('click', (event) => {
+    const trigger = event.target instanceof HTMLElement
+      ? event.target.closest('.ss-evidence-trigger')
+      : null;
+
+    if (!trigger) return;
+
+    const imageIndex = Number(trigger.dataset.imageIndex || 0);
+    openEvidenceLightbox(availableImageUrls, imageIndex);
   });
 }
 
