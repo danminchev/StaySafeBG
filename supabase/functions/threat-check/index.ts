@@ -207,24 +207,40 @@ async function checkSinkingYachts(urlCandidate: string): Promise<SourceResult> {
   }
 }
 
-async function checkUrlhaus(urlCandidate: string): Promise<SourceResult> {
+function toBase64Url(value: string): string {
+  const encoded = btoa(value);
+  return encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+async function checkVirusTotal(urlCandidate: string): Promise<SourceResult> {
+  const apiKey = Deno.env.get('VIRUSTOTAL_API_KEY');
+  if (!apiKey) {
+    return {
+      source: 'VirusTotal',
+      sourceType: 'external',
+      checked: false,
+      flagged: false,
+      confidence: 0,
+      reason: 'No API key configured',
+    };
+  }
+
   try {
-    const body = new URLSearchParams({ url: urlCandidate });
-    const response = await fetchWithTimeout('https://urlhaus-api.abuse.ch/v1/url/', {
-      method: 'POST',
+    const urlId = toBase64Url(urlCandidate);
+    const response = await fetchWithTimeout(`https://www.virustotal.com/api/v3/urls/${urlId}`, {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
         Accept: 'application/json',
         'User-Agent': 'StaySafeBG/1.0',
+        'x-apikey': apiKey,
       },
-      body,
     });
 
     if (!response.ok) {
       const errorText = await safeReadText(response);
       const reason = errorText ? `HTTP ${response.status}: ${errorText.slice(0, 140)}` : `HTTP ${response.status}`;
       return {
-        source: 'URLhaus',
+        source: 'VirusTotal',
         sourceType: 'external',
         checked: false,
         flagged: false,
@@ -233,27 +249,46 @@ async function checkUrlhaus(urlCandidate: string): Promise<SourceResult> {
       };
     }
 
-    const data = await safeReadJson(response) as { query_status?: string; url_status?: string; threat?: string } | null;
-    const queryStatus = String(data?.query_status || '').toLowerCase();
-    const flagged = queryStatus === 'ok';
-    const checked = queryStatus === 'ok' || queryStatus === 'no_results';
+    const data = await safeReadJson(response) as {
+      data?: {
+        attributes?: {
+          last_analysis_stats?: {
+            malicious?: number;
+            suspicious?: number;
+            harmless?: number;
+            undetected?: number;
+          };
+        };
+      };
+    } | null;
+
+    const stats = data?.data?.attributes?.last_analysis_stats || {};
+    const malicious = Number(stats.malicious || 0);
+    const suspicious = Number(stats.suspicious || 0);
+    const harmless = Number(stats.harmless || 0);
+    const undetected = Number(stats.undetected || 0);
+
+    const flagged = malicious > 0 || suspicious > 0;
+    const checked = (malicious + suspicious + harmless + undetected) > 0;
+    const confidence = flagged ? Math.min(0.97, 0.7 + malicious * 0.05 + suspicious * 0.02) : 0.7;
 
     return {
-      source: 'URLhaus',
+      source: 'VirusTotal',
       sourceType: 'external',
       checked,
       flagged,
-      confidence: flagged ? 0.9 : 0.62,
+      confidence,
       details: {
-        query_status: data?.query_status || null,
-        url_status: data?.url_status || null,
-        threat: data?.threat || null,
+        malicious,
+        suspicious,
+        harmless,
+        undetected,
       },
-      reason: checked ? undefined : `Unexpected response: ${queryStatus || 'empty'}`,
+      reason: checked ? undefined : 'No analysis stats in response',
     };
   } catch (error) {
     return {
-      source: 'URLhaus',
+      source: 'VirusTotal',
       sourceType: 'external',
       checked: false,
       flagged: false,
@@ -431,7 +466,7 @@ Deno.serve(async (request: Request) => {
 
     const sourceResults = await Promise.all([
       checkSinkingYachts(urlCandidate),
-      checkUrlhaus(urlCandidate),
+      checkVirusTotal(urlCandidate),
       checkGoogleSafeBrowsing(urlCandidate),
     ]);
     const heuristicResults = analyzeHeuristicUrlRisk(input, inputType);
