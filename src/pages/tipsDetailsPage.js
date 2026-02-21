@@ -12,13 +12,48 @@ function escapeHtml(value) {
 		.replaceAll("'", '&#039;');
 }
 
+function formatDate(dateValue) {
+	if (!dateValue) return 'Без дата';
+	const date = new Date(dateValue);
+	if (Number.isNaN(date.getTime())) return 'Без дата';
+
+	return new Intl.DateTimeFormat('bg-BG', {
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric'
+	}).format(date);
+}
+
+function getCategoryName(cat) {
+	const map = {
+		'phishing': '🎣 Фишинг',
+		'shopping': '🛒 Пазаруване',
+		'online_shopping': '🛒 Онлайн пазаруване',
+		'investment': '📈 Инвестиции',
+		'security': '🛡️ Сигурност',
+		'identity_theft': '🆔 Самоличност',
+		'tech_support': '💻 Тех. поддръжка',
+		'job_scams': '💼 Работа',
+		'phone': '📞 Телефонна измама',
+		'romance': '💘 Романтична измама',
+		'social': '💬 Социални мрежи',
+		'social_media': '💬 Социални мрежи',
+		'crypto': '₿ Крипто измама',
+		'marketplace': '🏷️ Marketplace измама',
+		'other': '🧩 Друго'
+	};
+	return map[cat] || '📰 Общи';
+}
+
 function renderMessage(message) {
 	const pageContent = document.getElementById('page-content');
 	if (!pageContent) return;
 
 	pageContent.innerHTML = `
-		<div class="alert alert-info">${message}</div>
-		<a href="tips.html" class="btn btn-secondary mt-3">Обратно към съветите</a>
+		<div class="tips-status-card">
+			<div class="alert alert-info mb-3">${message}</div>
+			<a href="tips.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Обратно към съветите</a>
+		</div>
 	`;
 }
 
@@ -27,23 +62,36 @@ function renderArticle(article) {
 	if (!pageContent) return;
 
 	const title = escapeHtml(article.title || 'Без заглавие');
-	const category = escapeHtml(article.category || 'Общи');
+	const category = escapeHtml(getCategoryName(article.category));
 	const content = escapeHtml(article.content || '');
+	const createdAt = formatDate(article.created_at);
 
 	pageContent.innerHTML = `
-		<nav aria-label="breadcrumb">
-			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><a href="tips.html">Съвети</a></li>
-				<li class="breadcrumb-item active" aria-current="page">${title}</li>
-			</ol>
-		</nav>
-		<article class="blog-post">
-			<h2 class="blog-post-title mb-2">${title}</h2>
-			<p class="blog-post-meta text-muted mb-4">Категория: ${category}</p>
-			<p style="white-space: pre-line;">${content}</p>
-		</article>
-		<div class="mt-4">
-			<a href="tips.html" class="btn btn-secondary">Обратно към съветите</a>
+		<div class="tips-details-shell">
+			<div class="tips-breadcrumb mb-3" aria-label="breadcrumb">
+				<ol class="breadcrumb">
+					<li class="breadcrumb-item"><a href="tips.html">Съвети</a></li>
+					<li class="breadcrumb-item active" aria-current="page">${title}</li>
+				</ol>
+			</div>
+
+			<article class="tips-article-card">
+				<span class="tips-kicker"><i class="bi bi-stars"></i>Практичен съвет</span>
+				<h1 class="tips-title">${title}</h1>
+
+				<div class="tips-meta">
+					<span class="tips-meta-badge"><i class="bi bi-tag"></i>Категория: ${category}</span>
+					<span class="tips-meta-badge tips-meta-date"><i class="bi bi-calendar3"></i>${createdAt}</span>
+				</div>
+
+				<hr class="tips-separator">
+
+				<div class="tips-article-content">${content}</div>
+
+				<div class="tips-footer-actions">
+					<a href="tips.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Обратно към съветите</a>
+				</div>
+			</article>
 		</div>
 	`;
 }

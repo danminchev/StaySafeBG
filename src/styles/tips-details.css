@@ -1,0 +1,127 @@
+.tips-details-page {
+  padding-top: 1.25rem;
+  padding-bottom: 3rem;
+}
+
+.tips-details-shell {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.tips-breadcrumb {
+  background: rgba(16, 40, 66, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--border-radius-pill);
+  padding: 0.55rem 1rem;
+  box-shadow: 0 8px 20px rgba(3, 12, 32, 0.25);
+}
+
+.tips-breadcrumb .breadcrumb {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.tips-breadcrumb .breadcrumb-item,
+.tips-breadcrumb .breadcrumb-item.active {
+  color: #c4d6ee;
+}
+
+.tips-breadcrumb .breadcrumb-item a {
+  color: #8de0d5;
+  font-weight: 600;
+}
+
+.tips-article-card {
+  background: linear-gradient(140deg, #0d2743 0%, #14375c 58%, #1b3159 100%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 16px 34px rgba(3, 12, 32, 0.36);
+  padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+}
+
+.tips-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #d4e4f6;
+  font-weight: 700;
+}
+
+.tips-title {
+  color: #f5f9ff;
+  font-size: clamp(1.75rem, 1.5rem + 1vw, 2.45rem);
+  line-height: 1.15;
+  margin: 0.6rem 0 0.9rem;
+}
+
+.tips-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.tips-meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: var(--border-radius-pill);
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(42, 157, 143, 0.35);
+  background: rgba(42, 157, 143, 0.12);
+  color: #e9f2ff;
+  font-weight: 600;
+  font-size: 0.86rem;
+}
+
+.tips-meta-date {
+  border-color: rgba(142, 178, 235, 0.34);
+  background: rgba(98, 140, 214, 0.22);
+}
+
+.tips-separator {
+  border: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 1.1rem 0 1.25rem;
+}
+
+.tips-article-content {
+  color: #dfeafb;
+  font-size: 1.04rem;
+  line-height: 1.82;
+  white-space: pre-line;
+}
+
+.tips-article-content h2,
+.tips-article-content h3,
+.tips-article-content h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.tips-footer-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.tips-footer-actions .btn {
+  border-radius: var(--border-radius-pill);
+  padding-left: 1.15rem;
+  padding-right: 1.15rem;
+  font-weight: 600;
+}
+
+.tips-status-card {
+  max-width: 760px;
+  margin: 0 auto;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 1.1rem;
+}
