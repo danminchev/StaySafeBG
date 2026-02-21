@@ -38,7 +38,6 @@ body {
   transition: all 0.2s ease;
 }
 
-.ss-navbar .ss-nav-btn,
 .ss-navbar .ss-account-btn,
 .ss-navbar .ss-profile-btn {
   background-color: transparent;
@@ -46,12 +45,48 @@ body {
   color: #f8fbff;
 }
 
-.ss-navbar .ss-nav-btn-active {
-  background-color: #f4b63f;
-  border-color: #f4b63f;
-  color: #0d253d;
+.ss-navbar .ss-nav-link {
+  color: #ffffff;
+  position: relative;
+  transition: color 0.3s ease;
+  padding: 0.5rem 0;
+  margin: 0 0.8rem;
+  text-decoration: none;
+  font-size: 1.6rem;
   font-weight: 700;
-  box-shadow: 0 0 0 2px rgba(244, 182, 63, 0.25), inset 0 -2px 0 rgba(13, 37, 61, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.ss-navbar .ss-nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 50%;
+  background-color: #f4b63f;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.ss-navbar .ss-nav-link:hover,
+.ss-navbar .ss-nav-link:focus {
+  color: #f8fbff;
+}
+
+.ss-navbar .ss-nav-link:hover::after,
+.ss-navbar .ss-nav-link:focus::after {
+  width: 100%;
+}
+
+.ss-navbar .ss-nav-link-active {
+  color: #f4b63f !important;
+}
+
+.ss-navbar .ss-nav-link-active::after {
+  width: 100%;
+  background-color: #f4b63f;
 }
 
 .ss-navbar .ss-account-solid {
@@ -60,14 +95,10 @@ body {
   color: #f8fbff;
 }
 
-.ss-navbar .ss-nav-btn:hover,
-.ss-navbar .ss-nav-btn:focus,
 .ss-navbar .ss-account-btn:hover,
 .ss-navbar .ss-account-btn:focus,
 .ss-navbar .ss-profile-btn:hover,
-.ss-navbar .ss-profile-btn:focus,
-.ss-navbar .ss-nav-btn-active:hover,
-.ss-navbar .ss-nav-btn-active:focus {
+.ss-navbar .ss-profile-btn:focus {
   background-color: #f4b63f;
   border-color: #f4b63f;
   color: #0d253d;
@@ -82,19 +113,13 @@ body {
   transform: translateY(-1px);
 }
 
-.ss-navbar .ss-nav-btn:active,
 .ss-navbar .ss-account-btn:active,
 .ss-navbar .ss-profile-btn:active,
-.ss-navbar .ss-account-solid:active,
-.ss-navbar .ss-nav-btn-active:active {
+.ss-navbar .ss-account-solid:active {
   transform: translateY(0);
 }
 
 .ss-navbar .ss-account-solid {
-  min-width: 150px;
-}
-
-.ss-navbar .ss-nav-btn {
   min-width: 150px;
 }
 

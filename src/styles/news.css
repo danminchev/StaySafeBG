@@ -345,7 +345,7 @@
 }
 
 .article-excerpt {
-  color: #cbd5e1;
+  color: #ffc107;
     font-size: 0.95rem;
     margin-bottom: 1.5rem;
     flex-grow: 1; /* Pushes meta to bottom */
@@ -354,13 +354,18 @@
 /* Card Meta/Footer */
 .article-meta {
   font-size: 0.8rem;
-  color: #cbd5e1;
+  color: #ffc107;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.article-meta .date-text,
+.article-meta .bi-calendar3 {
+  color: #f8fafc;
 }
 
 .meta-item {
@@ -464,13 +469,9 @@
   color: #f8fafc;
 }
 
-#newsDetailsModal #newsDetailsModalDate {
-  color: #dbe7f5 !important;
-}
-
 #communityReportModal #communityReportModalDate,
 #communityReportModal #communityReportModalSource {
-  color: #dbe7f5 !important;
+  color: #f8fafc !important;
 }
 
 #newsDetailsModal .article-content,
@@ -481,7 +482,7 @@
 #communityReportModal .article-content p,
 #communityReportModal .article-content li,
 #communityReportModal .article-content span {
-  color: #e5eefb;
+  color: #ffc107;
 }
 
 #newsDetailsModal .article-content,

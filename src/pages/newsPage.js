@@ -32,7 +32,6 @@ const dom = {
 	modal: {
 		el: document.getElementById('newsDetailsModal'),
 		title: document.getElementById('newsDetailsModalLabel'),
-		date: document.getElementById('newsDetailsModalDate'),
 		category: document.getElementById('newsDetailsModalCategory'),
 		content: document.getElementById('newsDetailsModalContent')
 	},
@@ -161,7 +160,6 @@ function openNewsModal(article) {
 	dom.modal.el.dataset.category = article.category || 'other';
     
     if(dom.modal.title) dom.modal.title.textContent = article.title;
-    if(dom.modal.date) dom.modal.date.textContent = formatDate(article.created_at);
     if(dom.modal.category) {
         dom.modal.category.textContent = getCategoryName(article.category);
 		dom.modal.category.className = 'badge modal-category-badge';
