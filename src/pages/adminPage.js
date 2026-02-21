@@ -14,11 +14,22 @@ import {
     updateAdminReport,
     updateReportStatus
 } from '../services/reportsService.js';
+import {
+    createTrustedPhishingDomain,
+    deleteTrustedPhishingDomain,
+    getTrustedPhishingDomains,
+    updateTrustedPhishingDomain
+} from '../services/trustedDomainsService.js';
 import { showToast } from '../utils/notifications.js';
 
 const state = {
     articles: [],
     reports: [],
+    phishingDomains: [],
+    phishingDomainsFilter: {
+        search: '',
+        status: 'all'
+    },
     users: [],
     selectedReportId: null,
     currentUserId: null,
@@ -54,6 +65,20 @@ const dom = {
     usersRefreshBtn: document.getElementById('btn-refresh-users'),
     usersBody: document.getElementById('admin-users-body'),
     reportsBody: document.getElementById('admin-reports-body'),
+    phishingDomainsRefreshBtn: document.getElementById('btn-refresh-phishing-domains'),
+    phishingDomainsBody: document.getElementById('admin-phishing-domains-body'),
+    phishingDomainForm: document.getElementById('add-phishing-domain-form'),
+    phishingDomainFields: {
+        domain: document.getElementById('phishing-domain-input'),
+        source: document.getElementById('phishing-domain-source-input'),
+        confidence: document.getElementById('phishing-domain-confidence-input'),
+        notes: document.getElementById('phishing-domain-notes-input'),
+        submit: document.getElementById('btn-add-phishing-domain')
+    },
+    phishingDomainFilters: {
+        searchInput: document.getElementById('phishing-domain-search-input'),
+        statusSelect: document.getElementById('phishing-domain-status-filter')
+    },
     stats: {
         pending: document.getElementById('admin-stat-pending'),
         approved: document.getElementById('admin-stat-approved'),
@@ -1038,10 +1063,12 @@ function renderAdminContent() {
     // Initialize event listeners for admin actions
     initArticleCreation();
 	initArticleEditing();
-	initReportReviewing();
+    initReportReviewing();
+    initPhishingDomainsManagement();
 	loadAdminReports();
 	loadAdminReportStats();
 	loadAdminArticles();
+    loadPhishingDomains();
 
     if (canManageUsers()) {
         initUserManagement();
@@ -1150,6 +1177,189 @@ function initReportReviewing() {
     if (dom.reportEdit.updateBtn) {
         dom.reportEdit.updateBtn.addEventListener('click', () => {
             saveEditedReport();
+        });
+    }
+}
+
+function renderPhishingDomainsTable() {
+    if (!dom.phishingDomainsBody) return;
+
+    dom.phishingDomainsBody.textContent = '';
+
+    const search = state.phishingDomainsFilter.search.trim().toLowerCase();
+    const status = state.phishingDomainsFilter.status;
+    const filtered = state.phishingDomains.filter((item) => {
+        const isActive = Boolean(item.is_active);
+        const statusMatch = status === 'all'
+            || (status === 'active' && isActive)
+            || (status === 'inactive' && !isActive);
+
+        if (!statusMatch) return false;
+        if (!search) return true;
+
+        const haystack = `${item.domain || ''} ${item.source || ''} ${item.notes || ''}`.toLowerCase();
+        return haystack.includes(search);
+    });
+
+    if (!filtered.length) {
+        dom.phishingDomainsBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Няма добавени домейни.</td></tr>';
+        return;
+    }
+
+    filtered.forEach((item) => {
+        const row = document.createElement('tr');
+        const statusBadge = item.is_active
+            ? '<span class="badge bg-success">Active</span>'
+            : '<span class="badge bg-secondary">Inactive</span>';
+
+        row.innerHTML = `
+            <td class="fw-semibold">${item.domain || '-'}</td>
+            <td>${item.source || '-'}</td>
+            <td>${Number(item.confidence || 0).toFixed(2)}</td>
+            <td>${statusBadge}</td>
+            <td>${formatDateTime(item.updated_at || item.last_seen_at || item.created_at)}</td>
+            <td class="text-end">
+                <div class="d-inline-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-${item.is_active ? 'warning' : 'success'}" data-action="${item.is_active ? 'deactivate-domain' : 'activate-domain'}" data-domain-id="${item.id}">
+                        ${item.is_active ? 'Деактивирай' : 'Активирай'}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-action="delete-domain" data-domain-id="${item.id}">
+                        Изтрий
+                    </button>
+                </div>
+            </td>
+        `;
+
+        dom.phishingDomainsBody.appendChild(row);
+    });
+}
+
+async function loadPhishingDomains() {
+    if (!dom.phishingDomainsBody) return;
+    dom.phishingDomainsBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Зареждане...</td></tr>';
+
+    try {
+        state.phishingDomains = await getTrustedPhishingDomains();
+        renderPhishingDomainsTable();
+    } catch (error) {
+        console.error('Error loading phishing domains:', error);
+        dom.phishingDomainsBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Грешка при зареждане на домейни.</td></tr>';
+        showToast('Неуспешно зареждане на phishing домейни.', 'error');
+    }
+}
+
+async function handleCreatePhishingDomain(event) {
+    event.preventDefault();
+
+    const domain = dom.phishingDomainFields.domain?.value?.trim();
+    if (!domain) {
+        showToast('Въведете домейн.', 'warning');
+        return;
+    }
+
+    const source = dom.phishingDomainFields.source?.value?.trim() || 'manual';
+    const confidence = Number(dom.phishingDomainFields.confidence?.value || 0.95);
+    const notes = dom.phishingDomainFields.notes?.value?.trim() || '';
+
+    const submitBtn = dom.phishingDomainFields.submit;
+    const original = submitBtn?.textContent || '';
+
+    try {
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Запазване...';
+        }
+
+        await createTrustedPhishingDomain({ domain, source, confidence, notes });
+        showToast('Домейнът е добавен успешно.', 'success');
+        dom.phishingDomainForm?.reset();
+        if (dom.phishingDomainFields.source) dom.phishingDomainFields.source.value = 'manual';
+        if (dom.phishingDomainFields.confidence) dom.phishingDomainFields.confidence.value = '0.95';
+        await loadPhishingDomains();
+    } catch (error) {
+        console.error('Error creating phishing domain:', error);
+        showToast('Неуспешно добавяне на домейн.', 'error');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = original;
+        }
+    }
+}
+
+async function handlePhishingDomainAction(action, id, button) {
+    if (!id) return;
+    const original = button?.textContent || '';
+
+    try {
+        if (button) {
+            button.disabled = true;
+            button.textContent = '...';
+        }
+
+        if (action === 'activate-domain') {
+            await updateTrustedPhishingDomain(id, { is_active: true });
+            showToast('Домейнът е активиран.', 'success');
+        } else if (action === 'deactivate-domain') {
+            await updateTrustedPhishingDomain(id, { is_active: false });
+            showToast('Домейнът е деактивиран.', 'success');
+        } else if (action === 'delete-domain') {
+            const ok = window.confirm('Сигурни ли сте, че искате да изтриете този домейн?');
+            if (!ok) return;
+            await deleteTrustedPhishingDomain(id);
+            showToast('Домейнът е изтрит.', 'success');
+        }
+
+        await loadPhishingDomains();
+    } catch (error) {
+        console.error('Error updating phishing domain:', error);
+        showToast('Неуспешна операция върху домейн.', 'error');
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.textContent = original;
+        }
+    }
+}
+
+function initPhishingDomainsManagement() {
+    if (dom.phishingDomainsRefreshBtn) {
+        dom.phishingDomainsRefreshBtn.addEventListener('click', () => {
+            loadPhishingDomains();
+        });
+    }
+
+    if (dom.phishingDomainForm) {
+        dom.phishingDomainForm.addEventListener('submit', handleCreatePhishingDomain);
+    }
+
+    if (dom.phishingDomainFilters.searchInput) {
+        dom.phishingDomainFilters.searchInput.addEventListener('input', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement)) return;
+            state.phishingDomainsFilter.search = target.value || '';
+            renderPhishingDomainsTable();
+        });
+    }
+
+    if (dom.phishingDomainFilters.statusSelect) {
+        dom.phishingDomainFilters.statusSelect.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLSelectElement)) return;
+            state.phishingDomainsFilter.status = target.value || 'all';
+            renderPhishingDomainsTable();
+        });
+    }
+
+    if (dom.phishingDomainsBody) {
+        dom.phishingDomainsBody.addEventListener('click', async (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+            const btn = target.closest('button[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            const id = btn.dataset.domainId;
+            await handlePhishingDomainAction(action, id, btn);
         });
     }
 }
