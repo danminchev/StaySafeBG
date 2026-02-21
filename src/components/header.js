@@ -102,7 +102,7 @@ function renderHeaderHtml(currentUser) {
   const isModerator = isModeratorUser(currentUser);
   const userLabel = escapeHtml(currentUser?.email || currentUser?.username || 'Профил');
   const activePage = getActivePage();
-  const ctaClass = 'nav-link ss-nav-link fw-semibold fs-5 mx-2';
+  const ctaClass = 'nav-link ss-nav-link fw-semibold mx-2';
   const accountClass = 'btn ss-account-btn fw-semibold px-4 py-2 fs-5 border-2';
 
   const homeIsActive = activePage === 'index.html';

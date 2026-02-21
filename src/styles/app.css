@@ -52,7 +52,7 @@ body {
   padding: 0.5rem 0;
   margin: 0 0.8rem;
   text-decoration: none;
-  font-size: 1.6rem;
+  font-size: 1.15rem !important;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.02em;
