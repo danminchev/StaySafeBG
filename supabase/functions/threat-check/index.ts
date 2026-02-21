@@ -1,4 +1,4 @@
-const corsHeaders = {
+﻿const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
@@ -37,7 +37,7 @@ function normalizeInput(value: unknown): string {
 function detectInputType(value: string): InputType {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const ipv4Pattern = /^(?:\d{1,3}\.){3}\d{1,3}(?::\d{1,5})?(?:\/.*)?$/;
-  const hasLetters = /[a-zA-Zа-яА-Я]/.test(value);
+  const hasLetters = /[a-zA-ZР°-СЏРђ-РЇ]/.test(value);
   const digitsOnly = value.replace(/\D/g, '');
 
   if (emailPattern.test(value)) return 'email';
@@ -119,10 +119,28 @@ function analyzeHeuristicUrlRisk(rawInput: string, inputType: InputType): Source
     reasons.push('High subdomain depth');
   }
 
-  const suspiciousKeywords = /(login|verify|secure|update|wallet|bank|signin|account|invoice|urgent)/i;
+  const suspiciousKeywords = /(login|verify|secure|update|wallet|bank|signin|account|invoice|urgent|coupon|gift|bonus|promo|prize)/i;
   if (suspiciousKeywords.test(parsed.pathname) || suspiciousKeywords.test(parsed.hostname)) {
     score += 0.1;
     reasons.push('Contains common phishing keywords');
+  }
+
+  const firstLabel = hostParts[0] || '';
+  const freeHostPattern = /(pages\.dev|github\.io|netlify\.app|vercel\.app|web\.app|firebaseapp\.com)$/i;
+  if (freeHostPattern.test(parsed.hostname)) {
+    score += 0.12;
+    reasons.push('Hosted on free subdomain platform');
+  }
+
+  if (/-[a-f0-9]{6,}$/i.test(firstLabel) || /-\d{5,}$/i.test(firstLabel)) {
+    score += 0.22;
+    reasons.push('Subdomain contains random-looking suffix');
+  }
+
+  const hyphenCount = (firstLabel.match(/-/g) || []).length;
+  if (hyphenCount >= 3) {
+    score += 0.08;
+    reasons.push('High hyphen density in subdomain');
   }
 
   if (reasons.length === 0) {
@@ -490,3 +508,4 @@ Deno.serve(async (request: Request) => {
     });
   }
 });
+

@@ -15,7 +15,7 @@ function detectInputType(value) {
   const input = normalizeInput(value);
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const ipv4Pattern = /^(?:\d{1,3}\.){3}\d{1,3}(?::\d{1,5})?(?:\/.*)?$/;
-  const hasLetters = /[a-zA-ZР°-СЏРђ-РЇ]/.test(input);
+  const hasLetters = /[a-zA-Z]/.test(input);
   const digitsOnly = input.replace(/\D/g, '');
 
   if (emailPattern.test(input)) return 'email';
@@ -201,6 +201,25 @@ function analyzeHeuristicUrlRisk(rawInput, inputType) {
   if (parsed.port && !['80', '443'].includes(parsed.port)) {
     risk += 18;
     reasons.push(`URL РёР·РїРѕР»Р·РІР° РЅРµСЃС‚Р°РЅРґР°СЂС‚РµРЅ РїРѕСЂС‚ (${parsed.port})`);
+  }
+
+  const hostParts = parsed.hostname.split('.').filter(Boolean);
+  const firstLabel = hostParts[0] || '';
+  const freeHostPattern = /(pages\.dev|github\.io|netlify\.app|vercel\.app|web\.app|firebaseapp\.com)$/i;
+  if (freeHostPattern.test(parsed.hostname)) {
+    risk += 12;
+    reasons.push('URL is hosted on a free subdomain platform');
+  }
+
+  if (/-[a-f0-9]{6,}$/i.test(firstLabel) || /-\d{5,}$/i.test(firstLabel)) {
+    risk += 22;
+    reasons.push('Subdomain contains random-looking suffix');
+  }
+
+  const hyphenCount = (firstLabel.match(/-/g) || []).length;
+  if (hyphenCount >= 3) {
+    risk += 8;
+    reasons.push('High hyphen density in subdomain');
   }
 
   const hasCriticalPattern = isIpv4Host && parsed.protocol === 'http:' && Boolean(parsed.port) && !['80', '443'].includes(parsed.port);
