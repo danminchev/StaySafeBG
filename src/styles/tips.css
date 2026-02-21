@@ -218,13 +218,12 @@
 /* Card Styling */
 .article-card {
   border: 1px solid rgba(255, 255, 255, 0.15);
-  border-left-width: 4px;
-  border-radius: var(--border-radius-lg);
-  background: rgba(51, 65, 85, 0.88);
+  border-radius: 1rem;
+  background: rgba(51, 65, 85, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 10px 25px rgba(3, 12, 32, 0.22);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -233,9 +232,30 @@
 }
 
 .article-card:hover {
-  transform: translateY(-7px);
-  box-shadow: 0 18px 36px rgba(3, 12, 32, 0.3);
-  background: rgba(71, 85, 105, 0.92);
+  transform: translateY(-8px) scale(1.02);
+  background: rgba(71, 85, 105, 0.9);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.2),
+    0 10px 10px -5px rgba(0, 0, 0, 0.1),
+    0 0 20px rgba(79, 70, 229, 0.15);
+  z-index: 10;
+}
+
+.article-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.article-card:hover::before {
+  opacity: 1;
 }
 
 .article-card.from-home-focus {
@@ -248,9 +268,8 @@
   outline-offset: 4px;
 }
 
-/* Category Specific Styles (Border & Badge) */
+/* Category Specific Styles (Accent & Badge) */
 /* Default */
-.article-card { border-left-color: var(--secondary-color); }
 .category-badge { 
   background-color: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.9);
@@ -259,53 +278,38 @@
 
 /* Category Mapping */
 /* Phishing */
-.article-card[data-category="phishing"] { border-left-color: var(--cat-phishing-border); }
 .article-card[data-category="phishing"] .category-badge { background-color: rgba(79, 70, 229, 0.2); color: #c7d2fe; border-color: rgba(79, 70, 229, 0.35); }
 
 /* Identity Theft */
-.article-card[data-category="identity_theft"] { border-left-color: var(--cat-identity-border); }
 .article-card[data-category="identity_theft"] .category-badge { background-color: rgba(225, 29, 72, 0.2); color: #fecdd3; border-color: rgba(225, 29, 72, 0.35); }
 
 /* Online Shopping */
-.article-card[data-category="online_shopping"] { border-left-color: var(--cat-shopping-border); }
 .article-card[data-category="online_shopping"] .category-badge { background-color: rgba(37, 99, 235, 0.2); color: #bfdbfe; border-color: rgba(37, 99, 235, 0.35); }
 
-.article-card[data-category="shopping"] { border-left-color: var(--cat-shopping-border); }
 .article-card[data-category="shopping"] .category-badge { background-color: rgba(37, 99, 235, 0.2); color: #bfdbfe; border-color: rgba(37, 99, 235, 0.35); }
 
 /* Investment */
-.article-card[data-category="investment"] { border-left-color: var(--cat-investment-border); }
 .article-card[data-category="investment"] .category-badge { background-color: rgba(16, 185, 129, 0.2); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.35); }
 
 /* Tech Support */
-.article-card[data-category="tech_support"] { border-left-color: var(--cat-tech-border); }
 .article-card[data-category="tech_support"] .category-badge { background-color: rgba(245, 158, 11, 0.2); color: #fde68a; border-color: rgba(245, 158, 11, 0.35); }
 
 /* Job Scams */
-.article-card[data-category="job_scams"] { border-left-color: var(--cat-job-border); }
 .article-card[data-category="job_scams"] .category-badge { background-color: rgba(20, 184, 166, 0.2); color: #99f6e4; border-color: rgba(20, 184, 166, 0.35); }
 
-.article-card[data-category="phone"] { border-left-color: #f97316; }
 .article-card[data-category="phone"] .category-badge { background-color: rgba(249, 115, 22, 0.2); color: #fed7aa; border-color: rgba(249, 115, 22, 0.35); }
 
-.article-card[data-category="security"] { border-left-color: #0ea5e9; }
 .article-card[data-category="security"] .category-badge { background-color: rgba(14, 165, 233, 0.2); color: #bae6fd; border-color: rgba(14, 165, 233, 0.35); }
 
-.article-card[data-category="social"],
-.article-card[data-category="social_media"] { border-left-color: #8b5cf6; }
 .article-card[data-category="social"] .category-badge,
 .article-card[data-category="social_media"] .category-badge { background-color: rgba(139, 92, 246, 0.2); color: #ddd6fe; border-color: rgba(139, 92, 246, 0.35); }
 
-.article-card[data-category="crypto"] { border-left-color: #a855f7; }
 .article-card[data-category="crypto"] .category-badge { background-color: rgba(168, 85, 247, 0.2); color: #e9d5ff; border-color: rgba(168, 85, 247, 0.35); }
 
-.article-card[data-category="marketplace"] { border-left-color: #f59e0b; }
 .article-card[data-category="marketplace"] .category-badge { background-color: rgba(245, 158, 11, 0.2); color: #fde68a; border-color: rgba(245, 158, 11, 0.35); }
 
-.article-card[data-category="romance"] { border-left-color: #ec4899; }
 .article-card[data-category="romance"] .category-badge { background-color: rgba(236, 72, 153, 0.2); color: #fbcfe8; border-color: rgba(236, 72, 153, 0.35); }
 
-.article-card[data-category="other"] { border-left-color: #64748b; }
 .article-card[data-category="other"] .category-badge { background-color: rgba(148, 163, 184, 0.2); color: #e2e8f0; border-color: rgba(148, 163, 184, 0.35); }
 
 
@@ -339,12 +343,12 @@
 }
 
 .article-title {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 700;
     margin-bottom: 0.75rem;
     line-height: 1.4;
     transition: color var(--transition-fast);
-  color: #ffc107;
+  color: #ffffff;
     width: 100%;
     overflow-wrap: break-word;
 }
@@ -359,7 +363,7 @@
 /* Card Meta/Footer */
 .article-meta {
   font-size: 0.8rem;
-  color: #ffc107;
+  color: rgba(255, 255, 255, 0.6);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -383,7 +387,7 @@
     font-size: 0.85rem;
     font-weight: 600;
     text-decoration: none;
-  color: #f4b63f;
+  color: var(--primary-color);
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -392,8 +396,7 @@
 
 .article-card:hover .read-more-btn {
     gap: 0.5rem;
-    text-decoration: underline;
-  color: #ffd782;
+    color: #93c5fd;
 }
 
 .article-link-overlay {
@@ -402,7 +405,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 100; /* Ensure clickable */
+  z-index: 2;
   cursor: pointer;
 }
 

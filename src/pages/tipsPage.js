@@ -29,12 +29,6 @@ const dom = {
 		category: document.getElementById('params-category'),
 		sort: document.getElementById('params-sort'),
 	},
-	modal: {
-		el: document.getElementById('newsDetailsModal'),
-		title: document.getElementById('newsDetailsModalLabel'),
-		category: document.getElementById('newsDetailsModalCategory'),
-		content: document.getElementById('newsDetailsModalContent')
-	},
 	clearBtn: document.getElementById('btn-clear'),
 	templates: {
 		article: document.getElementById('article-template'),
@@ -65,16 +59,6 @@ function formatDate(dateValue) {
 		month: 'short',
 		year: 'numeric'
 	}).format(date);
-}
-
-function getCategoryColor(cat) {
-	const map = {
-		'phishing': 'bg-danger-subtle text-danger-emphasis',
-		'shopping': 'bg-success-subtle text-success-emphasis',
-		'investment': 'bg-warning-subtle text-warning-emphasis',
-		'security': 'bg-info-subtle text-info-emphasis'
-	};
-	return map[cat] || 'bg-secondary-subtle text-secondary-emphasis';
 }
 
 function getCategoryName(cat) {
@@ -151,32 +135,6 @@ function renderError(message) {
 	dom.loadMoreContainer.classList.add('d-none');
 }
 
-function openNewsModal(article) {
-    if (!article || !window.bootstrap || !dom.modal.el) {
-        console.warn('Cannot open modal: missing article, bootstrap or modal element');
-        return;
-    }
-
-	dom.modal.el.dataset.category = article.category || 'other';
-    
-    if(dom.modal.title) dom.modal.title.textContent = article.title;
-    if(dom.modal.category) {
-        dom.modal.category.textContent = getCategoryName(article.category);
-		dom.modal.category.className = 'badge modal-category-badge';
-		dom.modal.category.dataset.category = article.category || 'other';
-    }
-    if(dom.modal.content) {
-        // Handle newlines for text content
-        const safeContent = article.content 
-            ? article.content.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, '<br>') 
-            : '';
-        dom.modal.content.innerHTML = safeContent;
-    }
-    
-    const modal = new window.bootstrap.Modal(dom.modal.el);
-    modal.show();
-}
-
 function createCard(article) {
 	const clone = dom.templates.article.content.cloneNode(true);
 	
@@ -189,13 +147,6 @@ function createCard(article) {
 	const link = clone.querySelector('.article-link-overlay');
 	if(link) {
 		link.href = `tips-details.html?id=${article.id}`;
-        link.addEventListener('click', (e) => {
-            // Allow opening in new tab with Ctrl/Cmd + Click
-            if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
-
-            e.preventDefault();
-            openNewsModal(article);
-        });
     }
 	
 	const badge = clone.querySelector('.category-badge');
@@ -218,17 +169,6 @@ function createCard(article) {
 	
 	const dateSpan = clone.querySelector('.date-text');
 	if(dateSpan) dateSpan.textContent = formatDate(article.created_at);
-
-    // Also attach click to "Read More" button if user clicks that specifically
-    const readMoreBtn = clone.querySelector('.read-more-btn');
-    if(readMoreBtn) {
-        readMoreBtn.style.cursor = 'pointer';
-        readMoreBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation(); // Avoid double triggering if overlay is present
-            openNewsModal(article);
-        });
-    }
 	
 	return clone;
 }
