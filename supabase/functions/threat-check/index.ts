@@ -1,4 +1,6 @@
-﻿const corsHeaders = {
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
@@ -28,7 +30,15 @@ type AggregateResult = {
   warnings: string[];
 };
 
+type SimilarDomainRow = {
+  domain: string;
+  similarity: number;
+  source: string;
+  confidence: number;
+};
+
 const REQUEST_TIMEOUT_MS = 6500;
+const DOMAIN_SIMILARITY_THRESHOLD = 0.52;
 
 function normalizeInput(value: unknown): string {
   return String(value || '').trim();
@@ -37,7 +47,7 @@ function normalizeInput(value: unknown): string {
 function detectInputType(value: string): InputType {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const ipv4Pattern = /^(?:\d{1,3}\.){3}\d{1,3}(?::\d{1,5})?(?:\/.*)?$/;
-  const hasLetters = /[a-zA-ZР°-СЏРђ-РЇ]/.test(value);
+  const hasLetters = /[a-zA-Z]/.test(value);
   const digitsOnly = value.replace(/\D/g, '');
 
   if (emailPattern.test(value)) return 'email';
@@ -59,6 +69,15 @@ function normalizeUrlCandidate(value: string): string | null {
 function extractDomainFromEmail(email: string): string | null {
   const [, domain] = email.split('@');
   return domain ? domain.toLowerCase() : null;
+}
+
+function normalizeHost(hostname: string): string {
+  return hostname.toLowerCase().replace(/^www\./, '');
+}
+
+function toBase64Url(value: string): string {
+  const encoded = btoa(value);
+  return encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
 async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}, timeoutMs = REQUEST_TIMEOUT_MS): Promise<Response> {
@@ -166,6 +185,113 @@ function analyzeHeuristicUrlRisk(rawInput: string, inputType: InputType): Source
   }];
 }
 
+async function checkTrustedPhishingDomains(urlCandidate: string): Promise<SourceResult> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    return {
+      source: 'Trusted phishing domain list',
+      sourceType: 'external',
+      checked: false,
+      flagged: false,
+      confidence: 0,
+      reason: 'SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing',
+    };
+  }
+
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
+  const hostname = normalizeHost(new URL(urlCandidate).hostname);
+
+  try {
+    const { data: exactMatch, error: exactError } = await supabase
+      .from('trusted_phishing_domains')
+      .select('domain, source, confidence')
+      .eq('is_active', true)
+      .eq('domain', hostname)
+      .maybeSingle();
+
+    if (exactError) {
+      return {
+        source: 'Trusted phishing domain list',
+        sourceType: 'external',
+        checked: false,
+        flagged: false,
+        confidence: 0,
+        reason: exactError.message,
+      };
+    }
+
+    if (exactMatch) {
+      return {
+        source: 'Trusted phishing domain list',
+        sourceType: 'external',
+        checked: true,
+        flagged: true,
+        confidence: Math.min(0.99, Math.max(0.75, Number(exactMatch.confidence ?? 0.9))),
+        reason: `Exact match with known phishing domain: ${exactMatch.domain}`,
+        details: exactMatch,
+      };
+    }
+
+    const { data: similarMatches, error: similarError } = await supabase.rpc('find_similar_phishing_domains', {
+      input_domain: hostname,
+      similarity_threshold: DOMAIN_SIMILARITY_THRESHOLD,
+      max_results: 5,
+    });
+
+    if (similarError) {
+      return {
+        source: 'Trusted phishing domain list',
+        sourceType: 'external',
+        checked: false,
+        flagged: false,
+        confidence: 0,
+        reason: similarError.message,
+      };
+    }
+
+    const candidates = Array.isArray(similarMatches) ? (similarMatches as SimilarDomainRow[]) : [];
+    if (candidates.length > 0) {
+      const top = candidates[0];
+      const similarity = Number(top.similarity || 0);
+      const flagged = similarity >= DOMAIN_SIMILARITY_THRESHOLD;
+
+      return {
+        source: 'Trusted phishing domain list',
+        sourceType: 'external',
+        checked: true,
+        flagged,
+        confidence: Math.min(0.95, 0.6 + similarity * 0.35),
+        reason: `Similar to known phishing domain (${top.domain}, similarity ${similarity.toFixed(2)})`,
+        details: {
+          input: hostname,
+          bestMatch: top,
+          similar: candidates,
+        },
+      };
+    }
+
+    return {
+      source: 'Trusted phishing domain list',
+      sourceType: 'external',
+      checked: true,
+      flagged: false,
+      confidence: 0.65,
+      reason: 'No match in trusted phishing list',
+    };
+  } catch (error) {
+    return {
+      source: 'Trusted phishing domain list',
+      sourceType: 'external',
+      checked: false,
+      flagged: false,
+      confidence: 0,
+      reason: error instanceof Error ? error.message : 'Unexpected error',
+    };
+  }
+}
+
 async function checkSinkingYachts(urlCandidate: string): Promise<SourceResult> {
   try {
     const hostname = new URL(urlCandidate).hostname;
@@ -225,11 +351,6 @@ async function checkSinkingYachts(urlCandidate: string): Promise<SourceResult> {
   }
 }
 
-function toBase64Url(value: string): string {
-  const encoded = btoa(value);
-  return encoded.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
-}
-
 async function checkVirusTotal(urlCandidate: string): Promise<SourceResult> {
   const apiKey = Deno.env.get('VIRUSTOTAL_API_KEY');
   if (!apiKey) {
@@ -285,23 +406,16 @@ async function checkVirusTotal(urlCandidate: string): Promise<SourceResult> {
     const suspicious = Number(stats.suspicious || 0);
     const harmless = Number(stats.harmless || 0);
     const undetected = Number(stats.undetected || 0);
-
     const flagged = malicious > 0 || suspicious > 0;
     const checked = (malicious + suspicious + harmless + undetected) > 0;
-    const confidence = flagged ? Math.min(0.97, 0.7 + malicious * 0.05 + suspicious * 0.02) : 0.7;
 
     return {
       source: 'VirusTotal',
       sourceType: 'external',
       checked,
       flagged,
-      confidence,
-      details: {
-        malicious,
-        suspicious,
-        harmless,
-        undetected,
-      },
+      confidence: flagged ? Math.min(0.97, 0.7 + malicious * 0.05 + suspicious * 0.02) : 0.7,
+      details: { malicious, suspicious, harmless, undetected },
       reason: checked ? undefined : 'No analysis stats in response',
     };
   } catch (error) {
@@ -340,7 +454,7 @@ async function checkGoogleSafeBrowsing(urlCandidate: string): Promise<SourceResu
       body: JSON.stringify({
         client: {
           clientId: 'staysafebg',
-          clientVersion: '1.1.0',
+          clientVersion: '1.2.0',
         },
         threatInfo: {
           threatTypes: ['MALWARE', 'SOCIAL_ENGINEERING', 'UNWANTED_SOFTWARE', 'POTENTIALLY_HARMFUL_APPLICATION'],
@@ -483,6 +597,7 @@ Deno.serve(async (request: Request) => {
     }
 
     const sourceResults = await Promise.all([
+      checkTrustedPhishingDomains(urlCandidate),
       checkSinkingYachts(urlCandidate),
       checkVirusTotal(urlCandidate),
       checkGoogleSafeBrowsing(urlCandidate),
@@ -508,4 +623,3 @@ Deno.serve(async (request: Request) => {
     });
   }
 });
-
