@@ -21,18 +21,16 @@ function detectInputType(value) {
   if (emailPattern.test(input)) return 'email';
   if (input.startsWith('http://') || input.startsWith('https://') || (input.includes('.') && hasLetters) || ipv4Pattern.test(input)) return 'url';
   if (digitsOnly.length >= 6) return 'phone';
-
   return 'unknown';
 }
 
 function normalizeUrlCandidate(value) {
   const trimmed = normalizeInput(value);
   if (!trimmed) return null;
-
   const prefixed = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+
   try {
-    const parsed = new URL(prefixed);
-    return parsed.href;
+    return new URL(prefixed).href;
   } catch {
     return null;
   }
@@ -122,10 +120,17 @@ async function checkAgainstInternet(rawInput, type) {
     const hostname = new URL(urlCandidate).hostname;
     const response = await fetch(`${INTERNET_CHECK_BASE}${encodeURIComponent(hostname)}`, {
       method: 'GET',
-      headers: {
-        Accept: 'application/json',
-      },
+      headers: { Accept: 'application/json' },
     });
+
+    if (response.status === 404) {
+      return {
+        checked: true,
+        flagged: false,
+        source: 'phish.sinking.yachts',
+        details: { reason: 'Not listed' },
+      };
+    }
 
     if (!response.ok) {
       return {
@@ -137,7 +142,6 @@ async function checkAgainstInternet(rawInput, type) {
     }
 
     const data = await response.json();
-
     let flagged = false;
     if (typeof data === 'boolean') {
       flagged = data;
@@ -244,6 +248,8 @@ async function checkInternetViaEdgeFunction(rawInput, inputType) {
     sources,
     checkedCount,
     flaggedCount,
+    warnings: Array.isArray(data?.warnings) ? data.warnings : [],
+    degraded: Boolean(data?.degraded),
     usedEdgeFunction: true,
   };
 }
@@ -264,23 +270,24 @@ export async function runScamCheck(rawInput) {
     .catch(async (edgeError) => {
       const fallback = await checkAgainstInternet(input, inputType);
       const edgeReason = edgeError?.message || 'Edge function unavailable';
-      const fallbackReason = fallback?.details?.error || 'No response from fallback source';
+      const fallbackReason = fallback?.details?.error || fallback?.details?.reason || 'No response from fallback source';
+
       return {
         ...fallback,
         riskScore: fallback.flagged ? 50 : 0,
         verdict: fallback.flagged ? 'warning' : 'clean',
-        sources: [
-          {
-            source: fallback.source,
-            checked: fallback.checked,
-            flagged: fallback.flagged,
-            confidence: fallback.flagged ? 0.7 : 0.5,
-            details: fallback.details,
-            reason: `Fallback direct check (edge: ${edgeReason}; source: ${fallbackReason})`,
-          },
-        ],
+        sources: [{
+          source: fallback.source,
+          checked: fallback.checked,
+          flagged: fallback.flagged,
+          confidence: fallback.flagged ? 0.7 : 0.5,
+          details: fallback.details,
+          reason: `Fallback direct check (edge: ${edgeReason}; source: ${fallbackReason})`,
+        }],
         checkedCount: fallback.checked ? 1 : 0,
         flaggedCount: fallback.flagged ? 1 : 0,
+        warnings: fallback.checked ? [] : ['External checks are temporarily unavailable.'],
+        degraded: true,
         usedEdgeFunction: false,
         edgeError: edgeReason,
       };
@@ -295,7 +302,7 @@ export async function runScamCheck(rawInput) {
     .some((source) => source?.source === 'Heuristic URL analysis');
 
   const heuristic = edgeHasHeuristic
-    ? { risk: 0, reasons: [] }
+    ? { risk: 0, reasons: [], critical: false, checked: false }
     : analyzeHeuristicUrlRisk(input, inputType);
 
   const dbRisk = databaseResult.matched ? Math.min(60, 20 + databaseResult.matches.length * 10) : 0;
@@ -320,7 +327,7 @@ export async function runScamCheck(rawInput) {
     riskScore = 100;
   }
 
-  if (databaseResult.matched && verdict === 'clean') {
+  if (databaseResult.matched && verdict !== 'danger') {
     verdict = 'warning';
     riskScore = Math.max(riskScore, 35);
   }
@@ -339,6 +346,9 @@ export async function runScamCheck(rawInput) {
     : [];
 
   const mergedSources = [...(internetResult.sources || []), ...heuristicSources];
+  const warnings = Array.isArray(internetResult?.warnings) && internetResult.warnings.length
+    ? internetResult.warnings
+    : (verdict === 'unknown' ? ['Външните източници не върнаха валиден отговор. Резултатът не е окончателен.'] : []);
 
   return {
     input,
@@ -353,7 +363,7 @@ export async function runScamCheck(rawInput) {
       checkedCount: (internetResult.checkedCount || 0) + (heuristicSources.length ? 1 : 0),
       flaggedCount: (internetResult.flaggedCount || 0) + (heuristicSources.length ? 1 : 0),
     },
-    warnings: verdict === 'unknown' ? ['Външните източници не върнаха валиден отговор. Резултатът не е окончателен.'] : [],
+    warnings,
   };
 }
 
