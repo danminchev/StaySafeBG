@@ -171,12 +171,12 @@ function mapVerdictFromScore(score) {
 
 function analyzeHeuristicUrlRisk(rawInput, inputType) {
   if (inputType !== 'url') {
-    return { risk: 0, reasons: [], critical: false };
+    return { risk: 0, reasons: [], critical: false, checked: false };
   }
 
   const candidate = normalizeUrlCandidate(rawInput);
   if (!candidate) {
-    return { risk: 0, reasons: [], critical: false };
+    return { risk: 0, reasons: [], critical: false, checked: false };
   }
 
   const parsed = new URL(candidate);
@@ -206,6 +206,7 @@ function analyzeHeuristicUrlRisk(rawInput, inputType) {
       risk: 100,
       reasons,
       critical: true,
+      checked: true,
     };
   }
 
@@ -213,6 +214,7 @@ function analyzeHeuristicUrlRisk(rawInput, inputType) {
     risk: Math.min(65, risk),
     reasons,
     critical: false,
+    checked: true,
   };
 }
 
@@ -303,7 +305,9 @@ export async function runScamCheck(rawInput) {
     ? Math.min(100, Math.max(internetRisk, dbRisk + heuristic.risk))
     : Math.min(100, dbRisk + Math.round(internetRisk * 0.6) + heuristic.risk);
 
-  const hasInternetCoverage = Boolean(internetResult.checked) || (internetResult.checkedCount || 0) > 0 || heuristic.risk > 0;
+  const hasInternetCoverage = Boolean(internetResult.checked)
+    || (internetResult.checkedCount || 0) > 0
+    || heuristic.checked;
 
   let verdict = internetResult.usedEdgeFunction
     ? (internetResult.verdict || mapVerdictFromScore(riskScore))
@@ -323,13 +327,13 @@ export async function runScamCheck(rawInput) {
 
   const isSuspicious = verdict === 'danger' || verdict === 'warning' || verdict === 'unknown';
 
-  const heuristicSources = heuristic.reasons.length
+  const heuristicSources = heuristic.checked
     ? [{
       source: 'Heuristic URL analysis',
       checked: true,
-      flagged: true,
-      confidence: heuristic.critical ? 0.95 : 0.65,
-      reason: heuristic.reasons.join('; '),
+      flagged: heuristic.reasons.length > 0,
+      confidence: heuristic.reasons.length ? (heuristic.critical ? 0.95 : 0.65) : 0.55,
+      reason: heuristic.reasons.length ? heuristic.reasons.join('; ') : 'No high-risk heuristic signals',
       details: { reasons: heuristic.reasons, critical: heuristic.critical },
     }]
     : [];
