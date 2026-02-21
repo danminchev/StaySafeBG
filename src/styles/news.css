@@ -339,13 +339,13 @@
     margin-bottom: 0.75rem;
     line-height: 1.4;
     transition: color var(--transition-fast);
-  color: #f8fafc;
+  color: #ffc107;
     width: 100%;
     overflow-wrap: break-word;
 }
 
 .article-excerpt {
-  color: #ffc107;
+  color: #f8fafc;
     font-size: 0.95rem;
     margin-bottom: 1.5rem;
     flex-grow: 1; /* Pushes meta to bottom */
@@ -466,7 +466,7 @@
 
 #newsDetailsModal .modal-title,
 #communityReportModal .modal-title {
-  color: #f8fafc;
+  color: #ffc107;
 }
 
 #communityReportModal #communityReportModalDate,
@@ -482,7 +482,7 @@
 #communityReportModal .article-content p,
 #communityReportModal .article-content li,
 #communityReportModal .article-content span {
-  color: #ffc107;
+  color: #f8fafc;
 }
 
 #newsDetailsModal .article-content,
