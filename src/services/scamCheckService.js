@@ -119,7 +119,8 @@ async function checkAgainstInternet(rawInput, type) {
   }
 
   try {
-    const response = await fetch(`${INTERNET_CHECK_BASE}${encodeURIComponent(urlCandidate)}`, {
+    const hostname = new URL(urlCandidate).hostname;
+    const response = await fetch(`${INTERNET_CHECK_BASE}${encodeURIComponent(hostname)}`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',

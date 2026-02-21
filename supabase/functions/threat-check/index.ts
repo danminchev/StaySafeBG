@@ -111,7 +111,8 @@ function analyzeHeuristicUrlRisk(rawInput: string, inputType: InputType): Source
 
 async function checkSinkingYachts(urlCandidate: string): Promise<SourceResult> {
   try {
-    const response = await fetch(`https://phish.sinking.yachts/v2/check/${encodeURIComponent(urlCandidate)}`, {
+    const hostname = new URL(urlCandidate).hostname;
+    const response = await fetch(`https://phish.sinking.yachts/v2/check/${encodeURIComponent(hostname)}`, {
       method: 'GET',
       headers: { Accept: 'application/json' },
     });
