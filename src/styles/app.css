@@ -266,13 +266,13 @@ main {
 
 .ss-report-modal-theme .form-control,
 .ss-report-modal-theme .form-select {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.28);
-  color: #f8fafc;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.42);
+  color: #ffffff;
 }
 
 .ss-report-modal-theme .form-control::placeholder {
-  color: #c4d4ea;
+  color: #e2eaf6;
 }
 
 .ss-report-modal-theme .form-control:focus,
