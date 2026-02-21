@@ -33,17 +33,27 @@ function iconByValue(value) {
 }
 
 function renderResult(result) {
-	const statusClass = result.verdict === 'danger' ? 'result-danger' : result.verdict === 'warning' ? 'result-warning' : 'result-safe';
+	const statusClass = result.verdict === 'danger'
+		? 'result-danger'
+		: result.verdict === 'warning'
+			? 'result-warning'
+			: result.verdict === 'unknown'
+				? 'result-unknown'
+				: 'result-safe';
 	const statusLabel = result.verdict === 'danger'
 		? 'ВИСОК РИСК'
 		: result.verdict === 'warning'
 			? 'СРЕДЕН РИСК'
-			: 'НИСЪК РИСК';
+			: result.verdict === 'unknown'
+				? 'НЕПЪЛНА ПРОВЕРКА'
+				: 'НИСЪК РИСК';
 	const summary = result.verdict === 'danger'
 		? 'Открити са силни рискови сигнали от множество източници.'
 		: result.verdict === 'warning'
 			? 'Има частични рискови сигнали. Не отваряйте линка без допълнителна проверка.'
-			: 'Не е открито съвпадение в базата и външните източници.';
+			: result.verdict === 'unknown'
+				? 'Външните източници не отговориха. Резултатът не може да се приеме за безопасен.'
+				: 'Не е открито съвпадение в базата и външните източници.';
 
 	const dbLabel = result.database.matched
 		? `Намерени съвпадения в база: ${result.database.matches.length}`
@@ -51,14 +61,14 @@ function renderResult(result) {
 
 	const internetLabel = result.internet.checked
 		? `Интернет източници: ${result.internet.flaggedCount || 0} сигнал(а) от ${result.internet.checkedCount || 0} проверени`
-		: 'Интернет проверка: няма данни за този тип вход';
+		: 'Интернет проверка: източниците не върнаха данни';
 
 	const sourceRows = (result.internet.sources || [])
 		.filter((source) => source.checked || source.reason)
 		.map((source) => `
 			<li>
 				<strong>${escapeHtml(source.source || 'Unknown source')}</strong>
-				<span class="small d-block ${source.flagged ? 'text-warning-emphasis' : 'text-muted'}">
+				<span class="small d-block ${source.flagged ? 'check-source-risk' : 'check-source-clean'}">
 					${source.flagged ? 'Сигнал за риск' : 'Няма сигнал'}${source.reason ? ` · ${escapeHtml(source.reason)}` : ''}
 				</span>
 			</li>
@@ -69,7 +79,7 @@ function renderResult(result) {
 		return `
 			<li>
 				<strong>${escapeHtml(target)}</strong>
-				<span class="small text-muted d-block">${escapeHtml(match.category || 'Категория: -')}</span>
+				<span class="small check-result-subtle d-block">${escapeHtml(match.category || 'Категория: -')}</span>
 			</li>
 		`;
 	}).join('');
@@ -78,7 +88,7 @@ function renderResult(result) {
 		<div class="check-result-card ${statusClass}">
 			<div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
 				<h5 class="mb-0"><i class="bi bi-activity me-2"></i>Резултат от проверката</h5>
-				<span class="badge rounded-pill ${result.verdict === 'danger' ? 'text-bg-danger' : result.verdict === 'warning' ? 'text-bg-warning text-dark' : 'text-bg-success'}">${statusLabel}</span>
+				<span class="badge rounded-pill ${result.verdict === 'danger' ? 'text-bg-danger' : result.verdict === 'warning' ? 'text-bg-warning text-dark' : result.verdict === 'unknown' ? 'text-bg-secondary' : 'text-bg-success'}">${statusLabel}</span>
 			</div>
 			<p class="mb-2">${summary}</p>
 			<div class="risk-score mb-2">Риск индекс: <strong>${result.riskScore}/100</strong></div>
@@ -87,6 +97,7 @@ function renderResult(result) {
 				<li><i class="bi bi-globe2 me-2"></i>${internetLabel}</li>
 				<li><i class="bi bi-shield-lock me-2"></i>Режим: ${result.internet.usedEdgeFunction ? 'Разширена проверка (Edge Function)' : 'Базова проверка (fallback)'}</li>
 			</ul>
+			${(result.warnings || []).length ? `<div class="check-result-warning mt-3"><i class="bi bi-exclamation-triangle me-2"></i>${escapeHtml(result.warnings[0])}</div>` : ''}
 			${matchedRows ? `<hr class="my-3"><h6 class="mb-2">Съвпадения в базата</h6><ul class="check-result-list mb-0">${matchedRows}</ul>` : ''}
 			${sourceRows ? `<hr class="my-3"><h6 class="mb-2">Външни източници</h6><ul class="check-result-list mb-0">${sourceRows}</ul>` : ''}
 		</div>
@@ -115,7 +126,12 @@ async function handleSubmit(event) {
 	try {
 		const result = await runScamCheck(value);
 		renderResult(result);
-		showToast(result.isSuspicious ? `Открити са рискови сигнали (индекс ${result.riskScore}/100).` : 'Проверката приключи без рисков сигнал.', result.isSuspicious ? 'warning' : 'success');
+		const toastMessage = result.verdict === 'unknown'
+			? 'Проверката е непълна: външните източници не отговориха надеждно.'
+			: result.isSuspicious
+				? `Открити са рискови сигнали (индекс ${result.riskScore}/100).`
+				: 'Проверката приключи без рисков сигнал.';
+		showToast(toastMessage, result.verdict === 'unknown' ? 'warning' : result.isSuspicious ? 'warning' : 'success');
 	} catch (error) {
 		showToast(error?.message || 'Грешка при проверката. Опитайте отново.', 'error');
 	} finally {

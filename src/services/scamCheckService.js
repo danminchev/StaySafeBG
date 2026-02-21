@@ -14,11 +14,12 @@ function normalizePhone(value) {
 function detectInputType(value) {
   const input = normalizeInput(value);
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const ipv4Pattern = /^(?:\d{1,3}\.){3}\d{1,3}(?::\d{1,5})?(?:\/.*)?$/;
   const hasLetters = /[a-zA-Zа-яА-Я]/.test(input);
   const digitsOnly = input.replace(/\D/g, '');
 
   if (emailPattern.test(input)) return 'email';
-  if (input.startsWith('http://') || input.startsWith('https://') || (input.includes('.') && hasLetters)) return 'url';
+  if (input.startsWith('http://') || input.startsWith('https://') || (input.includes('.') && hasLetters) || ipv4Pattern.test(input)) return 'url';
   if (digitsOnly.length >= 6) return 'phone';
 
   return 'unknown';
@@ -167,6 +168,42 @@ function mapVerdictFromScore(score) {
   return 'clean';
 }
 
+function analyzeHeuristicUrlRisk(rawInput, inputType) {
+  if (inputType !== 'url') {
+    return { risk: 0, reasons: [] };
+  }
+
+  const candidate = normalizeUrlCandidate(rawInput);
+  if (!candidate) {
+    return { risk: 0, reasons: [] };
+  }
+
+  const parsed = new URL(candidate);
+  const reasons = [];
+  let risk = 0;
+
+  const isIpv4Host = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(parsed.hostname);
+  if (isIpv4Host) {
+    risk += 40;
+    reasons.push('URL използва директен IP адрес вместо домейн');
+  }
+
+  if (parsed.protocol === 'http:') {
+    risk += 12;
+    reasons.push('URL е по HTTP (без TLS)');
+  }
+
+  if (parsed.port && !['80', '443'].includes(parsed.port)) {
+    risk += 18;
+    reasons.push(`URL използва нестандартен порт (${parsed.port})`);
+  }
+
+  return {
+    risk: Math.min(65, risk),
+    reasons,
+  };
+}
+
 async function checkInternetViaEdgeFunction(rawInput, inputType) {
   const supabase = requireSupabase();
   const { data, error } = await supabase.functions.invoke(THREAT_CHECK_FUNCTION_NAME, {
@@ -237,11 +274,27 @@ export async function runScamCheck(rawInput) {
     internetResultPromise,
   ]);
 
+  const heuristic = analyzeHeuristicUrlRisk(input, inputType);
   const dbRisk = databaseResult.matched ? Math.min(60, 20 + databaseResult.matches.length * 10) : 0;
   const internetRisk = Number.isFinite(internetResult.riskScore) ? internetResult.riskScore : 0;
-  const riskScore = Math.min(100, dbRisk + Math.round(internetRisk * 0.6));
-  const verdict = mapVerdictFromScore(riskScore);
-  const isSuspicious = verdict === 'danger' || verdict === 'warning';
+  const riskScore = Math.min(100, dbRisk + Math.round(internetRisk * 0.6) + heuristic.risk);
+
+  const hasInternetCoverage = Boolean(internetResult.checked) || (internetResult.checkedCount || 0) > 0;
+  const verdict = !hasInternetCoverage && !databaseResult.matched
+    ? 'unknown'
+    : mapVerdictFromScore(riskScore);
+
+  const isSuspicious = verdict === 'danger' || verdict === 'warning' || verdict === 'unknown';
+
+  const heuristicSources = heuristic.reasons.map((reason) => ({
+    source: 'Heuristic URL analysis',
+    checked: true,
+    flagged: true,
+    confidence: 0.65,
+    reason,
+  }));
+
+  const mergedSources = [...(internetResult.sources || []), ...heuristicSources];
 
   return {
     input,
@@ -250,7 +303,13 @@ export async function runScamCheck(rawInput) {
     verdict,
     riskScore,
     database: databaseResult,
-    internet: internetResult,
+    internet: {
+      ...internetResult,
+      sources: mergedSources,
+      checkedCount: (internetResult.checkedCount || 0) + (heuristicSources.length ? 1 : 0),
+      flaggedCount: (internetResult.flaggedCount || 0) + (heuristicSources.length ? 1 : 0),
+    },
+    warnings: verdict === 'unknown' ? ['Външните източници не върнаха валиден отговор. Резултатът не е окончателен.'] : [],
   };
 }
 

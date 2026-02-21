@@ -135,9 +135,23 @@
     border-color: rgba(251, 191, 36, 0.48);
 }
 
+.check-result-card.result-unknown {
+    background: rgba(71, 85, 105, 0.35);
+    border-color: rgba(148, 163, 184, 0.5);
+}
+
 .risk-score {
     font-weight: 600;
     color: #f8fafc;
+}
+
+.check-result-warning {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    background: rgba(245, 158, 11, 0.18);
+    color: #fef3c7;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.92rem;
 }
 
 .check-result-meta,
@@ -149,6 +163,28 @@
 .check-result-meta li,
 .check-result-list li {
     margin-bottom: 0.35rem;
+}
+
+.check-result-card h6 {
+    color: #dbeafe;
+    font-weight: 700;
+}
+
+.check-result-list strong {
+    color: #f8fafc;
+}
+
+.check-result-subtle {
+    color: #cbd5e1;
+}
+
+.check-source-clean {
+    color: #d1fae5;
+}
+
+.check-source-risk {
+    color: #fde68a;
+    font-weight: 600;
 }
 
 /* Recent Checks */

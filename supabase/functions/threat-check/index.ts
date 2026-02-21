@@ -20,11 +20,12 @@ function normalizeInput(value: unknown): string {
 
 function detectInputType(value: string): InputType {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const ipv4Pattern = /^(?:\d{1,3}\.){3}\d{1,3}(?::\d{1,5})?(?:\/.*)?$/;
   const hasLetters = /[a-zA-Zа-яА-Я]/.test(value);
   const digitsOnly = value.replace(/\D/g, '');
 
   if (emailPattern.test(value)) return 'email';
-  if (value.startsWith('http://') || value.startsWith('https://') || (value.includes('.') && hasLetters)) return 'url';
+  if (value.startsWith('http://') || value.startsWith('https://') || (value.includes('.') && hasLetters) || ipv4Pattern.test(value)) return 'url';
   if (digitsOnly.length >= 6) return 'phone';
 
   return 'unknown';
@@ -217,8 +218,9 @@ function aggregateSources(sources: SourceResult[]) {
 
   const score = totalConfidence > 0 ? Math.round((weightedFlagged / totalConfidence) * 100) : 0;
 
-  let verdict: 'danger' | 'warning' | 'clean' = 'clean';
-  if (score >= 65 || flaggedSources.length >= 2) verdict = 'danger';
+  let verdict: 'danger' | 'warning' | 'clean' | 'unknown' = 'clean';
+  if (checkedSources.length === 0) verdict = 'unknown';
+  else if (score >= 65 || flaggedSources.length >= 2) verdict = 'danger';
   else if (score >= 35 || flaggedSources.length === 1) verdict = 'warning';
 
   return {
