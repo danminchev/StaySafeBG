@@ -26,8 +26,8 @@
                   <p class="text-muted-light mb-4">Нашата система ще анализира въведените данни спрямо известни бази данни с измами.</p>
                   <form class="scam-check-form mb-4">
                        <div class="search-input-group input-group input-group-lg">
-                          <input type="text" class="form-control" placeholder="напр. +359 888 123 456 или suspicious-site.com" aria-label="Данни за проверка">
-                          <button class="btn ss-search-btn" type="button">
+                          <input id="scam-check-input" type="text" class="form-control" placeholder="напр. +359 888 123 456 или suspicious-site.com" aria-label="Данни за проверка">
+                          <button id="scam-check-submit" class="btn ss-search-btn" type="submit">
                               <i class="bi bi-search me-2"></i>Провери
                           </button>
                       </div>
@@ -35,23 +35,16 @@
                   <div class="alert scam-alert-info mb-0" role="alert">
                       <i class="bi bi-info-circle-fill me-2"></i> Забележка: Не всички измами са в нашата база данни. Винаги бъдете внимателни.
                   </div>
+                  <div id="scam-check-result" class="mt-3" aria-live="polite"></div>
               </div>
           </div>
           
           <div class="recent-checks-section mt-5">
               <h4 class="mb-4"><i class="bi bi-clock-history me-2"></i>Последни проверки</h4>
-               <div class="recent-checks-list">
+               <div id="recent-checks-list" class="recent-checks-list">
                   <div class="recent-check-item">
-                      <span class="check-target"><i class="bi bi-globe"></i> suspicious-bank-login.com</span>
-                      <span class="badge bg-danger text-white border border-danger-subtle rounded-pill">Съмнителен</span>
-                  </div>
-                  <div class="recent-check-item">
-                      <span class="check-target"><i class="bi bi-telephone"></i> +359 876 543 210</span>
-                      <span class="badge bg-success text-white border border-success-subtle rounded-pill">Безопасен</span>
-                  </div>
-                  <div class="recent-check-item">
-                      <span class="check-target"><i class="bi bi-globe"></i> cheap-iphones-now.net</span>
-                      <span class="badge bg-warning text-dark border border-warning-subtle rounded-pill">Непотвърден</span>
+                      <span class="check-target"><i class="bi bi-hourglass-split"></i> Зареждане на проверки...</span>
+                      <span class="badge bg-secondary rounded-pill">Изчакване</span>
                   </div>
                </div>
           </div>

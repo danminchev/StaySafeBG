@@ -112,6 +112,45 @@
     padding: 1rem 1.25rem;
 }
 
+.check-result-card {
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem 1.1rem;
+    text-align: left;
+    color: #e2e8f0;
+}
+
+.check-result-card.result-danger {
+    background: rgba(220, 38, 38, 0.18);
+    border-color: rgba(248, 113, 113, 0.4);
+}
+
+.check-result-card.result-safe {
+    background: rgba(22, 163, 74, 0.18);
+    border-color: rgba(74, 222, 128, 0.45);
+}
+
+.check-result-card.result-warning {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: rgba(251, 191, 36, 0.48);
+}
+
+.risk-score {
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+.check-result-meta,
+.check-result-list {
+    margin: 0;
+    padding-left: 1.1rem;
+}
+
+.check-result-meta li,
+.check-result-list li {
+    margin-bottom: 0.35rem;
+}
+
 /* Recent Checks */
 .recent-checks-section h4 {
     color: #f8fafc;

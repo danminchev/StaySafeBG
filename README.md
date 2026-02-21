@@ -36,3 +36,19 @@ Current migrations:
 
 - `admin.html` is role-protected (`role = admin`).
 - `report-scam.html` requires logged-in user and uploads files to `evidence` bucket path `userId/reportId/file`.
+
+## Advanced scam check (recommended)
+
+For the most reliable check on `scam-check.html`, deploy the Supabase Edge Function:
+
+1. Create function in your Supabase project from `supabase/functions/threat-check/index.ts`
+2. Deploy it as `threat-check`
+3. (Optional, recommended) add secret `GOOGLE_SAFE_BROWSING_API_KEY` to the function environment
+
+What it does:
+- Checks local DB (`scam_reports` with `approved` status)
+- Aggregates multiple internet sources (`phish.sinking.yachts`, `URLhaus`, optional `Google Safe Browsing`)
+- Returns weighted `riskScore` and verdict (`clean`, `warning`, `danger`)
+
+Fallback behavior:
+- If the Edge Function is unavailable, frontend automatically falls back to direct basic internet check.
