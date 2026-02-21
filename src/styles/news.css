@@ -238,6 +238,11 @@
   background: rgba(71, 85, 105, 0.92);
 }
 
+.article-card.from-home-focus {
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 2px rgba(244, 182, 63, 0.45), 0 20px 38px rgba(3, 12, 32, 0.32);
+}
+
 .article-card:focus-within {
   outline: 2px solid var(--secondary-color);
   outline-offset: 4px;

@@ -137,6 +137,7 @@ function renderApprovedReports(reports) {
         const dateStr = formatDate(report.created_at);
         const categoryKey = report.category || 'other';
         const categoryLabel = getCategoryName(categoryKey);
+        const reportHref = `community.html#report-${report.id}`;
 
         wrapper.innerHTML = `
             <div class="news-card-header">
@@ -148,8 +149,11 @@ function renderApprovedReports(reports) {
                 </time>
             </div>
             <h3 class="news-title h5 mb-0">
-                <span class="community-report-title"></span>
+                <a href="${reportHref}" class="stretched-link community-topic-link">
+                    <span class="community-report-title"></span>
+                </a>
             </h3>
+            <i class="bi bi-arrow-right news-arrow"></i>
         `;
 
         const categoryTextElement = wrapper.querySelector('.cat-text');

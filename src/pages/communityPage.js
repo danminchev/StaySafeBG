@@ -124,6 +124,7 @@ function renderReports(reports) {
 
     if (cardEl) {
       cardEl.dataset.category = report.category || 'other';
+      cardEl.id = `report-${report.id}`;
     }
 
     if (linkEl) {
@@ -145,6 +146,21 @@ function renderReports(reports) {
   });
 }
 
+function focusReportFromHash() {
+  const hash = window.location.hash || '';
+  if (!hash.startsWith('#report-')) return;
+
+  const targetReport = document.getElementById(hash.slice(1));
+  if (!targetReport) return;
+
+  targetReport.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  targetReport.classList.add('from-home-focus');
+
+  window.setTimeout(() => {
+    targetReport.classList.remove('from-home-focus');
+  }, 1800);
+}
+
 async function initCommunityPage() {
   await renderHeader();
   renderFooter();
@@ -162,6 +178,7 @@ async function initCommunityPage() {
   try {
     const result = await getApprovedReportsFeed({ limit: 30 });
     renderReports(result.data || []);
+    requestAnimationFrame(focusReportFromHash);
 
     if (totalCountEl) {
       totalCountEl.textContent = String(result.count || 0);
@@ -174,5 +191,7 @@ async function initCommunityPage() {
     }
   }
 }
+
+window.addEventListener('hashchange', focusReportFromHash);
 
 initCommunityPage();
