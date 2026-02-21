@@ -1,4 +1,4 @@
-import { requireSupabase } from './supabaseClient.js';
+﻿import { requireSupabase } from './supabaseClient.js';
 
 const INTERNET_CHECK_BASE = 'https://phish.sinking.yachts/v2/check/';
 const THREAT_CHECK_FUNCTION_NAME = 'threat-check';
@@ -15,7 +15,7 @@ function detectInputType(value) {
   const input = normalizeInput(value);
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const ipv4Pattern = /^(?:\d{1,3}\.){3}\d{1,3}(?::\d{1,5})?(?:\/.*)?$/;
-  const hasLetters = /[a-zA-Zа-яА-Я]/.test(input);
+  const hasLetters = /[a-zA-ZР°-СЏРђ-РЇ]/.test(input);
   const digitsOnly = input.replace(/\D/g, '');
 
   if (emailPattern.test(input)) return 'email';
@@ -190,17 +190,17 @@ function analyzeHeuristicUrlRisk(rawInput, inputType) {
   const isIpv4Host = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(parsed.hostname);
   if (isIpv4Host) {
     risk += 40;
-    reasons.push('URL използва директен IP адрес вместо домейн');
+    reasons.push('URL РёР·РїРѕР»Р·РІР° РґРёСЂРµРєС‚РµРЅ IP Р°РґСЂРµСЃ РІРјРµСЃС‚Рѕ РґРѕРјРµР№РЅ');
   }
 
   if (parsed.protocol === 'http:') {
     risk += 12;
-    reasons.push('URL е по HTTP (без TLS)');
+    reasons.push('URL Рµ РїРѕ HTTP (Р±РµР· TLS)');
   }
 
   if (parsed.port && !['80', '443'].includes(parsed.port)) {
     risk += 18;
-    reasons.push(`URL използва нестандартен порт (${parsed.port})`);
+    reasons.push(`URL РёР·РїРѕР»Р·РІР° РЅРµСЃС‚Р°РЅРґР°СЂС‚РµРЅ РїРѕСЂС‚ (${parsed.port})`);
   }
 
   const hasCriticalPattern = isIpv4Host && parsed.protocol === 'http:' && Boolean(parsed.port) && !['80', '443'].includes(parsed.port);
@@ -257,12 +257,12 @@ async function checkInternetViaEdgeFunction(rawInput, inputType) {
 export async function runScamCheck(rawInput) {
   const input = normalizeInput(rawInput);
   if (!input) {
-    throw new Error('Моля въведете линк, телефон или имейл.');
+    throw new Error('РњРѕР»СЏ РІСЉРІРµРґРµС‚Рµ Р»РёРЅРє, С‚РµР»РµС„РѕРЅ РёР»Рё РёРјРµР№Р».');
   }
 
   const inputType = detectInputType(input);
   if (inputType === 'unknown') {
-    throw new Error('Невалиден формат. Въведете URL, телефонен номер или имейл.');
+    throw new Error('РќРµРІР°Р»РёРґРµРЅ С„РѕСЂРјР°С‚. Р’СЉРІРµРґРµС‚Рµ URL, С‚РµР»РµС„РѕРЅРµРЅ РЅРѕРјРµСЂ РёР»Рё РёРјРµР№Р».');
   }
 
   const databaseResultPromise = checkAgainstDatabase(input, inputType);
@@ -348,7 +348,7 @@ export async function runScamCheck(rawInput) {
   const mergedSources = [...(internetResult.sources || []), ...heuristicSources];
   const warnings = Array.isArray(internetResult?.warnings) && internetResult.warnings.length
     ? internetResult.warnings
-    : (verdict === 'unknown' ? ['Външните източници не върнаха валиден отговор. Резултатът не е окончателен.'] : []);
+    : (verdict === 'unknown' ? ['Р’СЉРЅС€РЅРёС‚Рµ РёР·С‚РѕС‡РЅРёС†Рё РЅРµ РІСЉСЂРЅР°С…Р° РІР°Р»РёРґРµРЅ РѕС‚РіРѕРІРѕСЂ. Р РµР·СѓР»С‚Р°С‚СЉС‚ РЅРµ Рµ РѕРєРѕРЅС‡Р°С‚РµР»РµРЅ.'] : []);
 
   return {
     input,
@@ -379,3 +379,4 @@ export async function getRecentApprovedScamChecks(limit = 5) {
   if (error) throw error;
   return data || [];
 }
+
