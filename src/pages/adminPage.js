@@ -861,7 +861,7 @@ function renderArticlesTable() {
         const cell = document.createElement('td');
         cell.colSpan = 5;
         cell.className = 'text-center text-muted py-4';
-        cell.textContent = 'Няма налични новини.';
+        cell.textContent = 'Няма налични съвети.';
         row.appendChild(cell);
         dom.articlesBody.appendChild(row);
         return;
@@ -933,7 +933,7 @@ async function openViewArticleModal(articleId) {
     try {
         const article = await getArticleById(articleId);
         if (!article) {
-            showToast('Новината не е намерена.', 'warning');
+            showToast('Съветът не е намерен.', 'warning');
             return;
         }
 
@@ -959,7 +959,7 @@ async function openViewArticleModal(articleId) {
         openModal('viewArticleModal');
     } catch (error) {
         console.error('Error opening article details:', error);
-        showToast('Неуспешно зареждане на детайли за новината.', 'error');
+        showToast('Неуспешно зареждане на детайли за съвета.', 'error');
     }
 }
 
@@ -974,8 +974,8 @@ async function loadAdminArticles() {
         renderArticlesTable();
     } catch (error) {
         console.error('Error loading admin articles:', error);
-        dom.articlesBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Грешка при зареждане на новини.</td></tr>';
-        showToast('Неуспешно зареждане на новини.', 'error');
+        dom.articlesBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Грешка при зареждане на съвети.</td></tr>';
+        showToast('Неуспешно зареждане на съвети.', 'error');
     }
 }
 
@@ -1191,7 +1191,7 @@ function initArticleCreation() {
 
             await createArticle(newArticle);
 
-            showToast('Новината е създадена успешно!', 'success');
+            showToast('Съветът е създаден успешно!', 'success');
 
             closeModal('createArticleModal');
 
@@ -1202,10 +1202,10 @@ function initArticleCreation() {
 
         } catch (error) {
             console.error('Error creating article:', error);
-            showToast('Възникна грешка при създаването на новината: ' + error.message, 'error');
+            showToast('Възникна грешка при създаването на съвета: ' + error.message, 'error');
         } finally {
             saveBtn.disabled = false;
-            saveBtn.textContent = 'Запази новината';
+            saveBtn.textContent = 'Запази съвета';
         }
     });
 }
@@ -1243,17 +1243,17 @@ function initArticleEditing() {
             }
 
             if (action === 'delete-article') {
-                if (confirm('Сигурни ли сте, че искате да изтриете тази новина?')) {
+                if (confirm('Сигурни ли сте, че искате да изтриете този съвет?')) {
                     const originalText = button.textContent;
                     try {
                         button.disabled = true;
                         button.textContent = 'Изтриване...';
                         await deleteArticle(articleId);
-                        showToast('Новината е изтрита успешно.', 'success');
+                        showToast('Съветът е изтрит успешно.', 'success');
                         await loadAdminArticles();
                     } catch (error) {
                         console.error('Error deleting article:', error);
-                        showToast('Неуспешно изтриване на новина.', 'error');
+                        showToast('Неуспешно изтриване на съвет.', 'error');
                     } finally {
                         button.disabled = false;
                         button.textContent = originalText;
@@ -1267,7 +1267,7 @@ function initArticleEditing() {
                     button.disabled = true;
                     const article = await getArticleById(articleId);
                     if (!article) {
-                        showToast('Новината не беше намерена.', 'warning');
+                        showToast('Съветът не беше намерен.', 'warning');
                         return;
                     }
 
@@ -1287,7 +1287,7 @@ function initArticleEditing() {
                     openModal('editArticleModal');
                 } catch (error) {
                     console.error('Error opening article editor:', error);
-                    showToast('Неуспешно отваряне на новина за редакция.', 'error');
+                    showToast('Неуспешно отваряне на съвет за редакция.', 'error');
                 } finally {
                     button.disabled = false;
                 }
@@ -1326,7 +1326,7 @@ function initArticleEditing() {
                     tags: []
                 });
 
-                showToast('Новината е обновена успешно.', 'success');
+                showToast('Съветът е обновен успешно.', 'success');
                 closeModal('editArticleModal');
                 await loadAdminArticles();
             } catch (error) {

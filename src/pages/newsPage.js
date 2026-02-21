@@ -293,14 +293,14 @@ async function fetchArticles(isAppend = false) {
 		if (state.loadedCount < state.totalCount && state.totalCount > 0) {
 			dom.loadMoreContainer.classList.remove('d-none');
 			dom.loadMoreBtn.classList.remove('disabled');
-			dom.loadMoreBtn.textContent = 'Зареждане още новини';
+			dom.loadMoreBtn.textContent = 'Зареждане още съвети';
 		} else {
 			dom.loadMoreContainer.classList.add('d-none');
 		}
 
 	} catch (err) {
 		console.error(err);
-		renderError('Неуспешно зареждане на новините. Моля проверете връзката си.');
+		renderError('Неуспешно зареждане на съветите. Моля проверете връзката си.');
 	} finally {
 		state.isLoading = false;
 	}

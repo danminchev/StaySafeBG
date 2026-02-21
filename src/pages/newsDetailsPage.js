@@ -18,7 +18,7 @@ function renderMessage(message) {
 
 	pageContent.innerHTML = `
 		<div class="alert alert-info">${message}</div>
-		<a href="news.html" class="btn btn-secondary mt-3">Обратно към новините</a>
+		<a href="news.html" class="btn btn-secondary mt-3">Обратно към съветите</a>
 	`;
 }
 
@@ -33,7 +33,7 @@ function renderArticle(article) {
 	pageContent.innerHTML = `
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><a href="news.html">Новини</a></li>
+				<li class="breadcrumb-item"><a href="news.html">Съвети</a></li>
 				<li class="breadcrumb-item active" aria-current="page">${title}</li>
 			</ol>
 		</nav>
@@ -43,7 +43,7 @@ function renderArticle(article) {
 			<p style="white-space: pre-line;">${content}</p>
 		</article>
 		<div class="mt-4">
-			<a href="news.html" class="btn btn-secondary">Обратно към новините</a>
+			<a href="news.html" class="btn btn-secondary">Обратно към съветите</a>
 		</div>
 	`;
 }
@@ -58,20 +58,20 @@ async function initArticleDetailsPage() {
 
 	const id = new URLSearchParams(window.location.search).get('id');
 	if (!id) {
-		renderMessage('Липсва идентификатор на новината.');
+		renderMessage('Липсва идентификатор на съвета.');
 		return;
 	}
 
 	try {
 		const article = await getArticleById(id);
 		if (!article) {
-			renderMessage('Новината не е намерена или не е достъпна.');
+			renderMessage('Съветът не е намерен или не е достъпен.');
 			return;
 		}
 
 		renderArticle(article);
 	} catch (error) {
-		renderMessage(error.message || 'Грешка при зареждане на новината.');
+		renderMessage(error.message || 'Грешка при зареждане на съвета.');
 	}
 }
 

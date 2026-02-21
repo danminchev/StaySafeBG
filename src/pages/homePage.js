@@ -65,7 +65,7 @@ function renderLatestArticles(articles) {
     if (!listContainer) return;
 
     if (articles.length === 0) {
-        listContainer.innerHTML = '<p class="text-white-50">Все още няма публикувани новини.</p>';
+        listContainer.innerHTML = '<p class="text-white-50">Все още няма публикувани съвети.</p>';
         return;
     }
 

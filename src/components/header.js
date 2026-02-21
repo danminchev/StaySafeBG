@@ -160,7 +160,7 @@ function renderHeaderHtml(currentUser) {
               <a class="${ctaClass} ${reportIsActive ? 'ss-nav-link-active' : ''}" href="report-scam.html" ${reportIsActive ? 'aria-current="page"' : ''}>Докладвай</a>
             </li>
             <li class="nav-item mt-2 mt-lg-0">
-              <a class="${ctaClass} ${articlesIsActive ? 'ss-nav-link-active' : ''}" href="news.html" ${articlesIsActive ? 'aria-current="page"' : ''}>Новини</a>
+              <a class="${ctaClass} ${articlesIsActive ? 'ss-nav-link-active' : ''}" href="news.html" ${articlesIsActive ? 'aria-current="page"' : ''}>Съвети</a>
             </li>
             <li class="nav-item mt-2 mt-lg-0">
               <a class="${ctaClass} ${communityIsActive ? 'ss-nav-link-active' : ''}" href="community.html" ${communityIsActive ? 'aria-current="page"' : ''}>Общност</a>
