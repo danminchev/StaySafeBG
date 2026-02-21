@@ -17,29 +17,23 @@ function formatDate(dateString) {
 function getCategoryName(categoryKey) {
     const normalizedKey = String(categoryKey || '').toLowerCase();
     const categories = {
-        'phishing': 'Фишинг',
-        'phone': 'Телефонна измама',
-        'security': 'Сигурност',
-        'identity_theft': 'Кражба на самоличност',
-        'online_shopping': 'Онлайн пазаруване',
-        'shopping': 'Пазаруване',
-        'investment': 'Инвестиционни измами',
-        'tech_support': 'Техническа поддръжка',
-        'job_scams': 'Обяви за работа',
-        'romance': 'Романтични измами',
-        'social': 'Социални мрежи',
-        'social_media': 'Социални мрежи',
-        'crypto': 'Криптовалути',
-        'marketplace': 'Marketplace измами',
-        'romance_scams': 'Романтични измами',
-        'fake_websites': 'Фалшиви уебсайтове',
-        'lottery_scams': 'Лотарийни измами',
-        'bank_fraud': 'Банкови измами',
-        'crypto_scams': 'Криптовалути',
-        'charity_scams': 'Фалшиви каузи',
-        'other': 'Други'
+        'phishing': '🎣 Фишинг',
+        'shopping': '🛒 Пазаруване',
+        'online_shopping': '🛒 Онлайн пазаруване',
+        'investment': '📈 Инвестиции',
+        'security': '🛡️ Сигурност',
+        'identity_theft': '🆔 Самоличност',
+        'tech_support': '💻 Тех. поддръжка',
+        'job_scams': '💼 Работа',
+        'phone': '📞 Телефонна измама',
+        'romance': '💘 Романтична измама',
+        'social': '💬 Социални мрежи',
+        'social_media': '💬 Социални мрежи',
+        'crypto': '₿ Крипто измама',
+        'marketplace': '🏷️ Marketplace измама',
+        'other': '🧩 Друго'
     };
-    return categories[normalizedKey] || categoryKey || 'Новини';
+    return categories[normalizedKey] || '📰 Общи';
 }
 
 function localizeReportTitle(report) {
@@ -66,18 +60,6 @@ function localizeReportTitle(report) {
     return `${localizedPrefix} - ${remainder}`;
 }
 
-function getCategoryIcon(categoryKey) {
-    const normalizedKey = String(categoryKey || '').toLowerCase();
-    const icons = {
-        'phishing': 'bi-envelope-exclamation-fill',
-        'phone': 'bi-telephone-fill',
-        'security': 'bi-shield-lock-fill',
-        'other': 'bi-question-circle-fill'
-    };
-
-    return icons[normalizedKey] || 'bi-tag-fill';
-}
-
 function renderLatestArticles(articles) {
     const listContainer = document.getElementById('home-articles-list');
     if (!listContainer) return;
@@ -99,13 +81,11 @@ function renderLatestArticles(articles) {
         const dateStr = formatDate(article.created_at);
         const categoryKey = article.category || 'other';
         const categoryLabel = getCategoryName(categoryKey);
-        const categoryIcon = getCategoryIcon(categoryKey);
-        const isIconOnlyCategory = categoryKey === 'phone' || categoryKey === 'security';
         
         wrapper.innerHTML = `
             <div class="news-card-header">
                 <span class="news-badge" data-category="${categoryKey}">
-                    <i class="bi ${categoryIcon}"></i><span class="cat-text"></span>
+                    <span class="cat-text"></span>
                 </span>
                 <time class="news-date">
                     <i class="bi bi-calendar3 me-1"></i>${dateStr}
@@ -118,17 +98,8 @@ function renderLatestArticles(articles) {
         `;
         
         // Securely set text content
-        const badgeElement = wrapper.querySelector('.news-badge');
         const categoryTextElement = wrapper.querySelector('.cat-text');
-
-        if (isIconOnlyCategory) {
-            badgeElement.classList.add('icon-only');
-            badgeElement.setAttribute('title', categoryLabel);
-            badgeElement.setAttribute('aria-label', categoryLabel);
-            categoryTextElement.textContent = '';
-        } else {
-            categoryTextElement.textContent = categoryLabel;
-        }
+        categoryTextElement.textContent = categoryLabel;
 
         wrapper.querySelector('.article-link').textContent = article.title;
         
@@ -166,13 +137,11 @@ function renderApprovedReports(reports) {
         const dateStr = formatDate(report.created_at);
         const categoryKey = report.category || 'other';
         const categoryLabel = getCategoryName(categoryKey);
-        const categoryIcon = getCategoryIcon(categoryKey);
-        const isIconOnlyCategory = categoryKey === 'phone' || categoryKey === 'security' || categoryKey === 'phishing';
 
         wrapper.innerHTML = `
             <div class="news-card-header">
                 <span class="news-badge" data-category="${categoryKey}">
-                    <i class="bi ${categoryIcon}"></i><span class="cat-text"></span>
+                    <span class="cat-text"></span>
                 </span>
                 <time class="news-date">
                     <i class="bi bi-calendar3 me-1"></i>${dateStr}
@@ -183,17 +152,8 @@ function renderApprovedReports(reports) {
             </h3>
         `;
 
-        const badgeElement = wrapper.querySelector('.news-badge');
         const categoryTextElement = wrapper.querySelector('.cat-text');
-
-        if (isIconOnlyCategory) {
-            badgeElement.classList.add('icon-only');
-            badgeElement.setAttribute('title', categoryLabel);
-            badgeElement.setAttribute('aria-label', categoryLabel);
-            categoryTextElement.textContent = '';
-        } else {
-            categoryTextElement.textContent = categoryLabel;
-        }
+        categoryTextElement.textContent = categoryLabel;
 
         const titleEl = wrapper.querySelector('.community-report-title');
         titleEl.textContent = localizeReportTitle(report);
