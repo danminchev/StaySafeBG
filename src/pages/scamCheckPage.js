@@ -117,8 +117,11 @@ function renderResult(result) {
 				? 'risk-meter-fill-unknown'
 				: 'risk-meter-fill-safe';
 
-	const dbLabel = result.database.matched
-		? `Намерени съвпадения в база: ${result.database.matches.length}`
+	const reportMatchesCount = Array.isArray(result.database?.matches) ? result.database.matches.length : 0;
+	const maliciousMatchesCount = Array.isArray(result.maliciousResources?.matches) ? result.maliciousResources.matches.length : 0;
+	const totalDatabaseMatches = reportMatchesCount + maliciousMatchesCount;
+	const dbLabel = totalDatabaseMatches > 0
+		? `Намерени съвпадения в база: ${totalDatabaseMatches}`
 		: 'Няма съвпадение в базата';
 
 	const malwareLabel = result.maliciousResources?.matched
