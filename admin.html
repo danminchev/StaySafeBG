@@ -68,6 +68,21 @@
           <h2 class="mb-0">Управление на потребители</h2>
           <button class="btn btn-outline-primary" id="btn-refresh-users" type="button">Обнови списъка</button>
         </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-8">
+            <label for="admin-users-search-input" class="form-label">Търсене на потребител</label>
+            <input type="text" class="form-control" id="admin-users-search-input" placeholder="Търси по име, имейл или роля">
+          </div>
+          <div class="col-md-4">
+            <label for="admin-users-role-filter" class="form-label">Филтър роля</label>
+            <select class="form-select" id="admin-users-role-filter">
+              <option value="all">Всички роли</option>
+              <option value="admin">Админ</option>
+              <option value="moderator">Модератор</option>
+              <option value="user">Потребител</option>
+            </select>
+          </div>
+        </div>
         <div class="table-responsive">
           <table class="table table-striped table-hover align-middle" id="admin-users-table">
             <thead>

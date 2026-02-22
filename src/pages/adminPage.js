@@ -32,6 +32,10 @@ const state = {
         risk: 'all'
     },
     users: [],
+    usersFilter: {
+        search: '',
+        role: 'all'
+    },
     selectedReportId: null,
     currentUserId: null,
     currentUserRole: 'user'
@@ -65,6 +69,10 @@ const dom = {
     articlesBody: document.getElementById('admin-articles-body'),
     usersRefreshBtn: document.getElementById('btn-refresh-users'),
     usersBody: document.getElementById('admin-users-body'),
+    usersFilters: {
+        searchInput: document.getElementById('admin-users-search-input'),
+        roleSelect: document.getElementById('admin-users-role-filter')
+    },
     reportsBody: document.getElementById('admin-reports-body'),
     phishingDomainsRefreshBtn: document.getElementById('btn-refresh-phishing-domains'),
     phishingDomainsBody: document.getElementById('admin-phishing-domains-body'),
@@ -277,7 +285,24 @@ function renderUsersTable() {
         return;
     }
 
-    state.users.forEach((user) => {
+    const search = state.usersFilter.search.trim().toLowerCase();
+    const roleFilter = state.usersFilter.role;
+    const filteredUsers = state.users.filter((user) => {
+        const normalizedRole = String(user.role || 'user').toLowerCase();
+        const roleMatch = roleFilter === 'all' || normalizedRole === roleFilter;
+        if (!roleMatch) return false;
+        if (!search) return true;
+
+        const haystack = `${user.full_name || ''} ${user.email || ''} ${normalizedRole}`.toLowerCase();
+        return haystack.includes(search);
+    });
+
+    if (filteredUsers.length === 0) {
+        dom.usersBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Няма потребители по зададените филтри.</td></tr>';
+        return;
+    }
+
+    filteredUsers.forEach((user) => {
         const row = document.createElement('tr');
 
         const nameCell = document.createElement('td');
@@ -1196,6 +1221,24 @@ function initUserManagement() {
     if (dom.usersRefreshBtn) {
         dom.usersRefreshBtn.addEventListener('click', () => {
             loadAdminUsers();
+        });
+    }
+
+    if (dom.usersFilters.searchInput) {
+        dom.usersFilters.searchInput.addEventListener('input', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement)) return;
+            state.usersFilter.search = target.value || '';
+            renderUsersTable();
+        });
+    }
+
+    if (dom.usersFilters.roleSelect) {
+        dom.usersFilters.roleSelect.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLSelectElement)) return;
+            state.usersFilter.role = target.value || 'all';
+            renderUsersTable();
         });
     }
 
