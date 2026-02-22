@@ -42,6 +42,34 @@ function extractDomainFromEmail(email) {
   return domain ? domain.toLowerCase() : null;
 }
 
+function normalizeDomainValue(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .replace(/\/.*$/, '');
+}
+
+function extractDomainForTrustedLookup(rawInput, inputType) {
+  if (inputType === 'email') {
+    return normalizeDomainValue(extractDomainFromEmail(rawInput));
+  }
+
+  if (inputType === 'url') {
+    const candidate = normalizeUrlCandidate(rawInput);
+    if (!candidate) return '';
+    try {
+      const host = new URL(candidate).hostname;
+      return normalizeDomainValue(host);
+    } catch {
+      return '';
+    }
+  }
+
+  return '';
+}
+
 function buildDbSearchTerms(rawInput, type) {
   const normalized = normalizeInput(rawInput);
   const compactPhone = normalizePhone(rawInput);
@@ -184,6 +212,46 @@ function riskFromMaliciousMatch(match) {
   return Math.max(35, Math.min(100, base + confidenceBoost - statusPenalty));
 }
 
+function riskFromTrustedDomainMatch(match) {
+  const riskLevel = String(match?.risk_level || '').toLowerCase();
+  const confidence = Number(match?.confidence);
+  const base = riskLevel === 'high' ? 92 : riskLevel === 'medium' ? 70 : 50;
+  const confidenceBoost = Number.isFinite(confidence) ? Math.round(confidence * 8) : 0;
+  return Math.max(45, Math.min(100, base + confidenceBoost));
+}
+
+async function checkAgainstTrustedPhishingDomains(rawInput, inputType) {
+  const supabase = requireSupabase();
+  const domain = extractDomainForTrustedLookup(rawInput, inputType);
+  if (!domain) {
+    return { matched: false, matches: [], similar: [] };
+  }
+
+  const { data: exactMatches, error: exactError } = await supabase
+    .from('trusted_phishing_domains')
+    .select('id, domain, source, confidence, risk_level, is_active, updated_at')
+    .eq('is_active', true)
+    .eq('domain', domain)
+    .limit(5);
+
+  if (exactError) throw exactError;
+
+  const { data: similarMatches, error: similarError } = await supabase.rpc('find_similar_phishing_domains', {
+    input_domain: domain,
+    similarity_threshold: 0.52,
+    max_results: 5,
+  });
+
+  if (similarError) throw similarError;
+
+  return {
+    matched: (exactMatches || []).length > 0,
+    matches: exactMatches || [],
+    similar: Array.isArray(similarMatches) ? similarMatches : [],
+    domain,
+  };
+}
+
 function analyzeHeuristicUrlRisk(rawInput, inputType) {
   if (inputType !== 'url') {
     return { risk: 0, reasons: [], critical: false, checked: false };
@@ -298,6 +366,8 @@ export async function runScamCheck(rawInput) {
   const databaseResultPromise = checkAgainstDatabase(input, inputType);
   const maliciousResourcesPromise = checkAgainstMaliciousResources(input)
     .catch(() => ({ matched: false, matches: [] }));
+  const trustedDomainsPromise = checkAgainstTrustedPhishingDomains(input, inputType)
+    .catch(() => ({ matched: false, matches: [], similar: [] }));
   const internetResultPromise = checkInternetViaEdgeFunction(input, inputType)
     .catch(async (edgeError) => {
       const fallback = await checkAgainstInternet(input, inputType);
@@ -325,10 +395,11 @@ export async function runScamCheck(rawInput) {
       };
     });
 
-  const [databaseResult, internetResult, maliciousResources] = await Promise.all([
+  const [databaseResult, internetResult, maliciousResources, trustedPhishingDomains] = await Promise.all([
     databaseResultPromise,
     internetResultPromise,
     maliciousResourcesPromise,
+    trustedDomainsPromise,
   ]);
 
   const edgeHasHeuristic = (internetResult.sources || [])
@@ -342,11 +413,14 @@ export async function runScamCheck(rawInput) {
   const maliciousRisk = maliciousResources.matched
     ? Math.max(...maliciousResources.matches.map(riskFromMaliciousMatch))
     : 0;
+  const trustedDomainsRisk = trustedPhishingDomains.matched
+    ? Math.max(...trustedPhishingDomains.matches.map(riskFromTrustedDomainMatch))
+    : 0;
   const internetRisk = Number.isFinite(internetResult.riskScore) ? internetResult.riskScore : 0;
 
   let riskScore = internetResult.usedEdgeFunction
-    ? Math.min(100, Math.max(internetRisk, dbRisk + heuristic.risk, maliciousRisk))
-    : Math.min(100, dbRisk + Math.round(internetRisk * 0.6) + heuristic.risk + Math.round(maliciousRisk * 0.7));
+    ? Math.min(100, Math.max(internetRisk, dbRisk + heuristic.risk, maliciousRisk, trustedDomainsRisk))
+    : Math.min(100, dbRisk + Math.round(internetRisk * 0.6) + heuristic.risk + Math.round(maliciousRisk * 0.7) + Math.round(trustedDomainsRisk * 0.7));
 
   const hasInternetCoverage = Boolean(internetResult.checked)
     || (internetResult.checkedCount || 0) > 0
@@ -380,6 +454,18 @@ export async function runScamCheck(rawInput) {
     }
   }
 
+  if (trustedPhishingDomains.matched) {
+    const hasHighRiskDomain = trustedPhishingDomains.matches
+      .some((match) => String(match?.risk_level || '').toLowerCase() === 'high' || Number(match?.confidence || 0) >= 0.9);
+    if (hasHighRiskDomain) {
+      verdict = 'danger';
+      riskScore = Math.max(riskScore, 85);
+    } else if (verdict !== 'danger') {
+      verdict = 'warning';
+      riskScore = Math.max(riskScore, 50);
+    }
+  }
+
   const isSuspicious = verdict === 'danger' || verdict === 'warning' || verdict === 'unknown';
 
   const heuristicSources = heuristic.checked
@@ -406,6 +492,7 @@ export async function runScamCheck(rawInput) {
     riskScore,
     database: databaseResult,
     maliciousResources,
+    trustedPhishingDomains,
     internet: {
       ...internetResult,
       sources: mergedSources,

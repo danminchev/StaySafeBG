@@ -119,7 +119,8 @@ function renderResult(result) {
 
 	const reportMatchesCount = Array.isArray(result.database?.matches) ? result.database.matches.length : 0;
 	const maliciousMatchesCount = Array.isArray(result.maliciousResources?.matches) ? result.maliciousResources.matches.length : 0;
-	const totalDatabaseMatches = reportMatchesCount + maliciousMatchesCount;
+	const trustedMatchesCount = Array.isArray(result.trustedPhishingDomains?.matches) ? result.trustedPhishingDomains.matches.length : 0;
+	const totalDatabaseMatches = reportMatchesCount + maliciousMatchesCount + trustedMatchesCount;
 	const dbLabel = totalDatabaseMatches > 0
 		? `Намерени съвпадения в база: ${totalDatabaseMatches}`
 		: 'Няма съвпадение в базата';
@@ -127,6 +128,10 @@ function renderResult(result) {
 	const malwareLabel = result.maliciousResources?.matched
 		? `Зловредни ресурси: ${result.maliciousResources.matches.length} съвпадение(я)`
 		: 'Зловредни ресурси: няма съвпадение';
+
+	const trustedDomainsLabel = result.trustedPhishingDomains?.matched
+		? `Фишинг домейни: ${result.trustedPhishingDomains.matches.length} съвпадение(я)`
+		: 'Фишинг домейни: няма съвпадение';
 
 	const internetLabel = result.internet.checked
 		? `Интернет източници: ${result.internet.flaggedCount || 0} сигнал(а) от ${result.internet.checkedCount || 0} проверени`
@@ -162,6 +167,15 @@ function renderResult(result) {
 		</li>
 	`).join('');
 
+	const trustedDomainRows = (result.trustedPhishingDomains?.matches || []).map((match) => `
+		<li>
+			<strong>${escapeHtml(match.domain || '-')}</strong>
+			<span class="small d-block ${String(match.risk_level || '').toLowerCase() === 'high' ? 'check-source-risk' : 'check-result-subtle'}">
+				${escapeHtml(String(match.risk_level || 'medium').toUpperCase())} | confidence: ${escapeHtml(Number(match.confidence || 0).toFixed(2))} | ${escapeHtml(match.source || 'manual')}
+			</span>
+		</li>
+	`).join('');
+
 	resultHost.innerHTML = `
 		<div class="check-result-card ${statusClass}">
 			<div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
@@ -181,10 +195,12 @@ function renderResult(result) {
 			<ul class="check-result-meta mb-0">
 				<li><i class="bi bi-database-check me-2"></i>${dbLabel}</li>
 				<li><i class="bi bi-bug-fill me-2"></i>${malwareLabel}</li>
+				<li><i class="bi bi-shield-exclamation me-2"></i>${trustedDomainsLabel}</li>
 				<li><i class="bi bi-globe2 me-2"></i>${internetLabel}</li>
 				<li><i class="bi bi-shield-lock me-2"></i>Режим: ${result.internet.usedEdgeFunction ? 'Разширена проверка (Edge Function)' : 'Базова проверка (fallback)'}</li>
 			</ul>
 			${(result.warnings || []).length ? `<div class="check-result-warning mt-3"><i class="bi bi-exclamation-triangle me-2"></i>${escapeHtml(result.warnings[0])}</div>` : ''}
+			${trustedDomainRows ? `<hr class="my-3"><h6 class="mb-2">Съвпадения в списък с фишинг домейни</h6><ul class="check-result-list mb-0">${trustedDomainRows}</ul>` : ''}
 			${maliciousRows ? `<hr class="my-3"><h6 class="mb-2">Съвпадения в зловредни ресурси</h6><ul class="check-result-list mb-0">${maliciousRows}</ul>` : ''}
 			${matchedRows ? `<hr class="my-3"><h6 class="mb-2">Съвпадения в базата</h6><ul class="check-result-list mb-0">${matchedRows}</ul>` : ''}
 			${sourceRows ? `<hr class="my-3"><h6 class="mb-2">Външни източници</h6><ul class="check-result-list mb-0">${sourceRows}</ul>` : ''}
