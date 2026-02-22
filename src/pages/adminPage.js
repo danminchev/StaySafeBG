@@ -24,6 +24,11 @@ import { showToast } from '../utils/notifications.js';
 
 const state = {
     articles: [],
+    articlesFilter: {
+        search: '',
+        status: 'all',
+        category: 'all'
+    },
     reports: [],
     phishingDomains: [],
     phishingDomainsFilter: {
@@ -67,6 +72,12 @@ const dom = {
     refreshBtn: document.getElementById('btn-refresh-articles'),
     reportsRefreshBtn: document.getElementById('btn-refresh-reports'),
     articlesBody: document.getElementById('admin-articles-body'),
+    articleFilters: {
+        searchInput: document.getElementById('admin-articles-search-input'),
+        statusSelect: document.getElementById('admin-articles-status-filter'),
+        categorySelect: document.getElementById('admin-articles-category-filter'),
+        clearBtn: document.getElementById('btn-clear-article-filters')
+    },
     usersRefreshBtn: document.getElementById('btn-refresh-users'),
     usersBody: document.getElementById('admin-users-body'),
     usersFilters: {
@@ -1033,7 +1044,34 @@ function renderArticlesTable() {
         return;
     }
 
-    state.articles.forEach((article) => {
+    const search = state.articlesFilter.search.trim().toLowerCase();
+    const statusFilter = state.articlesFilter.status;
+    const categoryFilter = state.articlesFilter.category;
+    const filteredArticles = state.articles.filter((article) => {
+        const category = String(article.category || '').toLowerCase();
+        const statusValue = article.is_published ? 'published' : 'draft';
+
+        if (statusFilter !== 'all' && statusFilter !== statusValue) return false;
+        if (categoryFilter !== 'all' && categoryFilter !== category) return false;
+
+        if (!search) return true;
+        const localizedCategory = getCategoryName(article.category).toLowerCase();
+        const haystack = `${article.title || ''} ${category} ${localizedCategory}`.toLowerCase();
+        return haystack.includes(search);
+    });
+
+    if (filteredArticles.length === 0) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 5;
+        cell.className = 'text-center text-muted py-4';
+        cell.textContent = 'Няма съвети по зададените филтри.';
+        row.appendChild(cell);
+        dom.articlesBody.appendChild(row);
+        return;
+    }
+
+    filteredArticles.forEach((article) => {
         const row = document.createElement('tr');
 
         const titleCell = document.createElement('td');
@@ -1612,6 +1650,47 @@ function initArticleEditing() {
     if (dom.refreshBtn) {
         dom.refreshBtn.addEventListener('click', () => {
             loadAdminArticles();
+        });
+    }
+
+    if (dom.articleFilters.searchInput) {
+        dom.articleFilters.searchInput.addEventListener('input', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement)) return;
+            state.articlesFilter.search = target.value || '';
+            renderArticlesTable();
+        });
+    }
+
+    if (dom.articleFilters.statusSelect) {
+        dom.articleFilters.statusSelect.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLSelectElement)) return;
+            state.articlesFilter.status = target.value || 'all';
+            renderArticlesTable();
+        });
+    }
+
+    if (dom.articleFilters.categorySelect) {
+        dom.articleFilters.categorySelect.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLSelectElement)) return;
+            state.articlesFilter.category = target.value || 'all';
+            renderArticlesTable();
+        });
+    }
+
+    if (dom.articleFilters.clearBtn) {
+        dom.articleFilters.clearBtn.addEventListener('click', () => {
+            state.articlesFilter.search = '';
+            state.articlesFilter.status = 'all';
+            state.articlesFilter.category = 'all';
+
+            if (dom.articleFilters.searchInput) dom.articleFilters.searchInput.value = '';
+            if (dom.articleFilters.statusSelect) dom.articleFilters.statusSelect.value = 'all';
+            if (dom.articleFilters.categorySelect) dom.articleFilters.categorySelect.value = 'all';
+
+            renderArticlesTable();
         });
     }
 
