@@ -1,5 +1,6 @@
 ﻿import { requireSupabase } from './supabaseClient.js';
 
+import { checkAgainstMaliciousResources } from './maliciousResourcesService.js';
 const INTERNET_CHECK_BASE = 'https://phish.sinking.yachts/v2/check/';
 const THREAT_CHECK_FUNCTION_NAME = 'threat-check';
 
@@ -173,6 +174,16 @@ function mapVerdictFromScore(score) {
   return 'clean';
 }
 
+function riskFromMaliciousMatch(match) {
+  const riskLevel = String(match?.risk_level || '').toLowerCase();
+  const status = String(match?.status || '').toLowerCase();
+  const confidence = Number(match?.confidence);
+  const base = riskLevel === 'high' ? 95 : riskLevel === 'medium' ? 70 : 45;
+  const confidenceBoost = Number.isFinite(confidence) ? Math.round(confidence * 5) : 0;
+  const statusPenalty = status === 'offline' ? 15 : 0;
+  return Math.max(35, Math.min(100, base + confidenceBoost - statusPenalty));
+}
+
 function analyzeHeuristicUrlRisk(rawInput, inputType) {
   if (inputType !== 'url') {
     return { risk: 0, reasons: [], critical: false, checked: false };
@@ -285,6 +296,8 @@ export async function runScamCheck(rawInput) {
   }
 
   const databaseResultPromise = checkAgainstDatabase(input, inputType);
+  const maliciousResourcesPromise = checkAgainstMaliciousResources(input)
+    .catch(() => ({ matched: false, matches: [] }));
   const internetResultPromise = checkInternetViaEdgeFunction(input, inputType)
     .catch(async (edgeError) => {
       const fallback = await checkAgainstInternet(input, inputType);
@@ -312,9 +325,10 @@ export async function runScamCheck(rawInput) {
       };
     });
 
-  const [databaseResult, internetResult] = await Promise.all([
+  const [databaseResult, internetResult, maliciousResources] = await Promise.all([
     databaseResultPromise,
     internetResultPromise,
+    maliciousResourcesPromise,
   ]);
 
   const edgeHasHeuristic = (internetResult.sources || [])
@@ -325,11 +339,14 @@ export async function runScamCheck(rawInput) {
     : analyzeHeuristicUrlRisk(input, inputType);
 
   const dbRisk = databaseResult.matched ? Math.min(60, 20 + databaseResult.matches.length * 10) : 0;
+  const maliciousRisk = maliciousResources.matched
+    ? Math.max(...maliciousResources.matches.map(riskFromMaliciousMatch))
+    : 0;
   const internetRisk = Number.isFinite(internetResult.riskScore) ? internetResult.riskScore : 0;
 
   let riskScore = internetResult.usedEdgeFunction
-    ? Math.min(100, Math.max(internetRisk, dbRisk + heuristic.risk))
-    : Math.min(100, dbRisk + Math.round(internetRisk * 0.6) + heuristic.risk);
+    ? Math.min(100, Math.max(internetRisk, dbRisk + heuristic.risk, maliciousRisk))
+    : Math.min(100, dbRisk + Math.round(internetRisk * 0.6) + heuristic.risk + Math.round(maliciousRisk * 0.7));
 
   const hasInternetCoverage = Boolean(internetResult.checked)
     || (internetResult.checkedCount || 0) > 0
@@ -349,6 +366,18 @@ export async function runScamCheck(rawInput) {
   if (databaseResult.matched && verdict !== 'danger') {
     verdict = 'warning';
     riskScore = Math.max(riskScore, 35);
+  }
+
+  if (maliciousResources.matched) {
+    const hasHighRiskMalicious = maliciousResources.matches
+      .some((match) => String(match?.risk_level || '').toLowerCase() === 'high');
+    if (hasHighRiskMalicious) {
+      verdict = 'danger';
+      riskScore = Math.max(riskScore, 85);
+    } else if (verdict !== 'danger') {
+      verdict = 'warning';
+      riskScore = Math.max(riskScore, 45);
+    }
   }
 
   const isSuspicious = verdict === 'danger' || verdict === 'warning' || verdict === 'unknown';
@@ -376,6 +405,7 @@ export async function runScamCheck(rawInput) {
     verdict,
     riskScore,
     database: databaseResult,
+    maliciousResources,
     internet: {
       ...internetResult,
       sources: mergedSources,

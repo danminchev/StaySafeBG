@@ -121,6 +121,10 @@ function renderResult(result) {
 		? `Намерени съвпадения в база: ${result.database.matches.length}`
 		: 'Няма съвпадение в базата';
 
+	const malwareLabel = result.maliciousResources?.matched
+		? `Зловредни ресурси: ${result.maliciousResources.matches.length} съвпадение(я)`
+		: 'Зловредни ресурси: няма съвпадение';
+
 	const internetLabel = result.internet.checked
 		? `Интернет източници: ${result.internet.flaggedCount || 0} сигнал(а) от ${result.internet.checkedCount || 0} проверени`
 		: 'Интернет проверка: източниците не върнаха данни';
@@ -146,6 +150,15 @@ function renderResult(result) {
 		`;
 	}).join('');
 
+	const maliciousRows = (result.maliciousResources?.matches || []).map((match) => `
+		<li>
+			<strong>${escapeHtml(match.resource_value || match.normalized_value || '-')}</strong>
+			<span class="small d-block ${String(match.risk_level || '').toLowerCase() === 'high' ? 'check-source-risk' : 'check-result-subtle'}">
+				${escapeHtml(String(match.resource_type || 'other').toUpperCase())} | ${escapeHtml(String(match.risk_level || 'high').toUpperCase())} | ${escapeHtml(match.status || 'unknown')} | ${escapeHtml(match.source || 'manual')}
+			</span>
+		</li>
+	`).join('');
+
 	resultHost.innerHTML = `
 		<div class="check-result-card ${statusClass}">
 			<div class="d-flex justify-content-between align-items-center gap-2 flex-wrap mb-2">
@@ -164,10 +177,12 @@ function renderResult(result) {
 			</div>
 			<ul class="check-result-meta mb-0">
 				<li><i class="bi bi-database-check me-2"></i>${dbLabel}</li>
+				<li><i class="bi bi-bug-fill me-2"></i>${malwareLabel}</li>
 				<li><i class="bi bi-globe2 me-2"></i>${internetLabel}</li>
 				<li><i class="bi bi-shield-lock me-2"></i>Режим: ${result.internet.usedEdgeFunction ? 'Разширена проверка (Edge Function)' : 'Базова проверка (fallback)'}</li>
 			</ul>
 			${(result.warnings || []).length ? `<div class="check-result-warning mt-3"><i class="bi bi-exclamation-triangle me-2"></i>${escapeHtml(result.warnings[0])}</div>` : ''}
+			${maliciousRows ? `<hr class="my-3"><h6 class="mb-2">Съвпадения в зловредни ресурси</h6><ul class="check-result-list mb-0">${maliciousRows}</ul>` : ''}
 			${matchedRows ? `<hr class="my-3"><h6 class="mb-2">Съвпадения в базата</h6><ul class="check-result-list mb-0">${matchedRows}</ul>` : ''}
 			${sourceRows ? `<hr class="my-3"><h6 class="mb-2">Външни източници</h6><ul class="check-result-list mb-0">${sourceRows}</ul>` : ''}
 		</div>

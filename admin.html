@@ -284,6 +284,116 @@
           </tbody>
         </table>
       </div>
+      <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
+        <h2 class="mb-0">Управление на зловредни ресурси</h2>
+        <button class="btn btn-outline-primary" id="btn-refresh-malicious-resources" type="button">Обнови списъка</button>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="malicious-resource-search-input" class="form-label">Търсене</label>
+          <input type="text" class="form-control" id="malicious-resource-search-input" placeholder="Търси по ресурс, заплаха или източник">
+        </div>
+        <div class="col-md-3">
+          <label for="malicious-resource-type-filter" class="form-label">Филтър тип</label>
+          <select class="form-select" id="malicious-resource-type-filter">
+            <option value="all">Всички</option>
+            <option value="url">URL</option>
+            <option value="domain">Домейн</option>
+            <option value="ip">IP</option>
+            <option value="hash">Hash</option>
+            <option value="file">Файл</option>
+            <option value="other">Друго</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="malicious-resource-status-filter" class="form-label">Филтър статус</label>
+          <select class="form-select" id="malicious-resource-status-filter">
+            <option value="all">Всички</option>
+            <option value="online">Онлайн</option>
+            <option value="offline">Офлайн</option>
+            <option value="unknown">Неизвестен</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+          <button type="button" class="btn btn-outline-secondary" id="btn-clear-malicious-resource-filters">Изчисти филтрите</button>
+        </div>
+      </div>
+      <div class="card mb-3">
+        <div class="card-body">
+          <form id="add-malicious-resource-form" class="row g-3">
+            <div class="col-md-5">
+              <label for="malicious-resource-value-input" class="form-label">Зловреден ресурс</label>
+              <input type="text" class="form-control" id="malicious-resource-value-input" placeholder="http://..., domain, IP, hash" required>
+            </div>
+            <div class="col-md-2">
+              <label for="malicious-resource-type-input" class="form-label">Тип</label>
+              <select class="form-select" id="malicious-resource-type-input">
+                <option value="url">URL</option>
+                <option value="domain">Домейн</option>
+                <option value="ip">IP</option>
+                <option value="hash">Hash</option>
+                <option value="file">Файл</option>
+                <option value="other">Друго</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="malicious-resource-risk-input" class="form-label">Риск</label>
+              <select class="form-select" id="malicious-resource-risk-input">
+                <option value="high">Висок</option>
+                <option value="medium">Среден</option>
+                <option value="low">Нисък</option>
+              </select>
+            </div>
+            <div class="col-md-1">
+              <label for="malicious-resource-confidence-input" class="form-label">Доверие</label>
+              <input type="number" class="form-control" id="malicious-resource-confidence-input" value="0.95" min="0" max="1" step="0.01">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="submit" class="btn btn-danger w-100" id="btn-add-malicious-resource">Добави</button>
+            </div>
+            <div class="col-md-3">
+              <label for="malicious-resource-status-input" class="form-label">Статус</label>
+              <select class="form-select" id="malicious-resource-status-input">
+                <option value="online">Онлайн</option>
+                <option value="offline">Офлайн</option>
+                <option value="unknown">Неизвестен</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="malicious-resource-source-input" class="form-label">Източник</label>
+              <input type="text" class="form-control" id="malicious-resource-source-input" value="manual">
+            </div>
+            <div class="col-md-3">
+              <label for="malicious-resource-threat-name-input" class="form-label">Заплаха / семейство</label>
+              <input type="text" class="form-control" id="malicious-resource-threat-name-input" placeholder="напр. stealer, botnet">
+            </div>
+            <div class="col-md-3">
+              <label for="malicious-resource-notes-input" class="form-label">Бележки</label>
+              <input type="text" class="form-control" id="malicious-resource-notes-input" placeholder="Незадължително">
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle" id="admin-malicious-resources-table">
+          <thead>
+            <tr>
+              <th scope="col">Ресурс</th>
+              <th scope="col">Тип</th>
+              <th scope="col">Риск</th>
+              <th scope="col">Статус</th>
+              <th scope="col">Източник</th>
+              <th scope="col">Обновен</th>
+              <th scope="col" class="text-end" style="padding-right: 170px;">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="admin-malicious-resources-body">
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">Зареждане на зловредни ресурси...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
   </main>
 
   <!-- Create Article Modal -->
@@ -661,6 +771,85 @@
     </div>
   </div>
   
+  <div class="modal fade" id="editMaliciousResourceModal" tabindex="-1" aria-labelledby="editMaliciousResourceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editMaliciousResourceModalLabel">Редакция на зловреден ресурс</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-malicious-resource-form">
+            <input type="hidden" id="edit-malicious-resource-id">
+            <div class="mb-3">
+              <label for="edit-malicious-resource-value" class="form-label">Ресурс</label>
+              <input type="text" class="form-control" id="edit-malicious-resource-value" required>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="edit-malicious-resource-type" class="form-label">Тип</label>
+                <select class="form-select" id="edit-malicious-resource-type">
+                  <option value="url">URL</option>
+                  <option value="domain">Домейн</option>
+                  <option value="ip">IP</option>
+                  <option value="hash">Hash</option>
+                  <option value="file">Файл</option>
+                  <option value="other">Друго</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="edit-malicious-resource-threat-name" class="form-label">Заплаха / семейство</label>
+                <input type="text" class="form-control" id="edit-malicious-resource-threat-name">
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label for="edit-malicious-resource-source" class="form-label">Източник</label>
+                <input type="text" class="form-control" id="edit-malicious-resource-source">
+              </div>
+              <div class="col-md-4">
+                <label for="edit-malicious-resource-confidence" class="form-label">Доверие</label>
+                <input type="number" class="form-control" id="edit-malicious-resource-confidence" min="0" max="1" step="0.01">
+              </div>
+              <div class="col-md-4">
+                <label for="edit-malicious-resource-risk" class="form-label">Риск</label>
+                <select class="form-select" id="edit-malicious-resource-risk">
+                  <option value="high">Висок</option>
+                  <option value="medium">Среден</option>
+                  <option value="low">Нисък</option>
+                </select>
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="edit-malicious-resource-status" class="form-label">Статус</label>
+                <select class="form-select" id="edit-malicious-resource-status">
+                  <option value="online">Онлайн</option>
+                  <option value="offline">Офлайн</option>
+                  <option value="unknown">Неизвестен</option>
+                </select>
+              </div>
+              <div class="col-md-6 d-flex align-items-end">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="edit-malicious-resource-active" checked>
+                  <label class="form-check-label" for="edit-malicious-resource-active">Активен за проверка</label>
+                </div>
+              </div>
+            </div>
+            <div class="mb-0">
+              <label for="edit-malicious-resource-notes" class="form-label">Бележки</label>
+              <textarea class="form-control" id="edit-malicious-resource-notes" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
+          <button type="button" class="btn btn-primary" id="btn-update-malicious-resource">Запази промените</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer id="app-footer"></footer>
   
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

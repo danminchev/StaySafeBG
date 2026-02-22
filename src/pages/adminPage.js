@@ -20,6 +20,13 @@ import {
     getTrustedPhishingDomains,
     updateTrustedPhishingDomain
 } from '../services/trustedDomainsService.js';
+import {
+    checkAgainstMaliciousResources,
+    createMaliciousResource,
+    deleteMaliciousResource,
+    getMaliciousResources,
+    updateMaliciousResource
+} from '../services/maliciousResourcesService.js';
 import { showToast } from '../utils/notifications.js';
 
 const state = {
@@ -32,6 +39,12 @@ const state = {
     reports: [],
     reportsFilter: {
         search: '',
+        status: 'all'
+    },
+    maliciousResources: [],
+    maliciousResourcesFilter: {
+        search: '',
+        type: 'all',
         status: 'all'
     },
     phishingDomains: [],
@@ -97,6 +110,26 @@ const dom = {
     reportsBody: document.getElementById('admin-reports-body'),
     phishingDomainsRefreshBtn: document.getElementById('btn-refresh-phishing-domains'),
     phishingDomainsBody: document.getElementById('admin-phishing-domains-body'),
+    maliciousResourcesRefreshBtn: document.getElementById('btn-refresh-malicious-resources'),
+    maliciousResourcesBody: document.getElementById('admin-malicious-resources-body'),
+    maliciousResourceForm: document.getElementById('add-malicious-resource-form'),
+    maliciousResourceFields: {
+        value: document.getElementById('malicious-resource-value-input'),
+        type: document.getElementById('malicious-resource-type-input'),
+        source: document.getElementById('malicious-resource-source-input'),
+        confidence: document.getElementById('malicious-resource-confidence-input'),
+        risk: document.getElementById('malicious-resource-risk-input'),
+        status: document.getElementById('malicious-resource-status-input'),
+        threatName: document.getElementById('malicious-resource-threat-name-input'),
+        notes: document.getElementById('malicious-resource-notes-input'),
+        submit: document.getElementById('btn-add-malicious-resource')
+    },
+    maliciousResourceFilters: {
+        searchInput: document.getElementById('malicious-resource-search-input'),
+        typeSelect: document.getElementById('malicious-resource-type-filter'),
+        statusSelect: document.getElementById('malicious-resource-status-filter'),
+        clearBtn: document.getElementById('btn-clear-malicious-resource-filters')
+    },
     phishingDomainForm: document.getElementById('add-phishing-domain-form'),
     phishingDomainFields: {
         domain: document.getElementById('phishing-domain-input'),
@@ -121,6 +154,19 @@ const dom = {
         status: document.getElementById('edit-phishing-domain-status'),
         notes: document.getElementById('edit-phishing-domain-notes'),
         updateBtn: document.getElementById('btn-update-phishing-domain')
+    },
+    maliciousResourceEdit: {
+        id: document.getElementById('edit-malicious-resource-id'),
+        value: document.getElementById('edit-malicious-resource-value'),
+        type: document.getElementById('edit-malicious-resource-type'),
+        source: document.getElementById('edit-malicious-resource-source'),
+        confidence: document.getElementById('edit-malicious-resource-confidence'),
+        risk: document.getElementById('edit-malicious-resource-risk'),
+        status: document.getElementById('edit-malicious-resource-status'),
+        threatName: document.getElementById('edit-malicious-resource-threat-name'),
+        isActive: document.getElementById('edit-malicious-resource-active'),
+        notes: document.getElementById('edit-malicious-resource-notes'),
+        updateBtn: document.getElementById('btn-update-malicious-resource')
     },
     stats: {
         pending: document.getElementById('admin-stat-pending'),
@@ -984,6 +1030,34 @@ function findPhishingDomainById(id) {
     return state.phishingDomains.find((item) => String(item.id) === String(id));
 }
 
+function getMaliciousRiskMeta(riskLevel) {
+    return getPhishingRiskMeta(riskLevel);
+}
+
+function getMaliciousStatusMeta(status) {
+    const normalized = String(status || '').trim().toLowerCase();
+    if (normalized === 'online') return { value: 'online', label: 'Онлайн', className: 'bg-danger' };
+    if (normalized === 'offline') return { value: 'offline', label: 'Офлайн', className: 'bg-secondary' };
+    return { value: 'unknown', label: 'Неизвестен', className: 'bg-warning text-dark' };
+}
+
+function getMaliciousTypeLabel(type) {
+    const normalized = String(type || '').trim().toLowerCase();
+    const map = {
+        url: 'URL',
+        domain: 'Домейн',
+        ip: 'IP',
+        hash: 'Hash',
+        file: 'Файл',
+        other: 'Друго'
+    };
+    return map[normalized] || 'Друго';
+}
+
+function findMaliciousResourceById(id) {
+    return state.maliciousResources.find((item) => String(item.id) === String(id));
+}
+
 async function openEditPhishingDomainModal(domainId) {
     const item = findPhishingDomainById(domainId);
     if (!item) {
@@ -1275,10 +1349,12 @@ function renderAdminContent() {
 	initArticleEditing();
     initReportReviewing();
     initPhishingDomainsManagement();
+    initMaliciousResourcesManagement();
 	loadAdminReports();
 	loadAdminReportStats();
 	loadAdminArticles();
     loadPhishingDomains();
+    loadMaliciousResources();
 
     if (canManageUsers()) {
         initUserManagement();
@@ -1671,6 +1747,309 @@ function initPhishingDomainsManagement() {
             const action = btn.dataset.action;
             const id = btn.dataset.domainId;
             await handlePhishingDomainAction(action, id, btn);
+        });
+    }
+}
+
+function renderMaliciousResourcesTable() {
+    if (!dom.maliciousResourcesBody) return;
+
+    dom.maliciousResourcesBody.textContent = '';
+
+    const search = state.maliciousResourcesFilter.search.trim().toLowerCase();
+    const type = state.maliciousResourcesFilter.type;
+    const status = state.maliciousResourcesFilter.status;
+
+    const filtered = state.maliciousResources.filter((item) => {
+        const itemType = String(item.resource_type || '').toLowerCase();
+        const itemStatus = String(item.status || '').toLowerCase();
+        if (type !== 'all' && itemType !== type) return false;
+        if (status !== 'all' && itemStatus !== status) return false;
+        if (!search) return true;
+
+        const haystack = `${item.resource_value || ''} ${item.threat_name || ''} ${item.source || ''} ${item.notes || ''}`.toLowerCase();
+        return haystack.includes(search);
+    });
+
+    if (!filtered.length) {
+        dom.maliciousResourcesBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Няма добавени зловредни ресурси.</td></tr>';
+        return;
+    }
+
+    filtered.forEach((item) => {
+        const row = document.createElement('tr');
+        const riskMeta = getMaliciousRiskMeta(item.risk_level);
+        const statusMeta = getMaliciousStatusMeta(item.status);
+        const activeBadge = item.is_active
+            ? '<span class="badge bg-success">Активен</span>'
+            : '<span class="badge bg-secondary">Скрит</span>';
+
+        row.innerHTML = `
+            <td>
+                <div class="fw-semibold">${item.resource_value || '-'}</div>
+                <div class="small text-muted">${item.threat_name || '-'}</div>
+            </td>
+            <td>${getMaliciousTypeLabel(item.resource_type)}</td>
+            <td><span class="badge ${riskMeta.className}">${riskMeta.label}</span></td>
+            <td>
+                <div><span class="badge ${statusMeta.className}">${statusMeta.label}</span></div>
+                <div class="small mt-1">${activeBadge}</div>
+            </td>
+            <td>${item.source || '-'}</td>
+            <td>${formatDateTime(item.updated_at || item.last_seen_at || item.created_at)}</td>
+            <td class="text-end">
+                <div class="d-inline-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-action="edit-malicious-resource" data-resource-id="${item.id}">Редактирай</button>
+                    <button type="button" class="btn btn-sm btn-outline-${item.is_active ? 'warning' : 'success'}" data-action="${item.is_active ? 'deactivate-malicious-resource' : 'activate-malicious-resource'}" data-resource-id="${item.id}">
+                        ${item.is_active ? 'Деактивирай' : 'Активирай'}
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-action="delete-malicious-resource" data-resource-id="${item.id}">Изтрий</button>
+                </div>
+            </td>
+        `;
+
+        dom.maliciousResourcesBody.appendChild(row);
+    });
+}
+
+async function loadMaliciousResources() {
+    if (!dom.maliciousResourcesBody) return;
+    dom.maliciousResourcesBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Зареждане...</td></tr>';
+
+    try {
+        state.maliciousResources = await getMaliciousResources();
+        renderMaliciousResourcesTable();
+    } catch (error) {
+        console.error('Error loading malicious resources:', error);
+        dom.maliciousResourcesBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">Грешка при зареждане на зловредни ресурси.</td></tr>';
+        showToast('Неуспешно зареждане на зловредни ресурси.', 'error');
+    }
+}
+
+async function handleCreateMaliciousResource(event) {
+    event.preventDefault();
+
+    const resourceValue = dom.maliciousResourceFields.value?.value?.trim();
+    if (!resourceValue) {
+        showToast('Въведете зловреден ресурс.', 'warning');
+        return;
+    }
+
+    const submitBtn = dom.maliciousResourceFields.submit;
+    const originalText = submitBtn?.textContent || '';
+
+    try {
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Запазване...';
+        }
+
+        await createMaliciousResource({
+            resourceValue,
+            resourceType: dom.maliciousResourceFields.type?.value || 'url',
+            source: dom.maliciousResourceFields.source?.value || 'manual',
+            confidence: Number(dom.maliciousResourceFields.confidence?.value || 0.95),
+            riskLevel: dom.maliciousResourceFields.risk?.value || 'high',
+            status: dom.maliciousResourceFields.status?.value || 'online',
+            threatName: dom.maliciousResourceFields.threatName?.value || '',
+            notes: dom.maliciousResourceFields.notes?.value || ''
+        });
+
+        showToast('Зловредният ресурс е добавен успешно.', 'success');
+        dom.maliciousResourceForm?.reset();
+        if (dom.maliciousResourceFields.source) dom.maliciousResourceFields.source.value = 'manual';
+        if (dom.maliciousResourceFields.confidence) dom.maliciousResourceFields.confidence.value = '0.95';
+        if (dom.maliciousResourceFields.risk) dom.maliciousResourceFields.risk.value = 'high';
+        if (dom.maliciousResourceFields.status) dom.maliciousResourceFields.status.value = 'online';
+        if (dom.maliciousResourceFields.type) dom.maliciousResourceFields.type.value = 'url';
+        await loadMaliciousResources();
+    } catch (error) {
+        console.error('Error creating malicious resource:', error);
+        showToast('Неуспешно добавяне на зловреден ресурс.', 'error');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    }
+}
+
+async function openEditMaliciousResourceModal(resourceId) {
+    const item = findMaliciousResourceById(resourceId);
+    if (!item) {
+        showToast('Ресурсът не е намерен.', 'warning');
+        return;
+    }
+
+    if (dom.maliciousResourceEdit.id) dom.maliciousResourceEdit.id.value = item.id || '';
+    if (dom.maliciousResourceEdit.value) dom.maliciousResourceEdit.value.value = item.resource_value || '';
+    if (dom.maliciousResourceEdit.type) dom.maliciousResourceEdit.type.value = item.resource_type || 'url';
+    if (dom.maliciousResourceEdit.source) dom.maliciousResourceEdit.source.value = item.source || 'manual';
+    if (dom.maliciousResourceEdit.confidence) dom.maliciousResourceEdit.confidence.value = Number(item.confidence || 0).toFixed(2);
+    if (dom.maliciousResourceEdit.risk) dom.maliciousResourceEdit.risk.value = getMaliciousRiskMeta(item.risk_level).value;
+    if (dom.maliciousResourceEdit.status) dom.maliciousResourceEdit.status.value = getMaliciousStatusMeta(item.status).value;
+    if (dom.maliciousResourceEdit.threatName) dom.maliciousResourceEdit.threatName.value = item.threat_name || '';
+    if (dom.maliciousResourceEdit.notes) dom.maliciousResourceEdit.notes.value = item.notes || '';
+    if (dom.maliciousResourceEdit.isActive) dom.maliciousResourceEdit.isActive.checked = Boolean(item.is_active);
+
+    openModal('editMaliciousResourceModal');
+}
+
+async function saveEditedMaliciousResource() {
+    const id = dom.maliciousResourceEdit.id?.value;
+    const resourceValue = dom.maliciousResourceEdit.value?.value?.trim();
+    const confidence = Number(dom.maliciousResourceEdit.confidence?.value);
+    if (!id || !resourceValue) {
+        showToast('Липсват данни за ресурс.', 'warning');
+        return;
+    }
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+        showToast('Доверието трябва да е число между 0 и 1.', 'warning');
+        return;
+    }
+
+    const button = dom.maliciousResourceEdit.updateBtn;
+    const originalText = button?.textContent || '';
+
+    try {
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Запазване...';
+        }
+
+        await updateMaliciousResource(id, {
+            resourceValue,
+            resourceType: dom.maliciousResourceEdit.type?.value || 'url',
+            source: dom.maliciousResourceEdit.source?.value || 'manual',
+            confidence,
+            riskLevel: dom.maliciousResourceEdit.risk?.value || 'high',
+            status: dom.maliciousResourceEdit.status?.value || 'online',
+            threatName: dom.maliciousResourceEdit.threatName?.value || '',
+            notes: dom.maliciousResourceEdit.notes?.value || '',
+            is_active: Boolean(dom.maliciousResourceEdit.isActive?.checked)
+        });
+
+        closeModal('editMaliciousResourceModal');
+        showToast('Промените по ресурса са запазени.', 'success');
+        await loadMaliciousResources();
+    } catch (error) {
+        console.error('Error updating malicious resource:', error);
+        showToast('Неуспешно записване на ресурс.', 'error');
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+}
+
+async function handleMaliciousResourceAction(action, id, button) {
+    if (!id) return;
+    const originalText = button?.textContent || '';
+
+    try {
+        if (button) {
+            button.disabled = true;
+            button.textContent = '...';
+        }
+
+        if (action === 'edit-malicious-resource') {
+            await openEditMaliciousResourceModal(id);
+            return;
+        }
+
+        if (action === 'activate-malicious-resource') {
+            await updateMaliciousResource(id, { is_active: true });
+            showToast('Ресурсът е активиран.', 'success');
+        } else if (action === 'deactivate-malicious-resource') {
+            await updateMaliciousResource(id, { is_active: false });
+            showToast('Ресурсът е деактивиран.', 'success');
+        } else if (action === 'delete-malicious-resource') {
+            const ok = window.confirm('Сигурни ли сте, че искате да изтриете този зловреден ресурс?');
+            if (!ok) return;
+            await deleteMaliciousResource(id);
+            showToast('Ресурсът е изтрит.', 'success');
+        }
+
+        await loadMaliciousResources();
+    } catch (error) {
+        console.error('Error handling malicious resource action:', error);
+        showToast('Неуспешна операция върху зловреден ресурс.', 'error');
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+}
+
+function initMaliciousResourcesManagement() {
+    if (dom.maliciousResourcesRefreshBtn) {
+        dom.maliciousResourcesRefreshBtn.addEventListener('click', () => {
+            loadMaliciousResources();
+        });
+    }
+
+    if (dom.maliciousResourceForm) {
+        dom.maliciousResourceForm.addEventListener('submit', handleCreateMaliciousResource);
+    }
+
+    if (dom.maliciousResourceEdit.updateBtn) {
+        dom.maliciousResourceEdit.updateBtn.addEventListener('click', () => {
+            saveEditedMaliciousResource();
+        });
+    }
+
+    if (dom.maliciousResourceFilters.searchInput) {
+        dom.maliciousResourceFilters.searchInput.addEventListener('input', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement)) return;
+            state.maliciousResourcesFilter.search = target.value || '';
+            renderMaliciousResourcesTable();
+        });
+    }
+
+    if (dom.maliciousResourceFilters.typeSelect) {
+        dom.maliciousResourceFilters.typeSelect.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLSelectElement)) return;
+            state.maliciousResourcesFilter.type = target.value || 'all';
+            renderMaliciousResourcesTable();
+        });
+    }
+
+    if (dom.maliciousResourceFilters.statusSelect) {
+        dom.maliciousResourceFilters.statusSelect.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLSelectElement)) return;
+            state.maliciousResourcesFilter.status = target.value || 'all';
+            renderMaliciousResourcesTable();
+        });
+    }
+
+    if (dom.maliciousResourceFilters.clearBtn) {
+        dom.maliciousResourceFilters.clearBtn.addEventListener('click', () => {
+            state.maliciousResourcesFilter.search = '';
+            state.maliciousResourcesFilter.type = 'all';
+            state.maliciousResourcesFilter.status = 'all';
+
+            if (dom.maliciousResourceFilters.searchInput) dom.maliciousResourceFilters.searchInput.value = '';
+            if (dom.maliciousResourceFilters.typeSelect) dom.maliciousResourceFilters.typeSelect.value = 'all';
+            if (dom.maliciousResourceFilters.statusSelect) dom.maliciousResourceFilters.statusSelect.value = 'all';
+
+            renderMaliciousResourcesTable();
+        });
+    }
+
+    if (dom.maliciousResourcesBody) {
+        dom.maliciousResourcesBody.addEventListener('click', async (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+            const btn = target.closest('button[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            const id = btn.dataset.resourceId;
+            await handleMaliciousResourceAction(action, id, btn);
         });
     }
 }
