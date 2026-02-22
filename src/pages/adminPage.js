@@ -28,7 +28,8 @@ const state = {
     phishingDomains: [],
     phishingDomainsFilter: {
         search: '',
-        status: 'all'
+        status: 'all',
+        risk: 'all'
     },
     users: [],
     selectedReportId: null,
@@ -77,7 +78,19 @@ const dom = {
     },
     phishingDomainFilters: {
         searchInput: document.getElementById('phishing-domain-search-input'),
-        statusSelect: document.getElementById('phishing-domain-status-filter')
+        statusSelect: document.getElementById('phishing-domain-status-filter'),
+        riskSelect: document.getElementById('phishing-domain-risk-filter')
+    },
+    phishingDomainEdit: {
+        form: document.getElementById('edit-phishing-domain-form'),
+        id: document.getElementById('edit-phishing-domain-id'),
+        domain: document.getElementById('edit-phishing-domain-name'),
+        source: document.getElementById('edit-phishing-domain-source'),
+        confidence: document.getElementById('edit-phishing-domain-confidence'),
+        risk: document.getElementById('edit-phishing-domain-risk'),
+        status: document.getElementById('edit-phishing-domain-status'),
+        notes: document.getElementById('edit-phishing-domain-notes'),
+        updateBtn: document.getElementById('btn-update-phishing-domain')
     },
     stats: {
         pending: document.getElementById('admin-stat-pending'),
@@ -876,6 +889,109 @@ function openModal(modalId) {
     modal.show();
 }
 
+function getPhishingRiskLevel(item) {
+    const direct = String(item?.risk_level || '').trim().toLowerCase();
+    if (direct === 'low' || direct === 'medium' || direct === 'high') {
+        return direct;
+    }
+
+    const confidence = Number(item?.confidence);
+    if (!Number.isFinite(confidence)) return 'medium';
+    if (confidence >= 0.9) return 'high';
+    if (confidence >= 0.6) return 'medium';
+    return 'low';
+}
+
+function getPhishingRiskMeta(riskLevel) {
+    const normalized = String(riskLevel || '').trim().toLowerCase();
+    if (normalized === 'low') {
+        return { value: 'low', label: 'Нисък риск', className: 'bg-success' };
+    }
+    if (normalized === 'high') {
+        return { value: 'high', label: 'Висок риск', className: 'bg-danger' };
+    }
+    return { value: 'medium', label: 'Среден риск', className: 'bg-warning text-dark' };
+}
+
+function findPhishingDomainById(id) {
+    return state.phishingDomains.find((item) => String(item.id) === String(id));
+}
+
+async function openEditPhishingDomainModal(domainId) {
+    const item = findPhishingDomainById(domainId);
+    if (!item) {
+        showToast('Домейнът не е намерен.', 'warning');
+        return;
+    }
+
+    if (dom.phishingDomainEdit.id) dom.phishingDomainEdit.id.value = item.id || '';
+    if (dom.phishingDomainEdit.domain) dom.phishingDomainEdit.domain.value = item.domain || '';
+    if (dom.phishingDomainEdit.source) dom.phishingDomainEdit.source.value = item.source || 'manual';
+    if (dom.phishingDomainEdit.confidence) {
+        dom.phishingDomainEdit.confidence.value = Number(item.confidence || 0).toFixed(2);
+    }
+    if (dom.phishingDomainEdit.risk) {
+        dom.phishingDomainEdit.risk.value = getPhishingRiskMeta(getPhishingRiskLevel(item)).value;
+    }
+    if (dom.phishingDomainEdit.status) {
+        dom.phishingDomainEdit.status.value = item.is_active ? 'active' : 'inactive';
+    }
+    if (dom.phishingDomainEdit.notes) {
+        dom.phishingDomainEdit.notes.value = item.notes || '';
+    }
+
+    openModal('editPhishingDomainModal');
+}
+
+async function saveEditedPhishingDomain() {
+    const id = dom.phishingDomainEdit.id?.value;
+    if (!id) {
+        showToast('Липсва идентификатор на домейн.', 'error');
+        return;
+    }
+
+    const source = dom.phishingDomainEdit.source?.value?.trim() || 'manual';
+    const confidence = Number(dom.phishingDomainEdit.confidence?.value);
+    const riskLevel = dom.phishingDomainEdit.risk?.value || 'medium';
+    const status = dom.phishingDomainEdit.status?.value || 'active';
+    const notes = dom.phishingDomainEdit.notes?.value?.trim() || '';
+
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+        showToast('Доверието трябва да е число между 0 и 1.', 'warning');
+        return;
+    }
+
+    const button = dom.phishingDomainEdit.updateBtn;
+    const original = button?.textContent || '';
+
+    try {
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Запазване...';
+        }
+
+        await updateTrustedPhishingDomain(id, {
+            source,
+            confidence,
+            risk_level: riskLevel,
+            is_active: status === 'active',
+            notes
+        });
+
+        closeModal('editPhishingDomainModal');
+        showToast('Промените по домейна са запазени.', 'success');
+        await loadPhishingDomains();
+    } catch (error) {
+        console.error('Error saving phishing domain:', error);
+        showToast('Неуспешно записване на домейна.', 'error');
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.textContent = original;
+        }
+    }
+}
+
 function renderArticlesTable() {
     if (!dom.articlesBody) return;
 
@@ -1188,13 +1304,17 @@ function renderPhishingDomainsTable() {
 
     const search = state.phishingDomainsFilter.search.trim().toLowerCase();
     const status = state.phishingDomainsFilter.status;
+    const risk = state.phishingDomainsFilter.risk;
     const filtered = state.phishingDomains.filter((item) => {
         const isActive = Boolean(item.is_active);
+        const riskLevel = getPhishingRiskLevel(item);
         const statusMatch = status === 'all'
             || (status === 'active' && isActive)
             || (status === 'inactive' && !isActive);
+        const riskMatch = risk === 'all' || risk === riskLevel;
 
         if (!statusMatch) return false;
+        if (!riskMatch) return false;
         if (!search) return true;
 
         const haystack = `${item.domain || ''} ${item.source || ''} ${item.notes || ''}`.toLowerCase();
@@ -1202,12 +1322,13 @@ function renderPhishingDomainsTable() {
     });
 
     if (!filtered.length) {
-        dom.phishingDomainsBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Няма добавени домейни.</td></tr>';
+        dom.phishingDomainsBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Няма добавени домейни.</td></tr>';
         return;
     }
 
     filtered.forEach((item) => {
         const row = document.createElement('tr');
+        const riskMeta = getPhishingRiskMeta(getPhishingRiskLevel(item));
         const statusBadge = item.is_active
             ? '<span class="badge bg-success">Active</span>'
             : '<span class="badge bg-secondary">Inactive</span>';
@@ -1216,10 +1337,14 @@ function renderPhishingDomainsTable() {
             <td class="fw-semibold">${item.domain || '-'}</td>
             <td>${item.source || '-'}</td>
             <td>${Number(item.confidence || 0).toFixed(2)}</td>
+            <td><span class="badge ${riskMeta.className}">${riskMeta.label}</span></td>
             <td>${statusBadge}</td>
             <td>${formatDateTime(item.updated_at || item.last_seen_at || item.created_at)}</td>
             <td class="text-end">
                 <div class="d-inline-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-action="edit-domain" data-domain-id="${item.id}">
+                        Редактирай
+                    </button>
                     <button type="button" class="btn btn-sm btn-outline-${item.is_active ? 'warning' : 'success'}" data-action="${item.is_active ? 'deactivate-domain' : 'activate-domain'}" data-domain-id="${item.id}">
                         ${item.is_active ? 'Деактивирай' : 'Активирай'}
                     </button>
@@ -1236,14 +1361,14 @@ function renderPhishingDomainsTable() {
 
 async function loadPhishingDomains() {
     if (!dom.phishingDomainsBody) return;
-    dom.phishingDomainsBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Зареждане...</td></tr>';
+    dom.phishingDomainsBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Зареждане...</td></tr>';
 
     try {
         state.phishingDomains = await getTrustedPhishingDomains();
         renderPhishingDomainsTable();
     } catch (error) {
         console.error('Error loading phishing domains:', error);
-        dom.phishingDomainsBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Грешка при зареждане на домейни.</td></tr>';
+        dom.phishingDomainsBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">Грешка при зареждане на домейни.</td></tr>';
         showToast('Неуспешно зареждане на phishing домейни.', 'error');
     }
 }
@@ -1297,6 +1422,11 @@ async function handlePhishingDomainAction(action, id, button) {
             button.textContent = '...';
         }
 
+        if (action === 'edit-domain') {
+            await openEditPhishingDomainModal(id);
+            return;
+        }
+
         if (action === 'activate-domain') {
             await updateTrustedPhishingDomain(id, { is_active: true });
             showToast('Домейнът е активиран.', 'success');
@@ -1333,6 +1463,12 @@ function initPhishingDomainsManagement() {
         dom.phishingDomainForm.addEventListener('submit', handleCreatePhishingDomain);
     }
 
+    if (dom.phishingDomainEdit.updateBtn) {
+        dom.phishingDomainEdit.updateBtn.addEventListener('click', () => {
+            saveEditedPhishingDomain();
+        });
+    }
+
     if (dom.phishingDomainFilters.searchInput) {
         dom.phishingDomainFilters.searchInput.addEventListener('input', (event) => {
             const target = event.target;
@@ -1347,6 +1483,15 @@ function initPhishingDomainsManagement() {
             const target = event.target;
             if (!(target instanceof HTMLSelectElement)) return;
             state.phishingDomainsFilter.status = target.value || 'all';
+            renderPhishingDomainsTable();
+        });
+    }
+
+    if (dom.phishingDomainFilters.riskSelect) {
+        dom.phishingDomainFilters.riskSelect.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLSelectElement)) return;
+            state.phishingDomainsFilter.risk = target.value || 'all';
             renderPhishingDomainsTable();
         });
     }
@@ -1551,3 +1696,4 @@ function initArticleEditing() {
 }
 
 initAdminPage();
+

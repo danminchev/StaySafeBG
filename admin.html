@@ -118,16 +118,25 @@
         <button class="btn btn-outline-primary" id="btn-refresh-phishing-domains" type="button">Обнови списъка</button>
       </div>
       <div class="row g-3 mb-3">
-        <div class="col-md-8">
+        <div class="col-md-6">
           <label for="phishing-domain-search-input" class="form-label">Търсене</label>
           <input type="text" class="form-control" id="phishing-domain-search-input" placeholder="Търси по домейн или източник">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <label for="phishing-domain-status-filter" class="form-label">Филтър статус</label>
           <select class="form-select" id="phishing-domain-status-filter">
             <option value="all">Всички</option>
             <option value="active">Само активни</option>
             <option value="inactive">Само неактивни</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="phishing-domain-risk-filter" class="form-label">Филтър риск</label>
+          <select class="form-select" id="phishing-domain-risk-filter">
+            <option value="all">Всички</option>
+            <option value="low">Нисък риск</option>
+            <option value="medium">Среден риск</option>
+            <option value="high">Висок риск</option>
           </select>
         </div>
       </div>
@@ -163,6 +172,7 @@
               <th scope="col">Домейн</th>
               <th scope="col">Източник</th>
               <th scope="col">Доверие</th>
+              <th scope="col">Риск</th>
               <th scope="col">Статус</th>
               <th scope="col">Обновен</th>
               <th scope="col" class="text-end" style="padding-right: 170px;">Действия</th>
@@ -170,7 +180,7 @@
           </thead>
           <tbody id="admin-phishing-domains-body">
             <tr>
-              <td colspan="6" class="text-center text-muted py-4">Зареждане на фишинг домейни...</td>
+              <td colspan="7" class="text-center text-muted py-4">Зареждане на фишинг домейни...</td>
             </tr>
           </tbody>
         </table>
@@ -511,6 +521,65 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
           <button type="button" class="btn btn-primary" id="btn-update-report">Запази промените</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="editPhishingDomainModal" tabindex="-1" aria-labelledby="editPhishingDomainModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editPhishingDomainModalLabel">Редакция на phishing домейн</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-phishing-domain-form">
+            <input type="hidden" id="edit-phishing-domain-id">
+
+            <div class="mb-3">
+              <label for="edit-phishing-domain-name" class="form-label">Домейн</label>
+              <input type="text" class="form-control" id="edit-phishing-domain-name" readonly>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="edit-phishing-domain-source" class="form-label">Източник</label>
+                <input type="text" class="form-control" id="edit-phishing-domain-source" maxlength="120">
+              </div>
+              <div class="col-md-6">
+                <label for="edit-phishing-domain-confidence" class="form-label">Доверие</label>
+                <input type="number" class="form-control" id="edit-phishing-domain-confidence" min="0" max="1" step="0.01">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="edit-phishing-domain-risk" class="form-label">Ниво на риска</label>
+                <select class="form-select" id="edit-phishing-domain-risk">
+                  <option value="low">Нисък риск</option>
+                  <option value="medium">Среден риск</option>
+                  <option value="high">Висок риск</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="edit-phishing-domain-status" class="form-label">Статус</label>
+                <select class="form-select" id="edit-phishing-domain-status">
+                  <option value="active">Активен</option>
+                  <option value="inactive">Неактивен</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-0">
+              <label for="edit-phishing-domain-notes" class="form-label">Бележки</label>
+              <textarea class="form-control" id="edit-phishing-domain-notes" rows="3" placeholder="Незадължително"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
+          <button type="button" class="btn btn-primary" id="btn-update-phishing-domain">Запази промените</button>
         </div>
       </div>
     </div>
