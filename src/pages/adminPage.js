@@ -30,6 +30,10 @@ const state = {
         category: 'all'
     },
     reports: [],
+    reportsFilter: {
+        search: '',
+        status: 'all'
+    },
     phishingDomains: [],
     phishingDomainsFilter: {
         search: '',
@@ -71,6 +75,11 @@ const dom = {
     updateBtn: document.getElementById('btn-update-article'),
     refreshBtn: document.getElementById('btn-refresh-articles'),
     reportsRefreshBtn: document.getElementById('btn-refresh-reports'),
+    reportFilters: {
+        searchInput: document.getElementById('admin-reports-search-input'),
+        statusSelect: document.getElementById('admin-reports-status-filter'),
+        clearBtn: document.getElementById('btn-clear-report-filters')
+    },
     articlesBody: document.getElementById('admin-articles-body'),
     articleFilters: {
         searchInput: document.getElementById('admin-articles-search-input'),
@@ -82,7 +91,8 @@ const dom = {
     usersBody: document.getElementById('admin-users-body'),
     usersFilters: {
         searchInput: document.getElementById('admin-users-search-input'),
-        roleSelect: document.getElementById('admin-users-role-filter')
+        roleSelect: document.getElementById('admin-users-role-filter'),
+        clearBtn: document.getElementById('btn-clear-user-filters')
     },
     reportsBody: document.getElementById('admin-reports-body'),
     phishingDomainsRefreshBtn: document.getElementById('btn-refresh-phishing-domains'),
@@ -98,7 +108,8 @@ const dom = {
     phishingDomainFilters: {
         searchInput: document.getElementById('phishing-domain-search-input'),
         statusSelect: document.getElementById('phishing-domain-status-filter'),
-        riskSelect: document.getElementById('phishing-domain-risk-filter')
+        riskSelect: document.getElementById('phishing-domain-risk-filter'),
+        clearBtn: document.getElementById('btn-clear-phishing-domain-filters')
     },
     phishingDomainEdit: {
         form: document.getElementById('edit-phishing-domain-form'),
@@ -525,7 +536,27 @@ function renderReportsTable() {
         return;
     }
 
-    state.reports.forEach((report, index) => {
+    const search = state.reportsFilter.search.trim().toLowerCase();
+    const statusFilter = state.reportsFilter.status;
+    const filteredReports = state.reports.filter((report) => {
+        const normalizedStatus = String(report.status || '').toLowerCase();
+        if (statusFilter !== 'all' && normalizedStatus !== statusFilter) return false;
+
+        if (!search) return true;
+
+        const typeName = getReportTypeName(report);
+        const source = getReportSource(report);
+        const category = getCategoryName(report.category);
+        const haystack = `${report.title || ''} ${typeName || ''} ${source || ''} ${category || ''} ${normalizedStatus}`.toLowerCase();
+        return haystack.includes(search);
+    });
+
+    if (filteredReports.length === 0) {
+        dom.reportsBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Няма доклади по зададените филтри.</td></tr>';
+        return;
+    }
+
+    filteredReports.forEach((report, index) => {
         const row = document.createElement('tr');
         const statusMeta = getReportStatusMeta(report.status);
 
@@ -1280,6 +1311,18 @@ function initUserManagement() {
         });
     }
 
+    if (dom.usersFilters.clearBtn) {
+        dom.usersFilters.clearBtn.addEventListener('click', () => {
+            state.usersFilter.search = '';
+            state.usersFilter.role = 'all';
+
+            if (dom.usersFilters.searchInput) dom.usersFilters.searchInput.value = '';
+            if (dom.usersFilters.roleSelect) dom.usersFilters.roleSelect.value = 'all';
+
+            renderUsersTable();
+        });
+    }
+
     if (dom.userView.saveRoleBtn) {
         dom.userView.saveRoleBtn.addEventListener('click', () => {
             handleUpdateUserRole();
@@ -1320,6 +1363,36 @@ function initReportReviewing() {
         dom.reportsRefreshBtn.addEventListener('click', () => {
             loadAdminReports();
             loadAdminReportStats();
+        });
+    }
+
+    if (dom.reportFilters.searchInput) {
+        dom.reportFilters.searchInput.addEventListener('input', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement)) return;
+            state.reportsFilter.search = target.value || '';
+            renderReportsTable();
+        });
+    }
+
+    if (dom.reportFilters.statusSelect) {
+        dom.reportFilters.statusSelect.addEventListener('change', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLSelectElement)) return;
+            state.reportsFilter.status = target.value || 'all';
+            renderReportsTable();
+        });
+    }
+
+    if (dom.reportFilters.clearBtn) {
+        dom.reportFilters.clearBtn.addEventListener('click', () => {
+            state.reportsFilter.search = '';
+            state.reportsFilter.status = 'all';
+
+            if (dom.reportFilters.searchInput) dom.reportFilters.searchInput.value = '';
+            if (dom.reportFilters.statusSelect) dom.reportFilters.statusSelect.value = 'all';
+
+            renderReportsTable();
         });
     }
 
@@ -1573,6 +1646,18 @@ function initPhishingDomainsManagement() {
             const target = event.target;
             if (!(target instanceof HTMLSelectElement)) return;
             state.phishingDomainsFilter.risk = target.value || 'all';
+            renderPhishingDomainsTable();
+        });
+    }
+
+    if (dom.phishingDomainFilters.clearBtn) {
+        dom.phishingDomainFilters.clearBtn.addEventListener('click', () => {
+            state.phishingDomainsFilter.status = 'all';
+            state.phishingDomainsFilter.risk = 'all';
+
+            if (dom.phishingDomainFilters.statusSelect) dom.phishingDomainFilters.statusSelect.value = 'all';
+            if (dom.phishingDomainFilters.riskSelect) dom.phishingDomainFilters.riskSelect.value = 'all';
+
             renderPhishingDomainsTable();
         });
     }
