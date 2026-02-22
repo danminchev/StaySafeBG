@@ -170,7 +170,8 @@ Recommended pages:
 1.  **Immutable History:**
     *   Once a migration file is created (`YYYYMMDDHHMMSS_name.sql`), it is **frozen**.
     *   Do not modify it to fix bugs or add columns.
-    *   Do not delete it.
+  *   Do not delete it.
+  *   Do not rename it.
 
 2.  **Changes = New Files:**
     *   Any change to the database (schema, RLS policies, functions, triggers) must go into a **new** migration file with a fresh timestamp.
@@ -183,8 +184,10 @@ Recommended pages:
     *   verify the change works.
 
 4.  **Drift Prevention:**
-    *   If the remote database has migrations that are not local, sync them down (rename local files to match remote timestamps if strictly necessary for tools, or likely just ensure the content logic is applied).
-    *   If you see a mismatch, **do not** change history. Add a new migration to bring the state in sync.
+  *   If the remote database has migrations that are not local, pull/sync those migrations as **new local files**.
+  *   If local has migrations not applied remotely, apply them in order.
+  *   If you see a mismatch, **do not** change history (no edit/delete/rename of existing migrations). Add a new reconciliation migration.
+  *   Local and remote migration history must match by version and name, but matching is achieved only via append-only migrations and applying missing ones.
 
 5.  **Why?**
     *   Editing old migrations breaks deployment consistency between environments (dev, staging, prod).
