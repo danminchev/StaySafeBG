@@ -22,11 +22,11 @@
                   <h2><i class="bi bi-shield-check me-2"></i>Провери съмнително съдържание</h2>
               </div>
               <div class="scam-check-body">
-                  <h5 class="mb-3">Поставете линк, телефонен номер или имейл за проверка</h5>
+                  <h5 class="mb-3">Поставете линк, фишинг домейн или зловреден ресурс за проверка</h5>
                   <p class="text-muted-light mb-4">Нашата система ще анализира въведените данни спрямо известни бази данни с измами.</p>
                   <form class="scam-check-form mb-4">
                        <div class="search-input-group input-group input-group-lg">
-                          <input id="scam-check-input" type="text" class="form-control" placeholder="напр. +359 888 123 456 или suspicious-site.com" aria-label="Данни за проверка">
+                          <input id="scam-check-input" type="text" class="form-control" placeholder="напр. fake-bank-login.com или http://112.240.73.244:51487/bin.sh" aria-label="Данни за проверка">
                           <button id="scam-check-submit" class="btn ss-search-btn" type="submit">
                               <i class="bi bi-search me-2"></i>Провери
                           </button>
@@ -40,7 +40,8 @@
           </div>
           
           <div class="recent-checks-section mt-5">
-              <h4 class="mb-4"><i class="bi bi-clock-history me-2"></i>Последни проверки</h4>
+              <a href="resources-bulletin.html" class="resources-hub-link mb-4 d-flex align-items-center justify-content-between gap-3" aria-label="Фишинг домейни и зловредни ресурси"><span class="d-flex align-items-center gap-2"><i class="bi bi-shield-exclamation"></i><span>Фишинг домейни / Зловредни ресурси</span></span><span class="resources-hub-link-arrow"><i class="bi bi-arrow-right"></i></span></a>
+              <h4 class="mb-4 recent-checks-title"><i class="bi bi-clock-history me-2"></i>Последни проверки</h4>
                <div id="recent-checks-list" class="recent-checks-list">
                   <div class="recent-check-item">
                       <span class="check-target"><i class="bi bi-hourglass-split"></i> Зареждане на проверки...</span>

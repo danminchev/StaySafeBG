@@ -360,7 +360,7 @@ export async function runScamCheck(rawInput) {
 
   const inputType = detectInputType(input);
   if (inputType === 'unknown') {
-    throw new Error('РќРµРІР°Р»РёРґРµРЅ С„РѕСЂРјР°С‚. Р’СЉРІРµРґРµС‚Рµ URL, С‚РµР»РµС„РѕРЅРµРЅ РЅРѕРјРµСЂ РёР»Рё РёРјРµР№Р».');
+    throw new Error('Невалиден формат. Въведете URL, домейн, имейл или зловреден ресурс.');
   }
 
   const databaseResultPromise = checkAgainstDatabase(input, inputType);
@@ -515,4 +515,3 @@ export async function getRecentApprovedScamChecks(limit = 5) {
   if (error) throw error;
   return data || [];
 }
-

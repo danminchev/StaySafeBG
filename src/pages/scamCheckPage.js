@@ -221,7 +221,7 @@ async function handleSubmit(event) {
 
 	const value = input?.value?.trim() || '';
 	if (!value) {
-		showToast('Въведете URL, телефон или имейл за проверка.', 'warning');
+		showToast('Въведете URL, домейн, имейл или зловреден ресурс за проверка.', 'warning');
 		return;
 	}
 

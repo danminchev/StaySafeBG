@@ -21,7 +21,6 @@ import {
     updateTrustedPhishingDomain
 } from '../services/trustedDomainsService.js';
 import {
-    checkAgainstMaliciousResources,
     createMaliciousResource,
     deleteMaliciousResource,
     getMaliciousResources,
