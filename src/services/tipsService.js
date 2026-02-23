@@ -11,7 +11,11 @@ export async function getPublishedArticles({ category, q, sort = 'newest', limit
 
   // Apply filters
   if (category) {
-    query = query.eq('category', category);
+    if (category === 'social' || category === 'social_media') {
+      query = query.in('category', ['social', 'social_media']);
+    } else {
+      query = query.eq('category', category);
+    }
   }
 
   if (q) {
