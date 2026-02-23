@@ -106,7 +106,7 @@ function renderHeaderHtml(currentUser) {
   const accountClass = 'btn ss-account-btn fw-semibold px-4 py-2 fs-5 border-2';
 
   const homeIsActive = activePage === 'index.html';
-  const checkIsActive = activePage === 'scam-check.html';
+  const checkIsActive = activePage === 'scam-check.html' || activePage === 'resources-bulletin.html';
   const reportIsActive = activePage === 'report-scam.html';
   const articlesIsActive = activePage === 'tips.html' || activePage === 'tips-details.html';
   const communityIsActive = activePage === 'community.html';

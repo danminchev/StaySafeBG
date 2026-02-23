@@ -1,3 +1,40 @@
+.rb-breadcrumb {
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  background: linear-gradient(135deg, #2a4667 0%, #344d6b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 22px rgba(3, 12, 32, 0.14);
+}
+
+.rb-breadcrumb .breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.rb-breadcrumb .breadcrumb-item,
+.rb-breadcrumb .breadcrumb-item.active {
+  color: #dbeafe;
+  font-weight: 500;
+}
+
+.rb-breadcrumb .breadcrumb-item a {
+  color: #6ee7d8;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.rb-breadcrumb .breadcrumb-item a:hover,
+.rb-breadcrumb .breadcrumb-item a:focus {
+  color: #99f6e4;
+  text-decoration: underline;
+}
+
+.rb-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+  color: rgba(219, 234, 254, 0.75);
+}
+
 .rb-hero {
   border-radius: 1.25rem;
   overflow: hidden;
@@ -18,10 +55,31 @@
   font-size: 1.65rem;
   font-weight: 800;
   color: #f8fbff;
+  display: inline-block;
+  position: relative;
+  padding-bottom: 0.55rem;
+}
+
+.rb-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f4b63f 0%, #ffd369 100%);
+  box-shadow: 0 0 12px rgba(244, 182, 63, 0.22);
 }
 
 .rb-subtitle {
   color: #cfe2f6;
+  transition: color 0.22s ease;
+}
+
+.rb-hero:hover .rb-subtitle,
+.rb-hero:focus-within .rb-subtitle {
+  color: #fde68a;
 }
 
 .rb-card {
@@ -59,6 +117,15 @@
 }
 
 @media (max-width: 768px) {
+  .rb-breadcrumb {
+    border-radius: 1rem;
+    padding: 0.75rem 0.9rem;
+  }
+
+  .rb-breadcrumb .breadcrumb {
+    font-size: 0.92rem;
+  }
+
   .rb-title {
     font-size: 1.3rem;
   }
