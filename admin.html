@@ -65,7 +65,10 @@
 
       <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
         <h2 class="mb-0">Управление на фишинг домейни</h2>
-        <button class="btn btn-outline-primary" id="btn-refresh-phishing-domains" type="button">Обнови списъка</button>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#addPhishingDomainModal">Добави домейн</button>
+          <button class="btn btn-outline-primary" id="btn-refresh-phishing-domains" type="button">Обнови списъка</button>
+        </div>
       </div>
       <div class="row g-3 mb-3">
         <div class="col-md-6">
@@ -93,31 +96,6 @@
           <button type="button" class="btn btn-outline-secondary" id="btn-clear-phishing-domain-filters">Изчисти филтрите</button>
         </div>
       </div>
-      <div class="card mb-3">
-        <div class="card-body">
-          <form id="add-phishing-domain-form" class="row g-3">
-            <div class="col-md-4">
-              <label for="phishing-domain-input" class="form-label">Домейн</label>
-              <input type="text" class="form-control" id="phishing-domain-input" placeholder="example-phish.tld" required>
-            </div>
-            <div class="col-md-3">
-              <label for="phishing-domain-source-input" class="form-label">Източник</label>
-              <input type="text" class="form-control" id="phishing-domain-source-input" value="manual">
-            </div>
-            <div class="col-md-2">
-              <label for="phishing-domain-confidence-input" class="form-label">Доверие</label>
-              <input type="number" class="form-control" id="phishing-domain-confidence-input" value="0.95" min="0" max="1" step="0.01">
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-              <button type="submit" class="btn btn-danger w-100" id="btn-add-phishing-domain">Добави домейн</button>
-            </div>
-            <div class="col-12">
-              <label for="phishing-domain-notes-input" class="form-label">Бележки</label>
-              <input type="text" class="form-control" id="phishing-domain-notes-input" placeholder="Незадължително">
-            </div>
-          </form>
-        </div>
-      </div>
       <div class="table-responsive">
         <table class="table table-striped table-hover align-middle" id="admin-phishing-domains-table">
           <thead>
@@ -137,6 +115,39 @@
             </tr>
           </tbody>
         </table>
+      </div>
+      <div class="modal fade" id="addPhishingDomainModal" tabindex="-1" aria-labelledby="addPhishingDomainModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addPhishingDomainModalLabel">Добавяне на фишинг домейн</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="add-phishing-domain-form" class="row g-3">
+                <div class="col-md-4">
+                  <label for="phishing-domain-input" class="form-label">Домейн</label>
+                  <input type="text" class="form-control" id="phishing-domain-input" placeholder="example-phish.tld" required>
+                </div>
+                <div class="col-md-3">
+                  <label for="phishing-domain-source-input" class="form-label">Източник</label>
+                  <input type="text" class="form-control" id="phishing-domain-source-input" value="manual">
+                </div>
+                <div class="col-md-2">
+                  <label for="phishing-domain-confidence-input" class="form-label">Доверие</label>
+                  <input type="number" class="form-control" id="phishing-domain-confidence-input" value="0.95" min="0" max="1" step="0.01">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                  <button type="submit" class="btn btn-danger w-100" id="btn-add-phishing-domain">Добави домейн</button>
+                </div>
+                <div class="col-12">
+                  <label for="phishing-domain-notes-input" class="form-label">Бележки</label>
+                  <input type="text" class="form-control" id="phishing-domain-notes-input" placeholder="Незадължително">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="d-flex justify-content-between align-items-center mt-5 mb-3">

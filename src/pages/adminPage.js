@@ -1629,6 +1629,11 @@ async function handleCreatePhishingDomain(event) {
         dom.phishingDomainForm?.reset();
         if (dom.phishingDomainFields.source) dom.phishingDomainFields.source.value = 'manual';
         if (dom.phishingDomainFields.confidence) dom.phishingDomainFields.confidence.value = '0.95';
+        const addPhishingDomainModalEl = document.getElementById('addPhishingDomainModal');
+        const addPhishingDomainModal = addPhishingDomainModalEl
+            ? window.bootstrap?.Modal?.getInstance?.(addPhishingDomainModalEl)
+            : null;
+        addPhishingDomainModal?.hide();
         await loadPhishingDomains();
     } catch (error) {
         console.error('Error creating phishing domain:', error);
