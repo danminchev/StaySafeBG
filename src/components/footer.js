@@ -48,7 +48,7 @@ export function renderFooter() {
 
         <div class="ss-footer-bottom mt-4 pt-3">
           <span>&copy; ${currentYear} StaySafeBG. Всички права запазени.</span>
-          <a href="#" class="ss-footer-policy">Политика за поверителност</a>
+          <a href="privacy-policy.html" class="ss-footer-policy">Политика за поверителност</a>
         </div>
       </div>
     </footer>
