@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="bg" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -61,92 +61,6 @@
                   </div>
               </div>
           </div>
-      </div>
-
-      <div id="admin-users-section">
-        <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
-          <h2 class="mb-0">Управление на потребители</h2>
-          <button class="btn btn-outline-primary" id="btn-refresh-users" type="button">Обнови списъка</button>
-        </div>
-        <div class="row g-3 mb-3">
-          <div class="col-md-8">
-            <label for="admin-users-search-input" class="form-label">Търсене на потребител</label>
-            <input type="text" class="form-control" id="admin-users-search-input" placeholder="Търси по име, имейл или роля">
-          </div>
-          <div class="col-md-4">
-            <label for="admin-users-role-filter" class="form-label">Филтър роля</label>
-            <select class="form-select" id="admin-users-role-filter">
-              <option value="all">Всички роли</option>
-              <option value="admin">Админ</option>
-              <option value="moderator">Модератор</option>
-              <option value="user">Потребител</option>
-            </select>
-          </div>
-          <div class="col-12 d-flex justify-content-end">
-            <button type="button" class="btn btn-outline-secondary" id="btn-clear-user-filters">Изчисти филтрите</button>
-          </div>
-        </div>
-        <div class="table-responsive">
-          <table class="table table-striped table-hover align-middle" id="admin-users-table">
-            <thead>
-              <tr>
-                <th scope="col">Име</th>
-                <th scope="col">Имейл</th>
-                <th scope="col">Роля</th>
-                <th scope="col">Създаден</th>
-                <th scope="col">Последен вход</th>
-                <th scope="col" class="text-end" style="padding-right: 170px;">Действия</th>
-              </tr>
-            </thead>
-            <tbody id="admin-users-body">
-              <tr>
-                <td colspan="6" class="text-center text-muted py-4">Зареждане на потребители...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
-        <h2 class="mb-0">Управление на доклади</h2>
-        <button class="btn btn-outline-primary" id="btn-refresh-reports" type="button">Обнови доклади</button>
-      </div>
-      <div class="row g-3 mb-3">
-        <div class="col-md-8">
-          <label for="admin-reports-search-input" class="form-label">Търсене на доклад</label>
-          <input type="text" class="form-control" id="admin-reports-search-input" placeholder="Търси по тип, обект, категория или статус">
-        </div>
-        <div class="col-md-4">
-          <label for="admin-reports-status-filter" class="form-label">Филтър статус</label>
-          <select class="form-select" id="admin-reports-status-filter">
-            <option value="all">Всички</option>
-            <option value="pending">Чакащи</option>
-            <option value="approved">Потвърдени</option>
-            <option value="rejected">Отхвърлени</option>
-          </select>
-        </div>
-        <div class="col-12 d-flex justify-content-end">
-          <button type="button" class="btn btn-outline-secondary" id="btn-clear-report-filters">Изчисти филтрите</button>
-        </div>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Дата</th>
-                    <th scope="col">Тип</th>
-                    <th scope="col">Докладван обект</th>
-                    <th scope="col">Статус</th>
-                    <th scope="col" class="text-end" style="padding-right: 170px;">Действия</th>
-                </tr>
-            </thead>
-                <tbody id="admin-reports-body">
-                  <tr>
-                    <td colspan="6" class="text-center text-muted py-4">Зареждане на доклади...</td>
-                  </tr>
-            </tbody>
-        </table>
       </div>
 
       <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
@@ -225,65 +139,6 @@
         </table>
       </div>
 
-      <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
-        <h2 class="mb-0">Управление на съвети</h2>
-        <button class="btn btn-outline-primary" id="btn-refresh-articles" type="button">Обнови списъка</button>
-      </div>
-      <div class="row g-3 mb-3">
-        <div class="col-md-6">
-          <label for="admin-articles-search-input" class="form-label">Търсене на съвет</label>
-          <input type="text" class="form-control" id="admin-articles-search-input" placeholder="Търси по заглавие или категория">
-        </div>
-        <div class="col-md-3">
-          <label for="admin-articles-status-filter" class="form-label">Филтър статус</label>
-          <select class="form-select" id="admin-articles-status-filter">
-            <option value="all">Всички</option>
-            <option value="published">Публикувани</option>
-            <option value="draft">Чернови</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label for="admin-articles-category-filter" class="form-label">Филтър категория</label>
-          <select class="form-select" id="admin-articles-category-filter">
-            <option value="all">Всички категории</option>
-            <option value="phishing">Фишинг</option>
-            <option value="shopping">Пазаруване</option>
-            <option value="online_shopping">Онлайн пазаруване</option>
-            <option value="investment">Инвестиции</option>
-            <option value="security">Сигурност</option>
-            <option value="identity_theft">Кражба на самоличност</option>
-            <option value="tech_support">Техническа поддръжка</option>
-            <option value="job_scams">Работа</option>
-            <option value="phone">Телефонна измама</option>
-            <option value="romance">Романтична измама</option>
-            <option value="social">Социални мрежи</option>
-            <option value="crypto">Крипто измама</option>
-            <option value="marketplace">Marketplace измама</option>
-            <option value="other">Друго</option>
-          </select>
-        </div>
-        <div class="col-12 d-flex justify-content-end">
-          <button type="button" class="btn btn-outline-secondary" id="btn-clear-article-filters">Изчисти филтрите</button>
-        </div>
-      </div>
-      <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle" id="admin-articles-table">
-          <thead>
-            <tr>
-              <th scope="col">Заглавие</th>
-              <th scope="col">Категория</th>
-              <th scope="col">Статус</th>
-              <th scope="col">Дата</th>
-              <th scope="col" class="text-end" style="padding-right: 170px;">Действия</th>
-            </tr>
-          </thead>
-          <tbody id="admin-articles-body">
-            <tr>
-              <td colspan="5" class="text-center text-muted py-4">Зареждане на съвети...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
       <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
         <h2 class="mb-0">Управление на зловредни ресурси</h2>
         <button class="btn btn-outline-primary" id="btn-refresh-malicious-resources" type="button">Обнови списъка</button>
@@ -394,7 +249,152 @@
           </tbody>
         </table>
       </div>
-  </main>
+  <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
+        <h2 class="mb-0">Управление на доклади</h2>
+        <button class="btn btn-outline-primary" id="btn-refresh-reports" type="button">Обнови доклади</button>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-8">
+          <label for="admin-reports-search-input" class="form-label">Търсене на доклад</label>
+          <input type="text" class="form-control" id="admin-reports-search-input" placeholder="Търси по тип, обект, категория или статус">
+        </div>
+        <div class="col-md-4">
+          <label for="admin-reports-status-filter" class="form-label">Филтър статус</label>
+          <select class="form-select" id="admin-reports-status-filter">
+            <option value="all">Всички</option>
+            <option value="pending">Чакащи</option>
+            <option value="approved">Потвърдени</option>
+            <option value="rejected">Отхвърлени</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+          <button type="button" class="btn btn-outline-secondary" id="btn-clear-report-filters">Изчисти филтрите</button>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Дата</th>
+                    <th scope="col">Тип</th>
+                    <th scope="col">Докладван обект</th>
+                    <th scope="col">Статус</th>
+                    <th scope="col" class="text-end" style="padding-right: 170px;">Действия</th>
+                </tr>
+            </thead>
+                <tbody id="admin-reports-body">
+                  <tr>
+                    <td colspan="6" class="text-center text-muted py-4">Зареждане на доклади...</td>
+                  </tr>
+            </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
+        <h2 class="mb-0">Управление на съвети</h2>
+        <button class="btn btn-outline-primary" id="btn-refresh-articles" type="button">Обнови списъка</button>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="admin-articles-search-input" class="form-label">Търсене на съвет</label>
+          <input type="text" class="form-control" id="admin-articles-search-input" placeholder="Търси по заглавие или категория">
+        </div>
+        <div class="col-md-3">
+          <label for="admin-articles-status-filter" class="form-label">Филтър статус</label>
+          <select class="form-select" id="admin-articles-status-filter">
+            <option value="all">Всички</option>
+            <option value="published">Публикувани</option>
+            <option value="draft">Чернови</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="admin-articles-category-filter" class="form-label">Филтър категория</label>
+          <select class="form-select" id="admin-articles-category-filter">
+            <option value="all">Всички категории</option>
+            <option value="phishing">Фишинг</option>
+            <option value="shopping">Пазаруване</option>
+            <option value="online_shopping">Онлайн пазаруване</option>
+            <option value="investment">Инвестиции</option>
+            <option value="security">Сигурност</option>
+            <option value="identity_theft">Кражба на самоличност</option>
+            <option value="tech_support">Техническа поддръжка</option>
+            <option value="job_scams">Работа</option>
+            <option value="phone">Телефонна измама</option>
+            <option value="romance">Романтична измама</option>
+            <option value="social">Социални мрежи</option>
+            <option value="crypto">Крипто измама</option>
+            <option value="marketplace">Marketplace измама</option>
+            <option value="other">Друго</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+          <button type="button" class="btn btn-outline-secondary" id="btn-clear-article-filters">Изчисти филтрите</button>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle" id="admin-articles-table">
+          <thead>
+            <tr>
+              <th scope="col">Заглавие</th>
+              <th scope="col">Категория</th>
+              <th scope="col">Статус</th>
+              <th scope="col">Дата</th>
+              <th scope="col" class="text-end" style="padding-right: 170px;">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="admin-articles-body">
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4">Зареждане на съвети...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="admin-users-section">
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
+          <h2 class="mb-0">Управление на потребители</h2>
+          <button class="btn btn-outline-primary" id="btn-refresh-users" type="button">Обнови списъка</button>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-md-8">
+            <label for="admin-users-search-input" class="form-label">Търсене на потребител</label>
+            <input type="text" class="form-control" id="admin-users-search-input" placeholder="Търси по име, имейл или роля">
+          </div>
+          <div class="col-md-4">
+            <label for="admin-users-role-filter" class="form-label">Филтър роля</label>
+            <select class="form-select" id="admin-users-role-filter">
+              <option value="all">Всички роли</option>
+              <option value="admin">Админ</option>
+              <option value="moderator">Модератор</option>
+              <option value="user">Потребител</option>
+            </select>
+          </div>
+          <div class="col-12 d-flex justify-content-end">
+            <button type="button" class="btn btn-outline-secondary" id="btn-clear-user-filters">Изчисти филтрите</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle" id="admin-users-table">
+            <thead>
+              <tr>
+                <th scope="col">Име</th>
+                <th scope="col">Имейл</th>
+                <th scope="col">Роля</th>
+                <th scope="col">Създаден</th>
+                <th scope="col">Последен вход</th>
+                <th scope="col" class="text-end" style="padding-right: 170px;">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-body">
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4">Зареждане на потребители...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      </main>
 
   <!-- Create Article Modal -->
   <div class="modal fade" id="createArticleModal" tabindex="-1" aria-labelledby="createArticleModalLabel" aria-hidden="true">
@@ -856,3 +856,4 @@
   <script type="module" src="./src/pages/adminPage.js"></script>
 </body>
 </html>
+
