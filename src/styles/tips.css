@@ -282,6 +282,51 @@
   outline-offset: 4px;
 }
 
+.article-featured-wrapper {
+  width: 100% !important;
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+}
+
+.article-card.article-card-featured {
+  background:
+    radial-gradient(circle at 8% 10%, rgba(244, 182, 63, 0.06), transparent 42%),
+    rgba(71, 85, 105, 0.88);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 14px 24px rgba(3, 12, 32, 0.16),
+    0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.article-card.article-card-featured::before {
+  width: 5px;
+  opacity: 0.95;
+}
+
+.article-card.article-card-featured .card-body {
+  padding: 1.4rem 1.5rem;
+}
+
+.article-card.article-card-featured .article-title {
+  font-size: 1.55rem;
+  line-height: 1.28;
+  margin-bottom: 0.9rem;
+}
+
+.article-card.article-card-featured .article-excerpt {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #f1f7ff;
+  text-wrap: balance;
+}
+
+.article-card.article-card-featured .article-excerpt.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Category Specific Styles (Accent & Badge) */
 /* Default */
 .category-badge { 
@@ -599,5 +644,20 @@
   }
   .form-select.custom-select {
       height: 2.5rem;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .article-card.article-card-featured .card-body {
+    padding: 1.25rem 1.25rem;
+  }
+
+  .article-card.article-card-featured .article-title {
+    font-size: 1.28rem;
+    line-height: 1.32;
+  }
+
+  .article-card.article-card-featured .article-excerpt {
+    font-size: 0.95rem;
   }
 }

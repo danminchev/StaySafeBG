@@ -18,6 +18,8 @@ const state = {
 	loadedCount: 0
 };
 
+const FEATURED_ARTICLE_TITLE = 'Най-честите онлайн измами в България и как да се пазим (кратко ръководство)';
+
 // --- DOM Elements ---
 const dom = {
 	container: document.getElementById('articles-container'),
@@ -59,6 +61,18 @@ function formatDate(dateValue) {
 		month: 'short',
 		year: 'numeric'
 	}).format(date);
+}
+
+function normalizeTitle(value) {
+	return String(value || '')
+		.normalize('NFC')
+		.replace(/\s+/g, ' ')
+		.trim()
+		.toLowerCase();
+}
+
+function isFeaturedArticle(article) {
+	return normalizeTitle(article?.title) === normalizeTitle(FEATURED_ARTICLE_TITLE);
 }
 
 function getCategoryName(cat) {
@@ -137,11 +151,19 @@ function renderError(message) {
 
 function createCard(article) {
 	const clone = dom.templates.article.content.cloneNode(true);
+	const wrapper = clone.querySelector('.col');
+	const featured = isFeaturedArticle(article);
 	
 	// Apply category class and data attribute to the card root
 	const card = clone.querySelector('.article-card');
 	if(card) {
 		card.dataset.category = article.category || 'default';
+		if (featured) {
+			card.classList.add('article-card-featured');
+		}
+	}
+	if (wrapper && featured) {
+		wrapper.classList.add('article-featured-wrapper');
 	}
 	
 	const link = clone.querySelector('.article-link-overlay');
@@ -164,13 +186,37 @@ function createCard(article) {
 	if(text) {
 		const rawText = article.content || '';
         // Basic strip html logic if needed, or rely on textContent
-		text.textContent = rawText.slice(0, 150) + (rawText.length > 150 ? '...' : '');
+		const excerptLimit = featured ? 260 : 150;
+		text.textContent = rawText.slice(0, excerptLimit) + (rawText.length > excerptLimit ? '...' : '');
 	}
 	
 	const dateSpan = clone.querySelector('.date-text');
 	if(dateSpan) dateSpan.textContent = formatDate(article.created_at);
 	
 	return clone;
+}
+
+function getArticlesWithFeaturedFirst(items = []) {
+	const list = Array.isArray(items) ? [...items] : [];
+	const featuredIndex = list.findIndex(isFeaturedArticle);
+	if (featuredIndex <= 0) return list;
+	const [featured] = list.splice(featuredIndex, 1);
+	list.unshift(featured);
+	return list;
+}
+
+function renderArticlesList() {
+	if (!dom.container) return;
+	dom.container.innerHTML = '';
+
+	const orderedArticles = getArticlesWithFeaturedFirst(state.articles);
+	if (!orderedArticles.length) return;
+
+	const fragment = document.createDocumentFragment();
+	orderedArticles.forEach((article) => {
+		fragment.appendChild(createCard(article));
+	});
+	dom.container.appendChild(fragment);
 }
 
 // --- Data Fetching ---
@@ -220,11 +266,7 @@ async function fetchArticles(isAppend = false) {
                  return;
             }
 
-			const fragment = document.createDocumentFragment();
-			articles.forEach(article => {
-				fragment.appendChild(createCard(article));
-			});
-			dom.container.appendChild(fragment);
+			renderArticlesList();
 		}
 		
 		state.loadedCount = isAppend ? state.loadedCount + articles.length : articles.length;
