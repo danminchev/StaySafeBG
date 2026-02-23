@@ -65,9 +65,31 @@
 
       <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
         <h2 class="mb-0">Управление на фишинг домейни</h2>
-        <div class="d-flex align-items-center gap-2">
-          <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#addPhishingDomainModal">Добави домейн</button>
-          <button class="btn btn-outline-primary" id="btn-refresh-phishing-domains" type="button">Обнови списъка</button>
+        <button class="btn btn-outline-primary" id="btn-refresh-phishing-domains" type="button">Обнови списъка</button>
+      </div>
+      <div class="card mb-3">
+        <div class="card-body">
+          <form id="add-phishing-domain-form" class="row g-3">
+            <div class="col-md-4">
+              <label for="phishing-domain-input" class="form-label">Домейн</label>
+              <input type="text" class="form-control" id="phishing-domain-input" placeholder="example-phish.tld" required>
+            </div>
+            <div class="col-md-3">
+              <label for="phishing-domain-source-input" class="form-label">Източник</label>
+              <input type="text" class="form-control" id="phishing-domain-source-input" value="manual">
+            </div>
+            <div class="col-md-2">
+              <label for="phishing-domain-confidence-input" class="form-label">Доверие</label>
+              <input type="number" class="form-control" id="phishing-domain-confidence-input" value="0.95" min="0" max="1" step="0.01">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="submit" class="btn btn-danger w-100" id="btn-add-phishing-domain">Добави домейн</button>
+            </div>
+            <div class="col-12">
+              <label for="phishing-domain-notes-input" class="form-label">Бележки</label>
+              <input type="text" class="form-control" id="phishing-domain-notes-input" placeholder="Незадължително">
+            </div>
+          </form>
         </div>
       </div>
       <div class="row g-3 mb-3">
@@ -116,73 +138,10 @@
           </tbody>
         </table>
       </div>
-      <div class="modal fade" id="addPhishingDomainModal" tabindex="-1" aria-labelledby="addPhishingDomainModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="addPhishingDomainModalLabel">Добавяне на фишинг домейн</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form id="add-phishing-domain-form" class="row g-3">
-                <div class="col-md-4">
-                  <label for="phishing-domain-input" class="form-label">Домейн</label>
-                  <input type="text" class="form-control" id="phishing-domain-input" placeholder="example-phish.tld" required>
-                </div>
-                <div class="col-md-3">
-                  <label for="phishing-domain-source-input" class="form-label">Източник</label>
-                  <input type="text" class="form-control" id="phishing-domain-source-input" value="manual">
-                </div>
-                <div class="col-md-2">
-                  <label for="phishing-domain-confidence-input" class="form-label">Доверие</label>
-                  <input type="number" class="form-control" id="phishing-domain-confidence-input" value="0.95" min="0" max="1" step="0.01">
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                  <button type="submit" class="btn btn-danger w-100" id="btn-add-phishing-domain">Добави домейн</button>
-                </div>
-                <div class="col-12">
-                  <label for="phishing-domain-notes-input" class="form-label">Бележки</label>
-                  <input type="text" class="form-control" id="phishing-domain-notes-input" placeholder="Незадължително">
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
         <h2 class="mb-0">Управление на зловредни ресурси</h2>
         <button class="btn btn-outline-primary" id="btn-refresh-malicious-resources" type="button">Обнови списъка</button>
-      </div>
-      <div class="row g-3 mb-3">
-        <div class="col-md-6">
-          <label for="malicious-resource-search-input" class="form-label">Търсене</label>
-          <input type="text" class="form-control" id="malicious-resource-search-input" placeholder="Търси по ресурс, заплаха или източник">
-        </div>
-        <div class="col-md-3">
-          <label for="malicious-resource-type-filter" class="form-label">Филтър тип</label>
-          <select class="form-select" id="malicious-resource-type-filter">
-            <option value="all">Всички</option>
-            <option value="url">URL</option>
-            <option value="domain">Домейн</option>
-            <option value="ip">IP</option>
-            <option value="hash">Hash</option>
-            <option value="file">Файл</option>
-            <option value="other">Друго</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label for="malicious-resource-status-filter" class="form-label">Филтър статус</label>
-          <select class="form-select" id="malicious-resource-status-filter">
-            <option value="all">Всички</option>
-            <option value="online">Онлайн</option>
-            <option value="offline">Офлайн</option>
-            <option value="unknown">Неизвестен</option>
-          </select>
-        </div>
-        <div class="col-12 d-flex justify-content-end">
-          <button type="button" class="btn btn-outline-secondary" id="btn-clear-malicious-resource-filters">Изчисти филтрите</button>
-        </div>
       </div>
       <div class="card mb-3">
         <div class="card-body">
@@ -238,6 +197,36 @@
               <input type="text" class="form-control" id="malicious-resource-notes-input" placeholder="Незадължително">
             </div>
           </form>
+        </div>
+      </div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label for="malicious-resource-search-input" class="form-label">Търсене</label>
+          <input type="text" class="form-control" id="malicious-resource-search-input" placeholder="Търси по ресурс, заплаха или източник">
+        </div>
+        <div class="col-md-3">
+          <label for="malicious-resource-type-filter" class="form-label">Филтър тип</label>
+          <select class="form-select" id="malicious-resource-type-filter">
+            <option value="all">Всички</option>
+            <option value="url">URL</option>
+            <option value="domain">Домейн</option>
+            <option value="ip">IP</option>
+            <option value="hash">Hash</option>
+            <option value="file">Файл</option>
+            <option value="other">Друго</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="malicious-resource-status-filter" class="form-label">Филтър статус</label>
+          <select class="form-select" id="malicious-resource-status-filter">
+            <option value="all">Всички</option>
+            <option value="online">Онлайн</option>
+            <option value="offline">Офлайн</option>
+            <option value="unknown">Неизвестен</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+          <button type="button" class="btn btn-outline-secondary" id="btn-clear-malicious-resource-filters">Изчисти филтрите</button>
         </div>
       </div>
       <div class="table-responsive">
