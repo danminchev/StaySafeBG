@@ -31,26 +31,45 @@
         .hero-title-interactive::after {
           content: "";
           position: absolute;
-          left: 0;
+          left: 50%;
           bottom: 0;
-          width: 100%;
+          width: min(calc(100% + 10rem), 92vw);
           height: 3px;
           border-radius: 999px;
           background-color: #c9a45a;
-            transform: scaleX(1);
-          transform-origin: left center;
+          transform: translateX(-50%) scaleX(1);
+          transform-origin: center center;
             transition: box-shadow 0.28s ease;
         }
         .hero-title-interactive:hover::after,
         .hero-title-interactive:focus-visible::after {
           box-shadow: 0 0 10px rgba(201, 164, 90, 0.55);
         }
-        .hero-subtitle {
+        .hero-subtitle-wrap {
           transition: color 0.28s ease;
         }
-        .hero-title-interactive:hover + .hero-subtitle,
-        .hero-title-interactive:focus-visible + .hero-subtitle {
+        .hero-subtitle {
+          transition: color 0.28s ease;
+          margin-bottom: 0;
+        }
+        .hero-subtitle-line-main {
+          white-space: nowrap;
+        }
+        .hero-subtitle-line-secondary {
+          margin-top: 0.25rem;
+          font-weight: 600;
+        }
+        .hero-title-interactive:hover + .hero-subtitle-wrap .hero-subtitle,
+        .hero-title-interactive:focus-visible + .hero-subtitle-wrap .hero-subtitle {
           color: #c9a45a !important;
+        }
+        @media (max-width: 992px) {
+          .hero-subtitle-line-main {
+            white-space: normal;
+          }
+          .hero-title-interactive::after {
+            width: min(calc(100% + 3.5rem), 94vw);
+          }
         }
         .hero-brand {
           color: #c4e6f8;
@@ -195,7 +214,10 @@
     <div class="p-5 mb-5 hero-section rounded-4 shadow-sm text-center position-relative overflow-hidden fade-in">
       <div class="container-fluid py-4 position-relative z-1">
         <h1 class="display-4 fw-bold text-heading mb-3 hero-title-interactive">Добре дошли в <span class="hero-brand">StaySafe</span><span class="hero-brand-bg">BG</span></h1>
-        <p class="col-md-8 mx-auto fs-5 text-muted mb-4 hero-subtitle">Вашият надежден помощник за онлайн безопасност и превенция на измами в България. Бъдете информирани и защитени.</p>
+        <div class="col-md-10 mx-auto mb-4 hero-subtitle-wrap">
+          <p class="fs-5 text-muted hero-subtitle hero-subtitle-line-main">Вашият надежден помощник за онлайн безопасност и превенция на измами в България.</p>
+          <p class="fs-5 text-muted hero-subtitle hero-subtitle-line-secondary">Бъдете информирани и защитени.</p>
+        </div>
         <div class="d-flex justify-content-center gap-3 flex-wrap">
           <a class="btn hero-btn-primary btn-lg px-4 rounded-pill shadow-sm" href="scam-check.html">
                 <i class="bi bi-shield-check me-2"></i>Провери за измама
