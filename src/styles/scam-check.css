@@ -238,15 +238,13 @@
     gap: 1rem;
     flex-wrap: nowrap;
     text-decoration: none;
-    background:
-        radial-gradient(circle at 8% 18%, rgba(244, 182, 63, 0.16), transparent 42%),
-        linear-gradient(135deg, #1b2940 0%, #0f172a 100%);
+    background: linear-gradient(135deg, #1b2940 0%, #0f172a 100%);
     color: #f8fafc;
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 1rem;
     padding: 1rem 1.1rem;
     box-shadow: 0 12px 26px rgba(3, 12, 32, 0.18);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     overflow: hidden;
     text-decoration: none !important;
 }
@@ -254,7 +252,6 @@
 .resources-hub-link:hover,
 .resources-hub-link:focus {
     color: #f8fafc;
-    transform: translateY(-2px);
     box-shadow: 0 14px 28px rgba(3, 12, 32, 0.25);
     border-color: rgba(244, 182, 63, 0.45);
     text-decoration: none !important;
@@ -304,6 +301,8 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
+    text-shadow: none;
+    -webkit-font-smoothing: antialiased;
 }
 
 .resources-hub-link-title {
@@ -316,6 +315,8 @@
     position: relative;
     padding-bottom: 0.55rem;
     width: fit-content;
+    text-shadow: none;
+    -webkit-font-smoothing: antialiased;
 }
 
 .resources-hub-link-title::after {
@@ -327,7 +328,7 @@
     height: 3px;
     border-radius: 999px;
     background: linear-gradient(90deg, #f4b63f 0%, #ffd369 100%);
-    box-shadow: 0 0 0 1px rgba(244, 182, 63, 0.15);
+    box-shadow: none;
     opacity: 1;
     transform: scaleX(1);
     transform-origin: left center;
@@ -342,6 +343,8 @@
     max-width: 58ch;
     white-space: normal;
     transition: color 0.22s ease;
+    text-shadow: none;
+    -webkit-font-smoothing: antialiased;
 }
 
 .resources-hub-link-cta {
@@ -361,6 +364,8 @@
     font-weight: 700;
     letter-spacing: 0.01em;
     transition: color 0.22s ease;
+    text-shadow: none;
+    -webkit-font-smoothing: antialiased;
 }
 
 .resources-hub-link-arrow {
@@ -381,7 +386,7 @@
 .resources-hub-link:hover .resources-hub-link-title::after,
 .resources-hub-link:focus .resources-hub-link-title::after,
 .resources-hub-link:focus-visible .resources-hub-link-title::after {
-    box-shadow: 0 0 12px rgba(244, 182, 63, 0.28);
+    box-shadow: none;
 }
 
 .resources-hub-link:hover .resources-hub-link-description,
