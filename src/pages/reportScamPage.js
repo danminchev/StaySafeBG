@@ -26,6 +26,7 @@ function renderReportAuthNotice(form) {
 
 	const modalBody = form.closest('.modal-body') || form.parentElement;
 	const modalTitle = form.closest('.modal-content')?.querySelector('.modal-title');
+	const modalHeader = form.closest('.modal-content')?.querySelector('.modal-header');
 	if (!modalBody) return;
 
 	let notice = document.getElementById('report-auth-required-message');
@@ -40,7 +41,7 @@ function renderReportAuthNotice(form) {
 					<i class="bi bi-shield-lock-fill"></i>
 				</div>
 				<div class="ss-report-auth-gate__kicker">Защитено подаване на доклади</div>
-				<h3 class="ss-report-auth-gate__title">Вход или регистрация са необходими, за да подадете доклад</h3>
+				<h3 class="ss-report-auth-gate__title">За да подадете доклад, влезте в профила си или се регистрирайте.</h3>
 				<p class="ss-report-auth-gate__text">
 					За по-голяма проследяемост, сигурност и защита от злоупотреби приемаме доклади само от регистрирани потребители.
 					Ако вече имате профил, влезте. Ако сте нов потребител, създайте акаунт и продължете с подаването.
@@ -57,7 +58,9 @@ function renderReportAuthNotice(form) {
 		modalBody.append(notice);
 	}
 
-	if (modalTitle) {
+	if (modalHeader) {
+		modalHeader.classList.add('d-none');
+	} else if (modalTitle) {
 		modalTitle.textContent = 'Достъп до форма за доклад';
 	}
 
@@ -71,6 +74,10 @@ function clearReportAuthNotice() {
 	}
 
 	const modalTitle = document.querySelector('.ss-report-popup .modal-title');
+	const modalHeader = document.querySelector('.ss-report-popup .modal-header');
+	if (modalHeader) {
+		modalHeader.classList.remove('d-none');
+	}
 	if (modalTitle) {
 		modalTitle.textContent = 'Форма за доклад';
 	}
