@@ -15,7 +15,7 @@ export function renderFooter() {
         </div>
 
         <div class="row g-4 g-lg-5 align-items-start mt-1">
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-4 ss-footer-col-contact">
             <div class="ss-footer-block">
               <h6 class="ss-footer-title">Контакт</h6>
               <ul class="ss-footer-meta list-unstyled mb-0">
@@ -26,13 +26,13 @@ export function renderFooter() {
             </div>
           </div>
 
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-4 ss-footer-col-about">
             <div class="ss-footer-center">
               <p class="ss-footer-desc mb-0">Надеждна платформа за превенция на онлайн измами и дигитална безопасност.</p>
             </div>
           </div>
 
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-4 ss-footer-col-nav">
             <div class="ss-footer-block ss-footer-nav-wrap">
               <h6 class="ss-footer-title">Навигация</h6>
               <ul class="ss-footer-links list-unstyled mb-0">

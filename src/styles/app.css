@@ -656,6 +656,18 @@ main {
   .ss-footer-nav-wrap {
     text-align: left;
   }
+
+  .ss-footer-col-about {
+    order: 1;
+  }
+
+  .ss-footer-col-contact {
+    order: 3;
+  }
+
+  .ss-footer-col-nav {
+    order: 2;
+  }
 }
 
 @media (max-width: 1023.98px) {
