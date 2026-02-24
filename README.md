@@ -1,67 +1,72 @@
 # StaySafeBG
 
-StaySafeBG е уеб приложение за превенция на онлайн измами. Потребителите могат да проверяват съмнителни линкове/домейни/имейли, да подават сигнали за измами с доказателства и да четат обучителни материали (tips). Платформата използва Supabase за автентикация, база данни, Storage и Edge Functions.
+StaySafeBG is a web application for online scam prevention. Users can check suspicious URLs/domains/emails, submit scam reports with evidence files, and read educational safety content (tips). The platform uses Supabase for authentication, database, storage, and edge functions.
 
-## 1) Project description
+## 1) Project Description
 
-### Основни функции
-- Проверка за измама (`scam-check`) чрез комбиниране на:
-   - локални данни (одобрени сигнали),
-   - списъци с познати phishing домейни,
-   - списък със зловредни ресурси,
-   - външни източници през Edge Function (`threat-check`).
-- Подаване на сигнал за измама (`report-scam`) с прикачени файлове.
-- Публични и административни обучителни статии (`tips`).
-- Community секция с одобрени сигнали.
+### Core Features
+- Scam check (`scam-check`) by combining:
+   - local approved scam reports,
+   - trusted phishing domain intelligence,
+   - malicious resources list,
+   - external threat sources via Edge Function (`threat-check`).
+- Scam report submission (`report-scam`) with optional evidence attachments.
+- Public and admin-managed educational content (`tips`).
+- Community feed of approved scam reports.
 
-### Роли и достъп (кой какво може)
-- **Анонимен потребител**:
-   - достъп до публично съдържание (публикувани tips, approved сигнали, активни публични threat записи по RLS);
-   - проверка в `scam-check`.
-- **Регистриран потребител (`user`)**:
-   - всички права на анонимен;
-   - създаване на собствени сигнали (статус `pending`);
-   - достъп до собствените си сигнали и файлове.
-- **Модератор (`moderator`)**:
-   - управление на сигнали (преглед/редакция/статус);
-   - управление на tips;
-   - управление на `trusted_phishing_domains` и `malicious_resources`.
-- **Админ (`admin`)**:
-   - всички права на модератор;
-   - управление на потребители и роли (RPC функции).
+### Roles and Permissions
+- **Anonymous user**
+   - Can browse public content (published tips, approved reports).
+   - Can use scam check.
+- **Authenticated user (`user`)**
+   - All anonymous permissions.
+   - Can create own reports (`pending`).
+   - Can access own reports and own evidence files.
+- **Moderator (`moderator`)**
+   - Can review/manage reports and report status.
+   - Can manage tips content.
+   - Can manage `trusted_phishing_domains` and `malicious_resources`.
+- **Admin (`admin`)**
+   - All moderator permissions.
+   - Can manage users and roles via RPCs.
 
 ## 2) Architecture
 
-### Front-end
-- Multi-page приложение с **Vite + Vanilla JavaScript + Bootstrap**.
-- HTML entry points: `index.html`, `login.html`, `register.html`, `tips.html`, `tips-details.html`, `article-details.html`, `scam-check.html`, `report-scam.html`, `community.html`, `admin.html`.
-- Page modules в `src/pages/` и преизползваеми компоненти в `src/components/`.
+### Front-End
+- Multi-page app built with **Vite + Vanilla JavaScript + Bootstrap**.
+- HTML entry points:
+   - `index.html`, `login.html`, `register.html`, `tips.html`, `tips-details.html`, `article-details.html`, `scam-check.html`, `report-scam.html`, `community.html`, `admin.html`.
+- Page logic in `src/pages/`, shared UI in `src/components/`.
 
-### Back-end (BaaS)
-- **Supabase Auth**: регистрация, логин, сесии.
-- **Supabase Postgres**: бизнес таблици + RLS политики + RPC функции.
-- **Supabase Storage**: bucket `evidence` за файлове към сигнали.
-- **Supabase Edge Function**: `supabase/functions/threat-check/index.ts` за агрегирана външна проверка.
+### Back-End (Supabase)
+- **Auth**: sign up, sign in, session handling.
+- **Postgres**: business tables, RLS policies, RPC functions.
+- **Storage**: `evidence` bucket for report files.
+- **Edge Function**: `supabase/functions/threat-check/index.ts` for aggregated threat checks and scoring.
 
-### Технологии
+### Technologies
 - Front-end: `vite`, `bootstrap`, `@supabase/supabase-js`
 - Back-end: Supabase (Postgres, Auth, Storage, Edge Functions)
-- SQL миграции: `supabase/migrations/*.sql`
+- Database migrations: `supabase/migrations/*.sql`
 
-## 3) Database schema design
+## 3) Database Schema Design
 
-Основни таблици и връзки:
+### ER Diagram
 
 ```mermaid
 erDiagram
    AUTH_USERS {
       uuid id PK
+      text email
+      timestamptz created_at
    }
 
    PROFILES {
       uuid id PK, FK
       text email
       text full_name
+      text avatar_url
+      timestamptz updated_at
       timestamptz created_at
    }
 
@@ -76,6 +81,7 @@ erDiagram
       text title
       text content
       text category
+      text[] tags
       uuid author_id FK
       boolean is_published
       timestamptz created_at
@@ -86,6 +92,10 @@ erDiagram
       text title
       text description
       text category
+      text scam_type
+      text url
+      text phone
+      text iban
       text status
       uuid created_by FK
       timestamptz created_at
@@ -102,10 +112,13 @@ erDiagram
    TRUSTED_PHISHING_DOMAINS {
       uuid id PK
       text domain UNIQUE
+      text source
       numeric confidence
       text risk_level
       boolean is_active
       uuid created_by FK
+      timestamptz first_seen_at
+      timestamptz last_seen_at
       timestamptz updated_at
    }
 
@@ -114,74 +127,128 @@ erDiagram
       text resource_value
       text normalized_value
       text resource_type
+      text threat_name
+      text source
+      numeric confidence
       text risk_level
       text status
       boolean is_active
       uuid created_by FK
+      timestamptz first_seen_at
+      timestamptz last_seen_at
       timestamptz updated_at
    }
 
    AUTH_USERS ||--|| PROFILES : has
-   AUTH_USERS ||--|| USER_ROLES : has
+   AUTH_USERS ||--|| USER_ROLES : assigned
    AUTH_USERS ||--o{ TIPS : authors
-   AUTH_USERS ||--o{ SCAM_REPORTS : creates
+   AUTH_USERS ||--o{ SCAM_REPORTS : submits
    SCAM_REPORTS ||--o{ REPORT_FILES : contains
    AUTH_USERS ||--o{ TRUSTED_PHISHING_DOMAINS : creates
    AUTH_USERS ||--o{ MALICIOUS_RESOURCES : creates
 ```
 
-> Забележка: в migration history таблицата за статии е преименувана от `articles` -> `news` -> `tips`.
+### Database Schema Details
 
-## 4) Local development setup guide
+#### `public.user_roles`
+- PK: `user_id` -> `auth.users(id)`
+- Purpose: authorization role per user
+- Constraint: `role IN ('user', 'admin', 'moderator')`
+
+#### `public.profiles`
+- PK/FK: `id` -> `auth.users(id)`
+- Purpose: public user profile data
+
+#### `public.tips` *(renamed over time: `articles` -> `news` -> `tips`)*
+- PK: `id`
+- FK: `author_id` -> `auth.users(id)` (`ON DELETE SET NULL`)
+- Purpose: educational content
+
+#### `public.scam_reports`
+- PK: `id`
+- FK: `created_by` -> `auth.users(id)` (`ON DELETE CASCADE`)
+- Key fields: `category`, `scam_type`, `url`, `phone`, `iban`, `status`
+- Status check: `status IN ('pending', 'approved', 'rejected')`
+
+#### `public.report_files`
+- PK: `id`
+- FK: `report_id` -> `public.scam_reports(id)` (`ON DELETE CASCADE`)
+- Purpose: metadata for evidence files stored in Supabase Storage
+
+#### `public.trusted_phishing_domains`
+- PK: `id`
+- Unique: `domain`
+- FK: `created_by` -> `auth.users(id)` (`ON DELETE SET NULL`)
+- Key fields: `confidence`, `risk_level`, `is_active`
+- Risk check: `risk_level IN ('low', 'medium', 'high')`
+
+#### `public.malicious_resources`
+- PK: `id`
+- Unique composite: `(resource_type, normalized_value)`
+- FK: `created_by` -> `auth.users(id)` (`ON DELETE SET NULL`)
+- Key fields: `resource_type`, `status`, `confidence`, `risk_level`, `is_active`
+- Checks:
+   - `resource_type IN ('url', 'domain', 'ip', 'hash', 'file', 'other')`
+   - `status IN ('online', 'offline', 'unknown')`
+   - `risk_level IN ('low', 'medium', 'high')`
+
+### Security Model (RLS)
+- RLS is enabled on core business tables.
+- Anonymous users read only public/approved/active data.
+- Authenticated users can manage own records where policies allow.
+- Moderators/admins have expanded access through policy checks and helper functions (`is_admin`, `is_moderator`, `can_moderate_reports`, `can_manage_news`).
+
+## 4) Local Development Setup Guide
 
 ### 1. Prerequisites
-- Node.js 18+ и npm
-- Supabase проект (за реални данни/автентикация)
+- Node.js 18+
+- npm
+- A Supabase project
 
-### 2. Инсталация
+### 2. Install dependencies
 ```bash
 npm install
 ```
 
-### 3. Environment variables
-Копирай `.env.example` в `.env` и попълни:
+### 3. Configure environment variables
+Copy `.env.example` to `.env` and set:
 
 ```env
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_ANON_KEY=...
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-### 4. Стартиране
+### 4. Run locally
 ```bash
 npm run dev
 ```
 
-### 5. Build / Preview
+### 5. Build and preview
 ```bash
 npm run build
 npm run preview
 ```
 
-### 6. (Optional, recommended) Edge Function `threat-check`
-За най-добър резултат от `scam-check`, деплойни Edge Function-а:
-- код: `supabase/functions/threat-check/index.ts`
-- optional secrets:
+### 6. Optional: deploy `threat-check` Edge Function
+For best scam-check coverage, deploy:
+- Function file: `supabase/functions/threat-check/index.ts`
+- Optional function secrets:
    - `GOOGLE_SAFE_BROWSING_API_KEY`
    - `VIRUSTOTAL_API_KEY`
 
-Ако функцията не е налична, фронтендът използва fallback проверка.
+If the edge function is unavailable, the front-end falls back to a basic direct external check.
 
-## 5) Key folders and files
+## 5) Key Folders and Files
 
 ### Root
-- `index.html`, `login.html`, `register.html`, `tips.html`, `tips-details.html`, `article-details.html`, `scam-check.html`, `report-scam.html`, `community.html`, `admin.html` — отделни входни точки за страниците.
-- `vite.config.js` — multi-page build конфигурация за Vite.
-- `package.json` — зависимости и скриптове.
+- `index.html`, `login.html`, `register.html`, `tips.html`, `tips-details.html`, `article-details.html`, `scam-check.html`, `report-scam.html`, `community.html`, `admin.html` - page entry points.
+- `vite.config.js` - multi-page Vite build configuration.
+- `package.json` - scripts and dependencies.
 
 ### `src/`
-- `src/pages/` — page-level логика по страници.
-- `src/components/` — преизползваеми UI части (`header.js`, `footer.js`).
-- `src/services/` — слой за достъп до Supabase и бизнес операции:
+- `src/pages/` - page-level UI logic.
+- `src/components/` - reusable UI pieces (`header.js`, `footer.js`).
+- `src/services/` - data/auth/business layer:
    - `authService.js`, `rolesService.js`
    - `reportsService.js`, `storageService.js`
    - `tipsService.js`
@@ -189,15 +256,15 @@ npm run preview
    - `scamCheckService.js`
    - `adminUsersService.js`
    - `supabaseClient.js`
-- `src/styles/` — стилове по страници + общи theme/main стилове.
-- `src/utils/notifications.js` — helper за нотификации.
+- `src/styles/` - page and global styles.
+- `src/utils/notifications.js` - notification helpers.
 
 ### `supabase/`
-- `supabase/migrations/` — SQL миграции (append-only).
-- `supabase/functions/threat-check/index.ts` — Edge Function за threat aggregation и risk scoring.
+- `supabase/migrations/` - append-only SQL migrations.
+- `supabase/functions/threat-check/index.ts` - threat aggregation and risk scoring function.
 
-## 6) Notes for contributors
+## 6) Notes for Contributors
 
-- Не променяй вече приложени миграции; добавяй нови.
-- Пази синхрон между локални миграции и Supabase migration history.
-- Достъпите са контролирани през RLS и роли (`user`, `moderator`, `admin`).
+- Do not edit already applied migrations; create new migration files for every schema change.
+- Keep local migration files and remote migration history in sync.
+- Access is enforced through RLS policies and role-based helper functions.
