@@ -12,6 +12,10 @@ export async function createScamReport({
   iban,
   createdBy,
 }) {
+  if (!createdBy) {
+    throw new Error('Необходимо е да сте регистриран и влязъл потребител, за да подадете доклад.');
+  }
+
   const supabase = requireSupabase();
   const { data, error } = await supabase
     .from('scam_reports')

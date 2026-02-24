@@ -1,4 +1,4 @@
-import { renderHeader } from '../components/header.js';
+﻿import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
 import { getCurrentUser } from '../services/authService.js';
 import { createScamReport, attachReportFile } from '../services/reportsService.js';
@@ -19,6 +19,80 @@ function showMessage(message, type = 'danger') {
 
 	alertEl.className = `alert alert-${type} mt-3`;
 	alertEl.textContent = message;
+}
+
+function renderReportAuthNotice(form) {
+	if (!form) return;
+
+	const modalBody = form.closest('.modal-body') || form.parentElement;
+	const modalTitle = form.closest('.modal-content')?.querySelector('.modal-title');
+	if (!modalBody) return;
+
+	let notice = document.getElementById('report-auth-required-message');
+	if (!notice) {
+		notice = document.createElement('div');
+		notice.id = 'report-auth-required-message';
+		notice.className = 'ss-report-auth-gate mb-2';
+		notice.innerHTML = `
+			<div class="ss-report-auth-gate__glow" aria-hidden="true"></div>
+			<div class="ss-report-auth-gate__content">
+				<div class="ss-report-auth-gate__icon" aria-hidden="true">
+					<i class="bi bi-shield-lock-fill"></i>
+				</div>
+				<div class="ss-report-auth-gate__kicker">Защитено подаване на доклади</div>
+				<h3 class="ss-report-auth-gate__title">Вход или регистрация са необходими, за да подадете доклад</h3>
+				<p class="ss-report-auth-gate__text">
+					За по-голяма проследяемост, сигурност и защита от злоупотреби приемаме доклади само от регистрирани потребители.
+					Ако вече имате профил, влезте. Ако сте нов потребител, създайте акаунт и продължете с подаването.
+				</p>
+				<div class="ss-report-auth-gate__actions">
+					<a href="login.html" class="btn btn-primary btn-lg">Вход</a>
+					<a href="register.html" class="btn btn-outline-light btn-lg">Регистрация</a>
+				</div>
+				<p class="ss-report-auth-gate__footnote mb-0">
+					След вход ще получите достъп до формата за докладване.
+				</p>
+			</div>
+		`;
+		modalBody.append(notice);
+	}
+
+	if (modalTitle) {
+		modalTitle.textContent = 'Достъп до форма за доклад';
+	}
+
+	form.classList.add('d-none');
+}
+
+function clearReportAuthNotice() {
+	const notice = document.getElementById('report-auth-required-message');
+	if (notice) {
+		notice.remove();
+	}
+
+	const modalTitle = document.querySelector('.ss-report-popup .modal-title');
+	if (modalTitle) {
+		modalTitle.textContent = 'Форма за доклад';
+	}
+}
+
+async function enforceReportAuthRequirement(form) {
+	let user = null;
+
+	try {
+		user = await getCurrentUser();
+	} catch {
+		user = null;
+	}
+
+	if (!user) {
+		renderReportAuthNotice(form);
+		return null;
+	}
+
+	clearReportAuthNotice();
+	form.classList.remove('d-none');
+	return user;
 }
 
 function parseSource(source) {
@@ -79,7 +153,7 @@ async function handleReportSubmit(event) {
 	}
 
 	if (!user) {
-		showMessage('Трябва да сте влезли, за да докладвате измама.');
+		showMessage('\u041d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u043e \u0435 \u0434\u0430 \u0441\u0442\u0435 \u0432\u043b\u0435\u0437\u043b\u0438 \u0438\u043b\u0438 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u0430\u043d\u0438, \u0437\u0430 \u0434\u0430 \u043f\u043e\u0434\u0430\u0434\u0435\u0442\u0435 \u0434\u043e\u043a\u043b\u0430\u0434.');
 		window.setTimeout(() => {
 			window.location.href = 'login.html';
 		}, 900);
@@ -180,8 +254,11 @@ async function initReportScamPage() {
 	}
 
 	if (form) {
+		form.classList.add('d-none');
+		await enforceReportAuthRequirement(form);
 		form.addEventListener('submit', handleReportSubmit);
 	}
 }
 
 initReportScamPage();
+
