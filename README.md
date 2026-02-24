@@ -62,56 +62,68 @@ erDiagram
    }
 
    PROFILES {
-    uuid id PK "FK"
-    text email
-    text full_name
-    text avatar_url
-    timestamptz updated_at
-    timestamptz created_at
-  }
+      uuid id PK
+      uuid id FK
+      text email
+      text full_name
+      text avatar_url
+      timestamptz updated_at
+      timestamptz created_at
+   }
 
-  USER_ROLES {
-    uuid user_id PK "FK"
-    text role
-    timestamptz created_at
-  }
+   USER_ROLES {
+      uuid user_id PK
+      uuid user_id FK
+      text role
+      timestamptz created_at
+   }
 
-  TIPS {
-    uuid id PK
-    text title
-    text content
-    text category
-    text tags "text[]"
-    uuid author_id FK
-    boolean is_published
-    timestamptz created_at
-  }
+   TIPS {
+      uuid id PK
+      text title
+      text content
+      text category
+      text tags
+      uuid author_id FK
+      boolean is_published
+      timestamptz created_at
+   }
 
-  SCAM_REPORTS {
-    uuid id PK
-    text title
-    text description
-    text category
-    text scam_type
-    text url
-    text phone
-    text iban
-    text status
-    uuid created_by FK
-    timestamptz created_at
-  }
+   SCAM_REPORTS {
+      uuid id PK
+      text title
+      text description
+      text category
+      text scam_type
+      text url
+      text phone
+      text iban
+      text status
+      uuid created_by FK
+      timestamptz created_at
+   }
 
-  REPORT_FILES {
-    uuid id PK
-    uuid report_id FK
-    text file_path
-    text mime_type
-    timestamptz created_at
-  }
 
-  TRUSTED_PHISHING_DOMAINS {
-    uuid id PK
-    text domain "UNIQUE"
+   REPORT_FILES {
+      uuid id PK
+      uuid report_id FK
+      text file_path
+      text mime_type
+      timestamptz created_at
+   }
+
+   TRUSTED_PHISHING_DOMAINS {
+      uuid id PK
+      text domain UK
+      text source
+      numeric confidence
+      text risk_level
+      boolean is_active
+      uuid created_by FK
+      timestamptz first_seen_at
+      timestamptz last_seen_at
+      timestamptz updated_at
+   }
 
    MALICIOUS_RESOURCES {
       uuid id PK
