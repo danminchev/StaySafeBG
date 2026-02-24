@@ -469,8 +469,13 @@
     }
 
     .resources-hub-link-cta {
-        margin-left: 3.15rem;
-        margin-top: 0.15rem;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 0.25rem;
+        width: min(100%, 14rem);
+        min-width: 11.5rem;
+        justify-content: center;
+        padding: 0.45rem 0.65rem 0.45rem 1.05rem;
     }
 
     .resources-hub-link-description {
