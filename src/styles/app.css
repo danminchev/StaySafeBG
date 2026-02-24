@@ -943,6 +943,23 @@ main {
     font-size: 0.88rem;
   }
 
+  .ss-report-modal-theme .form-control[type="file"] {
+    padding: 0;
+    min-height: 46px;
+    line-height: 1.2;
+    overflow: hidden;
+  }
+
+  .ss-report-modal-theme .form-control[type="file"]::file-selector-button {
+    margin: 0;
+    margin-right: 0.35rem;
+    height: 44px;
+    padding: 0 0.7rem;
+    border-right: 1px solid rgba(13, 37, 61, 0.14);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
   .ss-native-select-mobile-hidden {
     display: none !important;
   }
