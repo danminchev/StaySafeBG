@@ -71,6 +71,26 @@
             width: min(calc(100% + 3.5rem), 94vw);
           }
         }
+        @media (max-width: 767.98px) {
+          .hero-section .hero-cta-group {
+            gap: 0.5rem !important;
+            flex-wrap: nowrap !important;
+            justify-content: center !important;
+          }
+          .hero-section .hero-btn-primary,
+          .hero-section .hero-btn-secondary {
+            width: auto;
+            min-width: 0;
+            padding: 0.55rem 0.85rem !important;
+            font-size: 0.9rem;
+            line-height: 1.15;
+            white-space: nowrap;
+          }
+          .hero-section .hero-btn-primary i,
+          .hero-section .hero-btn-secondary i {
+            margin-right: 0.35rem !important;
+          }
+        }
         .hero-brand {
           color: #c4e6f8;
         }
@@ -316,6 +336,30 @@
         }
       }
       @media (max-width: 576px) {
+        .hero-section .hero-cta-group {
+          flex-direction: column;
+          flex-wrap: nowrap !important;
+          align-items: center;
+          width: 100%;
+          max-width: 16rem;
+          margin-inline: auto;
+          gap: 0.45rem !important;
+        }
+        .hero-section .hero-btn-primary,
+        .hero-section .hero-btn-secondary {
+          width: auto;
+          min-width: 13.5rem;
+          max-width: 100%;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.55rem 0.95rem !important;
+          font-size: 0.82rem;
+          line-height: 1.1;
+          white-space: nowrap;
+          text-align: center;
+          border-radius: 999px !important;
+        }
         .platform-overview-list {
           grid-template-columns: 1fr;
         }
@@ -340,7 +384,7 @@
           <p class="fs-5 text-muted hero-subtitle hero-subtitle-line-main">Вашият надежден помощник за онлайн безопасност и превенция на измами в България.</p>
           <p class="fs-5 text-muted hero-subtitle hero-subtitle-line-secondary">Бъдете информирани и защитени.</p>
         </div>
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <div class="d-flex justify-content-center gap-3 flex-wrap hero-cta-group">
           <a class="btn hero-btn-primary btn-lg px-4 rounded-pill shadow-sm" href="scam-check.html">
                 <i class="bi bi-shield-check me-2"></i>Провери за измама
             </a>
