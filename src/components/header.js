@@ -140,15 +140,15 @@ function renderHeaderHtml(currentUser) {
   return `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 ss-navbar">
       <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="index.html">
-          <img src="/logo-nav.png" alt="StaySafeBG Logo" style="height: 84px; width: auto;" class="d-inline-block">
+        <a class="navbar-brand d-flex align-items-center ss-navbar-brand" href="index.html">
+          <img src="/logo-nav.png" alt="StaySafeBG Logo" style="height: 84px; width: auto;" class="d-inline-block ss-navbar-brand-img">
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Превключи навигацията">
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="collapse navbar-collapse ss-navbar-collapse-panel" id="navbarNav">
           <ul class="navbar-nav mx-lg-auto mb-2 mb-lg-0 align-items-lg-center">
             <li class="nav-item mt-2 mt-lg-0">
               <a class="${ctaClass} ${homeIsActive ? 'ss-nav-link-active' : ''}" href="index.html" ${homeIsActive ? 'aria-current="page"' : ''}>Начало</a>

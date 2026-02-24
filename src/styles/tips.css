@@ -277,10 +277,13 @@
     width: calc(100% - 0.35rem);
     border-radius: var(--border-radius-lg);
     margin-top: 0.5rem;
+    margin-bottom: 1.1rem;
+    padding: 0.85rem 0;
   }
 
   .articles-page-subtitle {
     font-size: 0.9rem;
+    line-height: 1.45;
   }
 
   .articles-page-logo {
@@ -291,6 +294,33 @@
 
   .articles-page-title {
     font-size: clamp(1.9rem, 7vw, 2.5rem);
+  }
+
+  .articles-page-title-line {
+    width: min(100%, 260px);
+  }
+
+  #community-toolbar .articles-page-title-line {
+    width: min(100%, 320px);
+  }
+
+  .community-section-header {
+    padding: 0.9rem;
+    gap: 0.35rem;
+  }
+
+  .community-section-header__badge {
+    font-size: 0.72rem;
+    padding: 0.25rem 0.55rem;
+  }
+
+  .community-section-header__title {
+    font-size: clamp(1.05rem, 5vw, 1.35rem);
+  }
+
+  .community-section-header__text {
+    font-size: 0.9rem;
+    line-height: 1.45;
   }
 
   .filter-group .d-flex {
@@ -718,6 +748,35 @@
   }
   .form-select.custom-select {
       height: 2.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .article-card {
+    border-radius: 0.85rem;
+  }
+
+  .article-card .card-body {
+    padding: 0.95rem !important;
+  }
+
+  .article-title {
+    font-size: 1.06rem;
+    line-height: 1.3;
+  }
+
+  .article-excerpt {
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .article-meta {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .read-more-btn {
+    margin-left: 0 !important;
   }
 }
 
