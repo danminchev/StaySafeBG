@@ -15,9 +15,9 @@ export function renderFooter() {
         </div>
 
         <div class="row g-4 g-lg-5 align-items-start mt-1">
-          <div class="col-12 col-lg-4 ss-footer-col-contact">
+          <div class="col-12 col-lg-4 d-none d-lg-block ss-footer-col-contact">
             <div class="ss-footer-block">
-              <h6 class="ss-footer-title">Контакт</h6>
+              <h6 class="ss-footer-title">Контакти</h6>
               <ul class="ss-footer-meta list-unstyled mb-0">
                 <li><strong>Телефон:</strong> +359 889 153 077</li>
                 <li><strong>Имейл:</strong> support@staysafebg.bg</li>
@@ -32,7 +32,33 @@ export function renderFooter() {
             </div>
           </div>
 
-          <div class="col-12 col-lg-4 ss-footer-col-nav">
+          <div class="col-12 d-lg-none ss-footer-col-mobile-links">
+            <div class="ss-footer-block ss-footer-mobile-links-panel">
+              <div class="ss-footer-mobile-links-grid">
+                <div class="ss-footer-mobile-pane ss-footer-mobile-pane-contact">
+                  <h6 class="ss-footer-title">Контакти</h6>
+                  <ul class="ss-footer-meta list-unstyled mb-0">
+                    <li><strong>Телефон:</strong> +359 889 153 077</li>
+                    <li><strong>Имейл:</strong> support@staysafebg.bg</li>
+                    <li><strong>Адрес:</strong> България</li>
+                  </ul>
+                </div>
+
+                <div class="ss-footer-mobile-pane ss-footer-mobile-pane-nav">
+                  <h6 class="ss-footer-title">Навигация</h6>
+                  <ul class="ss-footer-links list-unstyled mb-0">
+                    <li><a href="index.html">Начало</a></li>
+                    <li><a href="scam-check.html">Провери измама</a></li>
+                    <li><a href="report-scam.html">Докладвай измама</a></li>
+                    <li><a href="tips.html">Съвети</a></li>
+                    <li><a href="community.html">Общност</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-4 d-none d-lg-block ss-footer-col-nav">
             <div class="ss-footer-block ss-footer-nav-wrap">
               <h6 class="ss-footer-title">Навигация</h6>
               <ul class="ss-footer-links list-unstyled mb-0">
@@ -53,6 +79,7 @@ export function renderFooter() {
       </div>
     </footer>
   `;
+
   const container = document.getElementById('app-footer');
   if (container) container.innerHTML = footerHtml;
 }
