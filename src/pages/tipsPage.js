@@ -9,7 +9,7 @@ const state = {
 		q: '',
 		category: '',
 		sort: 'newest',
-		limit: 9,
+		limit: 1000,
 		offset: 0
 	},
 	articles: [],

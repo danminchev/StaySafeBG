@@ -952,9 +952,8 @@ main {
 
   .ss-report-modal-theme .form-control[type="file"]::file-selector-button {
     margin: 0;
-    margin-right: 0.35rem;
     height: 44px;
-    padding: 0 0.7rem;
+    padding: 0 0.65rem;
     border-right: 1px solid rgba(13, 37, 61, 0.14);
     font-size: 0.9rem;
     font-weight: 700;
