@@ -101,6 +101,51 @@
     color: #0d253d;
 }
 
+@media (max-width: 767.98px) {
+    .scam-check-form .form-control {
+        padding: 0.95rem 0.95rem;
+        font-size: 0.98rem;
+    }
+
+    .scam-check-form .form-control::placeholder {
+        font-size: 0.95rem;
+    }
+
+    .scam-check-form .ss-search-btn {
+        font-size: 0.95rem;
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
+        white-space: nowrap;
+        flex: 0 0 auto;
+        min-width: 52px;
+        justify-content: center;
+    }
+
+    .scam-check-form .ss-search-btn .ss-search-btn-icon {
+        margin-right: 0 !important;
+        font-size: 0.95rem;
+    }
+
+    .scam-check-form .ss-search-btn .ss-search-btn-text {
+        display: none;
+    }
+}
+
+@media (max-width: 479.98px) {
+    .scam-check-form .form-control {
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
+        font-size: 0.94rem;
+    }
+
+    .scam-check-form .ss-search-btn {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+        font-size: 0.9rem;
+        min-width: 48px;
+    }
+}
+
 /* Alert */
 .scam-alert-info {
     background-color: rgba(14, 165, 233, 0.15);
@@ -444,6 +489,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     border: 1px solid rgba(255, 255, 255, 0.15);
     padding: 1.2rem 1.5rem;
@@ -467,11 +513,16 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .check-target i {
     color: #94a3b8;
     font-size: 1.2rem;
+    flex: 0 0 auto;
 }
 
 .recent-check-item .badge {
@@ -481,4 +532,33 @@
     letter-spacing: 0.03em;
     text-transform: uppercase;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex: 0 0 auto;
+    max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+    .recent-check-item {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        padding: 0.95rem 1rem;
+        gap: 0.65rem;
+    }
+
+    .check-target {
+        font-size: 0.98rem;
+        line-height: 1.35;
+        width: 100%;
+        gap: 0.55rem;
+    }
+
+    .check-target i {
+        font-size: 1rem;
+        margin-top: 0.1rem;
+    }
+
+    .recent-check-item .badge {
+        margin-left: auto;
+        font-size: 0.78rem;
+        padding: 0.48em 0.9em;
+    }
 }
