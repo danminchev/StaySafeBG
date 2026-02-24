@@ -324,12 +324,89 @@
   }
 
   .filter-group .d-flex {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.4rem !important;
+    width: 100%;
   }
 
   .filter-group .custom-select {
     min-width: 0;
     flex: 1 1 45%;
+  }
+
+  .filter-group .ss-mobile-select--toolbar {
+    min-width: 0;
+    flex: 1 1 45%;
+  }
+
+  #tips-mobile-category {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  #tips-mobile-sort {
+    flex: 0 0 7.15rem;
+  }
+
+  #tips-mobile-category .ss-mobile-select__label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #tips-mobile-sort .ss-mobile-select__trigger {
+    padding-left: 0.7rem;
+    padding-right: 0.65rem;
+  }
+
+  #tips-mobile-sort .ss-mobile-select__label {
+    font-size: 0.92rem;
+  }
+
+  .filter-group .ss-mobile-select--toolbar .ss-mobile-select__trigger {
+    min-height: 2.8rem;
+    border-radius: var(--border-radius-pill);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background-color: rgba(255, 255, 255, 0.96);
+    color: #0d253d;
+    box-shadow: 0 8px 22px rgba(8, 22, 38, 0.26);
+    padding: 0.55rem 0.95rem;
+  }
+
+  .filter-group .ss-mobile-select--toolbar .ss-mobile-select__trigger:focus {
+    border-color: #f4b63f;
+    box-shadow: 0 0 0 0.2rem rgba(244, 182, 63, 0.28), 0 8px 22px rgba(8, 22, 38, 0.26);
+  }
+
+  .filter-group .ss-mobile-select--toolbar .ss-mobile-select__menu {
+    top: calc(100% + 0.35rem);
+    background: linear-gradient(180deg, rgba(13, 36, 63, 0.99), rgba(18, 48, 78, 0.98));
+    border-radius: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 28px rgba(3, 12, 32, 0.28);
+  }
+
+  .filter-group .ss-mobile-select--toolbar .ss-mobile-select__option {
+    color: #eaf3ff;
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  .filter-group .ss-mobile-select--toolbar .ss-mobile-select__option.is-selected {
+    background: rgba(244, 182, 63, 0.14);
+    color: #fde68a;
+  }
+
+  .filter-group #btn-clear {
+    width: 2.15rem !important;
+    height: 2.15rem !important;
+    min-width: 2.15rem;
+    min-height: 2.15rem;
+    flex: 0 0 2.15rem !important;
+    padding: 0 !important;
+    font-size: 0.78rem;
+    margin-left: auto;
   }
 }
 

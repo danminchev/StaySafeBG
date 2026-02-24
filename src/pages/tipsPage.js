@@ -38,6 +38,103 @@ const dom = {
 	}
 };
 
+function ensureMobileToolbarSelect(selectEl, customId) {
+	if (!selectEl) return;
+
+	let wrap = document.getElementById(customId);
+	if (!wrap) {
+		wrap = document.createElement('div');
+		wrap.id = customId;
+		wrap.className = 'ss-mobile-select ss-mobile-select--toolbar d-none';
+		wrap.innerHTML = `
+			<button type="button" class="ss-mobile-select__trigger" aria-haspopup="listbox" aria-expanded="false">
+				<span class="ss-mobile-select__label"></span>
+				<i class="bi bi-chevron-down ss-mobile-select__caret" aria-hidden="true"></i>
+			</button>
+			<div class="ss-mobile-select__menu" role="listbox" tabindex="-1"></div>
+		`;
+		selectEl.insertAdjacentElement('afterend', wrap);
+	}
+
+	const trigger = wrap.querySelector('.ss-mobile-select__trigger');
+	const label = wrap.querySelector('.ss-mobile-select__label');
+	const menu = wrap.querySelector('.ss-mobile-select__menu');
+	if (!trigger || !label || !menu) return;
+
+	const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+	wrap.classList.toggle('d-none', !isMobile);
+	selectEl.classList.toggle('ss-native-select-mobile-hidden', isMobile);
+
+	if (!isMobile) {
+		wrap.classList.remove('is-open');
+		trigger.setAttribute('aria-expanded', 'false');
+		return;
+	}
+
+	const selectedOption = selectEl.options[selectEl.selectedIndex] || selectEl.options[0];
+	label.textContent = selectedOption?.textContent || '';
+
+	menu.innerHTML = '';
+	for (const option of Array.from(selectEl.options)) {
+		const btn = document.createElement('button');
+		btn.type = 'button';
+		btn.className = 'ss-mobile-select__option';
+		btn.setAttribute('role', 'option');
+		btn.textContent = option.textContent;
+		btn.dataset.value = option.value || '';
+		if (option.value === selectEl.value) {
+			btn.classList.add('is-selected');
+			btn.setAttribute('aria-selected', 'true');
+		}
+
+		btn.addEventListener('click', () => {
+			selectEl.value = option.value;
+			selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+			label.textContent = option.textContent;
+			wrap.classList.remove('is-open');
+			trigger.setAttribute('aria-expanded', 'false');
+		});
+
+		menu.appendChild(btn);
+	}
+
+	if (!wrap.dataset.bound) {
+		trigger.addEventListener('click', () => {
+			const next = !wrap.classList.contains('is-open');
+			document.querySelectorAll('.ss-mobile-select.is-open').forEach((el) => {
+				if (el !== wrap) {
+					el.classList.remove('is-open');
+					const t = el.querySelector('.ss-mobile-select__trigger');
+					if (t) t.setAttribute('aria-expanded', 'false');
+				}
+			});
+			wrap.classList.toggle('is-open', next);
+			trigger.setAttribute('aria-expanded', String(next));
+		});
+
+		document.addEventListener('click', (event) => {
+			if (!wrap.contains(event.target)) {
+				wrap.classList.remove('is-open');
+				trigger.setAttribute('aria-expanded', 'false');
+			}
+		});
+
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') {
+				wrap.classList.remove('is-open');
+				trigger.setAttribute('aria-expanded', 'false');
+			}
+		});
+
+		wrap.dataset.bound = 'true';
+	}
+}
+
+function syncMobileToolbarSelects() {
+	ensureMobileToolbarSelect(dom.inputs.category, 'tips-mobile-category');
+	ensureMobileToolbarSelect(dom.inputs.sort, 'tips-mobile-sort');
+}
+
 // --- Utilities ---
 function debounce(func, wait) {
 	let timeout;
@@ -300,6 +397,7 @@ async function init() {
 	}
 
 	readURLParams();
+	syncMobileToolbarSelects();
 	
 	// Check if we should override the existing static HTML
 	// The requirement says "modernize tips.html". 
@@ -322,12 +420,14 @@ async function init() {
 	
 	dom.inputs.category.addEventListener('change', (e) => {
 		state.params.category = e.target.value;
+		syncMobileToolbarSelects();
 		updateURL();
 		fetchArticles(false);
 	});
 	
 	dom.inputs.sort.addEventListener('change', (e) => {
 		state.params.sort = e.target.value;
+		syncMobileToolbarSelects();
 		updateURL();
 		fetchArticles(false);
 	});
@@ -340,6 +440,7 @@ async function init() {
 		dom.inputs.search.value = '';
 		dom.inputs.category.value = '';
 		dom.inputs.sort.value = 'newest';
+		syncMobileToolbarSelects();
 		
 		updateURL();
 		fetchArticles(false);
@@ -359,6 +460,8 @@ async function init() {
            toolbar.classList.remove('is-stuck');
        }
     });
+
+	window.addEventListener('resize', syncMobileToolbarSelects);
 
 	// Initial Fetch
 	fetchArticles(false);
