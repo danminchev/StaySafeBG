@@ -503,6 +503,93 @@ main {
   font-size: 0.92rem;
 }
 
+.ss-mobile-select {
+  position: relative;
+  width: 100%;
+}
+
+.ss-mobile-select__trigger {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 0.65rem 0.8rem;
+  text-align: left;
+}
+
+.ss-mobile-select__trigger:focus {
+  outline: none;
+  border-color: #7fdc72;
+  box-shadow: 0 0 0 0.2rem rgba(127, 220, 114, 0.25);
+}
+
+.ss-mobile-select__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ss-mobile-select__caret {
+  transition: transform 0.2s ease;
+  flex: 0 0 auto;
+}
+
+.ss-mobile-select.is-open .ss-mobile-select__caret {
+  transform: rotate(180deg);
+}
+
+.ss-mobile-select__menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-height: min(46vh, 280px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 30;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(180deg, rgba(12, 32, 57, 0.99), rgba(19, 44, 74, 0.98));
+  box-shadow: 0 16px 28px rgba(3, 12, 32, 0.34);
+  padding: 0.35rem;
+}
+
+.ss-mobile-select.is-open .ss-mobile-select__menu {
+  display: block;
+}
+
+.ss-mobile-select__option {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #eaf3ff;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  line-height: 1.25;
+}
+
+.ss-mobile-select__option:hover,
+.ss-mobile-select__option:focus {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  outline: none;
+}
+
+.ss-mobile-select__option.is-selected {
+  background: rgba(244, 182, 63, 0.14);
+  color: #fde68a;
+}
+
 @media (max-width: 576px) {
   .ss-report-auth-gate__content {
     padding: 1rem;
@@ -846,6 +933,18 @@ main {
   .ss-report-modal-theme .form-label,
   .ss-report-modal-theme .form-check-label {
     font-size: 0.96rem;
+  }
+
+  .ss-report-modal-theme .form-select {
+    font-size: 0.9rem;
+  }
+
+  .ss-report-modal-theme .form-select option {
+    font-size: 0.88rem;
+  }
+
+  .ss-native-select-mobile-hidden {
+    display: none !important;
   }
 
   .ss-report-auth-gate {

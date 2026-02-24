@@ -21,6 +21,123 @@ function showMessage(message, type = 'danger') {
 	alertEl.textContent = message;
 }
 
+function applyResponsiveScamTypeLabels(selectEl) {
+	if (!selectEl) return;
+
+	const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+	const mobileLabels = {
+		'': 'Тема...',
+		phishing: 'Фишинг',
+		phone: 'Телефон',
+		investment: 'Инвестиции',
+		shopping: 'Пазаруване',
+		social_media: 'Социални',
+		identity_theft: 'Самоличност',
+		job_scam: 'Работа',
+		crypto: 'Крипто',
+		marketplace: 'Маркетплейс',
+		romance: 'Романтична',
+		other: 'Друго'
+	};
+
+	for (const option of Array.from(selectEl.options)) {
+		if (!option.dataset.fullLabel) {
+			option.dataset.fullLabel = option.textContent;
+		}
+
+		const optionValue = option.value || '';
+		if (isMobile && Object.prototype.hasOwnProperty.call(mobileLabels, optionValue)) {
+			option.textContent = mobileLabels[optionValue];
+		} else {
+			option.textContent = option.dataset.fullLabel;
+		}
+	}
+}
+
+function ensureMobileScamTypeDropdown(selectEl) {
+	if (!selectEl) return;
+
+	let customWrap = document.getElementById('scamTypeMobileDropdown');
+	if (!customWrap) {
+		customWrap = document.createElement('div');
+		customWrap.id = 'scamTypeMobileDropdown';
+		customWrap.className = 'ss-mobile-select d-none';
+		customWrap.innerHTML = `
+			<button type="button" class="ss-mobile-select__trigger" aria-haspopup="listbox" aria-expanded="false">
+				<span class="ss-mobile-select__label"></span>
+				<i class="bi bi-chevron-down ss-mobile-select__caret" aria-hidden="true"></i>
+			</button>
+			<div class="ss-mobile-select__menu" role="listbox" tabindex="-1"></div>
+		`;
+		selectEl.insertAdjacentElement('afterend', customWrap);
+	}
+
+	const trigger = customWrap.querySelector('.ss-mobile-select__trigger');
+	const label = customWrap.querySelector('.ss-mobile-select__label');
+	const menu = customWrap.querySelector('.ss-mobile-select__menu');
+	if (!trigger || !label || !menu) return;
+
+	const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+	customWrap.classList.toggle('d-none', !isMobile);
+	selectEl.classList.toggle('ss-native-select-mobile-hidden', isMobile);
+	if (!isMobile) {
+		customWrap.classList.remove('is-open');
+		trigger.setAttribute('aria-expanded', 'false');
+		return;
+	}
+
+	const selectedOption = selectEl.options[selectEl.selectedIndex] || selectEl.options[0];
+	label.textContent = selectedOption?.textContent || 'Тема...';
+
+	menu.innerHTML = '';
+	for (const option of Array.from(selectEl.options)) {
+		const item = document.createElement('button');
+		item.type = 'button';
+		item.className = 'ss-mobile-select__option';
+		item.setAttribute('role', 'option');
+		item.dataset.value = option.value || '';
+		item.textContent = option.textContent;
+		if (option.value === selectEl.value) {
+			item.classList.add('is-selected');
+			item.setAttribute('aria-selected', 'true');
+		}
+
+		item.addEventListener('click', () => {
+			selectEl.value = option.value;
+			selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+			customWrap.classList.remove('is-open');
+			trigger.setAttribute('aria-expanded', 'false');
+			label.textContent = option.textContent;
+		});
+
+		menu.appendChild(item);
+	}
+
+	if (!customWrap.dataset.bound) {
+		trigger.addEventListener('click', () => {
+			const willOpen = !customWrap.classList.contains('is-open');
+			customWrap.classList.toggle('is-open', willOpen);
+			trigger.setAttribute('aria-expanded', String(willOpen));
+		});
+
+		document.addEventListener('click', (event) => {
+			if (!customWrap.contains(event.target)) {
+				customWrap.classList.remove('is-open');
+				trigger.setAttribute('aria-expanded', 'false');
+			}
+		});
+
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') {
+				customWrap.classList.remove('is-open');
+				trigger.setAttribute('aria-expanded', 'false');
+			}
+		});
+
+		customWrap.dataset.bound = 'true';
+	}
+}
+
 function renderReportAuthNotice(form) {
 	if (!form) return;
 
@@ -248,8 +365,18 @@ async function initReportScamPage() {
 	const scamTypeOtherWrap = document.getElementById('scamTypeOtherWrap');
 	const scamTypeOtherInput = document.getElementById('scamTypeOther');
 
+	if (scamTypeSelect) {
+		applyResponsiveScamTypeLabels(scamTypeSelect);
+		ensureMobileScamTypeDropdown(scamTypeSelect);
+		window.addEventListener('resize', () => {
+			applyResponsiveScamTypeLabels(scamTypeSelect);
+			ensureMobileScamTypeDropdown(scamTypeSelect);
+		});
+	}
+
 	if (scamTypeSelect && scamTypeOtherWrap && scamTypeOtherInput) {
 		scamTypeSelect.addEventListener('change', () => {
+			ensureMobileScamTypeDropdown(scamTypeSelect);
 			const isOther = scamTypeSelect.value === 'other';
 			scamTypeOtherWrap.classList.toggle('d-none', !isOther);
 			if (isOther) {
