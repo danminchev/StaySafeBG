@@ -129,4 +129,94 @@
   .rb-title {
     font-size: 1.3rem;
   }
+
+  .rb-card .table-responsive {
+    overflow-x: visible;
+  }
+
+  .rb-card .table {
+    display: block;
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  .rb-card .table thead {
+    display: none;
+  }
+
+  .rb-card .table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  .rb-card .table tbody tr {
+    display: block;
+    width: 100%;
+    padding: 0.85rem 0.95rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .rb-card .table tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .rb-card .table tbody td {
+    display: grid;
+    grid-template-columns: 82px minmax(0, 1fr);
+    gap: 0.55rem;
+    align-items: start;
+    width: 100%;
+    border: 0;
+    padding: 0.3rem 0;
+    font-size: 0.92rem;
+    white-space: normal;
+    vertical-align: top;
+  }
+
+  .rb-card .table tbody td::before {
+    content: "";
+    color: #b9d1eb;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.35;
+    padding-top: 0.15rem;
+  }
+
+  .rb-card .table tbody td[colspan] {
+    display: block;
+    text-align: center;
+    padding: 1rem 0.25rem;
+    font-size: 0.92rem;
+  }
+
+  .rb-card .table tbody td[colspan]::before {
+    display: none;
+  }
+
+  .rb-resource-cell {
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .rb-card .badge {
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  #rb-phishing-body tr td:nth-child(1)::before { content: "Домейн"; }
+  #rb-phishing-body tr td:nth-child(2)::before { content: "Риск"; }
+  #rb-phishing-body tr td:nth-child(3)::before { content: "Статус"; }
+  #rb-phishing-body tr td:nth-child(4)::before { content: "Източник"; }
+  #rb-phishing-body tr td:nth-child(5)::before { content: "Обновен"; }
+
+  #rb-malicious-body tr td:nth-child(1)::before { content: "Ресурс"; }
+  #rb-malicious-body tr td:nth-child(2)::before { content: "Тип"; }
+  #rb-malicious-body tr td:nth-child(3)::before { content: "Риск"; }
+  #rb-malicious-body tr td:nth-child(4)::before { content: "Статус"; }
+  #rb-malicious-body tr td:nth-child(5)::before { content: "Източник"; }
+  #rb-malicious-body tr td:nth-child(6)::before { content: "Обновен"; }
 }
