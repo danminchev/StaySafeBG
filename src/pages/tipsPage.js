@@ -18,8 +18,6 @@ const state = {
 	loadedCount: 0
 };
 
-const FEATURED_ARTICLE_TITLE = 'Най-честите онлайн измами в България и как да се пазим (кратко ръководство)';
-
 // --- DOM Elements ---
 const dom = {
 	container: document.getElementById('articles-container'),
@@ -160,18 +158,6 @@ function formatDate(dateValue) {
 	}).format(date);
 }
 
-function normalizeTitle(value) {
-	return String(value || '')
-		.normalize('NFC')
-		.replace(/\s+/g, ' ')
-		.trim()
-		.toLowerCase();
-}
-
-function isFeaturedArticle(article) {
-	return normalizeTitle(article?.title) === normalizeTitle(FEATURED_ARTICLE_TITLE);
-}
-
 function getCategoryName(cat) {
 	const map = {
 		'phishing': '🎣 Фишинг',
@@ -249,18 +235,11 @@ function renderError(message) {
 function createCard(article) {
 	const clone = dom.templates.article.content.cloneNode(true);
 	const wrapper = clone.querySelector('.col');
-	const featured = isFeaturedArticle(article);
 	
 	// Apply category class and data attribute to the card root
 	const card = clone.querySelector('.article-card');
 	if(card) {
 		card.dataset.category = article.category || 'default';
-		if (featured) {
-			card.classList.add('article-card-featured');
-		}
-	}
-	if (wrapper && featured) {
-		wrapper.classList.add('article-featured-wrapper');
 	}
 	
 	const link = clone.querySelector('.article-link-overlay');
@@ -283,7 +262,7 @@ function createCard(article) {
 	if(text) {
 		const rawText = article.content || '';
         // Basic strip html logic if needed, or rely on textContent
-		const excerptLimit = featured ? 260 : 150;
+		const excerptLimit = 150;
 		text.textContent = rawText.slice(0, excerptLimit) + (rawText.length > excerptLimit ? '...' : '');
 	}
 	
@@ -293,24 +272,13 @@ function createCard(article) {
 	return clone;
 }
 
-function getArticlesWithFeaturedFirst(items = []) {
-	const list = Array.isArray(items) ? [...items] : [];
-	const featuredIndex = list.findIndex(isFeaturedArticle);
-	if (featuredIndex <= 0) return list;
-	const [featured] = list.splice(featuredIndex, 1);
-	list.unshift(featured);
-	return list;
-}
-
 function renderArticlesList() {
 	if (!dom.container) return;
 	dom.container.innerHTML = '';
-
-	const orderedArticles = getArticlesWithFeaturedFirst(state.articles);
-	if (!orderedArticles.length) return;
+	if (!state.articles.length) return;
 
 	const fragment = document.createDocumentFragment();
-	orderedArticles.forEach((article) => {
+	state.articles.forEach((article) => {
 		fragment.appendChild(createCard(article));
 	});
 	dom.container.appendChild(fragment);
