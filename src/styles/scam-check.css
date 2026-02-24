@@ -475,7 +475,9 @@
         width: min(100%, 14rem);
         min-width: 11.5rem;
         justify-content: center;
-        padding: 0.45rem 0.65rem 0.45rem 1.05rem;
+        flex-direction: row;
+        gap: 0.45rem;
+        padding: 0.38rem 0.55rem 0.38rem 0.95rem;
     }
 
     .resources-hub-link-description {
