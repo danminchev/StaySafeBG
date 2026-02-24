@@ -36,13 +36,34 @@
   <main class="container mb-5" id="page-content">
 
     <section>
-      <div class="community-section-header mb-3">
+      <div id="community-section-header" class="community-section-header mb-3">
         <div class="community-section-header__badge">
           <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
           <span>Проверено съдържание</span>
         </div>
         <h2 class="community-section-header__title mb-0">Одобрени потребителски доклади</h2>
         <p class="community-section-header__text mb-0">Публикувани сигнали след преглед от екипа на <span class="community-brand-wordmark"><span class="community-brand-wordmark__main">StaySafe</span><span class="community-brand-wordmark__bg">BG</span></span>, за да подпомогнат информираността и превенцията.</p>
+      </div>
+
+      <div id="community-auth-gate" class="ss-report-auth-gate community-auth-gate mb-3 d-none" aria-live="polite">
+        <div class="ss-report-auth-gate__glow" aria-hidden="true"></div>
+        <div class="ss-report-auth-gate__content">
+          <div class="ss-report-auth-gate__icon" aria-hidden="true">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div class="ss-report-auth-gate__kicker">Достъп до общността</div>
+          <h3 class="ss-report-auth-gate__title">Влезте в профила си или се регистрирайте, за да видите одобрените доклади.</h3>
+          <p class="ss-report-auth-gate__text">
+            Достъпът до одобрените потребителски доклади е наличен за регистрирани потребители. Това ни помага да осигурим по-добра проследяемост, по-висока сигурност и по-отговорно използване на съдържанието.
+          </p>
+          <div class="ss-report-auth-gate__actions">
+            <a href="login.html" class="btn btn-primary btn-lg">Вход</a>
+            <a href="register.html" class="btn btn-outline-light btn-lg">Регистрация</a>
+          </div>
+          <p class="ss-report-auth-gate__footnote mb-0">
+            След вход ще получите достъп до секцията „Одобрени потребителски доклади“.
+          </p>
+        </div>
       </div>
 
       <div id="community-reports-list" class="row row-cols-1 row-cols-lg-2 g-4">

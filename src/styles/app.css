@@ -406,6 +406,21 @@ main {
   margin-bottom: 0.8rem;
 }
 
+.ss-report-auth-gate__actions .btn-primary {
+  background-color: #f4b63f;
+  border-color: #f4b63f;
+  color: #0d253d;
+  box-shadow: 0 8px 18px rgba(244, 182, 63, 0.22);
+}
+
+.ss-report-auth-gate__actions .btn-primary:hover,
+.ss-report-auth-gate__actions .btn-primary:focus {
+  background-color: #e3a631;
+  border-color: #e3a631;
+  color: #0d253d;
+  box-shadow: 0 10px 20px rgba(227, 166, 49, 0.26);
+}
+
 .ss-report-auth-gate__actions .btn-outline-light {
   border-color: rgba(255, 255, 255, 0.4);
   color: #eff6ff;

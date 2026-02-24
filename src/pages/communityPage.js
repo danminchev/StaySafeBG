@@ -1,5 +1,6 @@
 import { renderHeader } from '../components/header.js';
 import { renderFooter } from '../components/footer.js';
+import { getCurrentUser } from '../services/authService.js';
 import { getApprovedReportsFeed } from '../services/reportsService.js';
 import { hasSupabaseConfig } from '../services/supabaseClient.js';
 
@@ -99,6 +100,24 @@ function renderEmptyState(message) {
   `;
 }
 
+function setCommunityAccessState({ isAuthorized }) {
+  const sectionHeader = document.getElementById('community-section-header');
+  const reportsList = document.getElementById('community-reports-list');
+  const authGate = document.getElementById('community-auth-gate');
+
+  if (sectionHeader) {
+    sectionHeader.classList.toggle('d-none', !isAuthorized);
+  }
+
+  if (reportsList) {
+    reportsList.classList.toggle('d-none', !isAuthorized);
+  }
+
+  if (authGate) {
+    authGate.classList.toggle('d-none', isAuthorized);
+  }
+}
+
 function renderReports(reports) {
   const list = document.getElementById('community-reports-list');
   const template = document.getElementById('community-report-template');
@@ -174,6 +193,23 @@ async function initCommunityPage() {
     renderEmptyState('Базата данни не е конфигурирана.');
     return;
   }
+
+  let user = null;
+  try {
+    user = await getCurrentUser();
+  } catch {
+    user = null;
+  }
+
+  if (!user) {
+    setCommunityAccessState({ isAuthorized: false });
+    if (totalCountEl) {
+      totalCountEl.textContent = '-';
+    }
+    return;
+  }
+
+  setCommunityAccessState({ isAuthorized: true });
 
   try {
     const result = await getApprovedReportsFeed({ limit: 30 });
